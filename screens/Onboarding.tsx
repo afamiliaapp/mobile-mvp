@@ -19,6 +19,8 @@ const { width, height } = Dimensions.get('window');
 interface OnboardingItem {
   id: string;
   image: any; // require('../assets/...') returns 'any'
+  image2: any; // require('../assets/...') returns 'any'
+  image3: any; // require('../assets/...') returns 'any'
   logo: any;
   title: string;
   subtitle: string;
@@ -29,6 +31,8 @@ const onboardingData: OnboardingItem[] = [
   {
     id: '1',
     image: require('../assets/onboardinIMG1.jpg'),
+    image2: require('../assets/onboardinIMG1.jpg'),
+    image3: require('../assets/onboardinIMG1.jpg'),
     logo: require('../assets/AfamiliaLogdddoDesign1.png'),
     title: 'A home for your family, in your pocket',
     subtitle:
@@ -38,14 +42,19 @@ const onboardingData: OnboardingItem[] = [
   {
     id: '2',
     image: require('../assets/onboardinIMG2.png'),
+    image2: require('../assets/notifyimage1.jpg'),
+    image3: require('../assets/notifyimage2.jpg'),
     logo: require('../assets/AfamiliaLogdddoDesign1.png'),
-    title: 'Stay connected with loved ones',
-    subtitle: 'Share updates, photos, and reminders easily.',
+    title: 'No more missed moments.',
+    subtitle:
+      'Shared calendars, reminders, and chores so everyone stays on track',
     layoutType: 'type2',
   },
   {
     id: '3',
     image: require('../assets/onboardinIMG1.jpg'),
+    image2: require('../assets/onboardinIMG1.jpg'),
+    image3: require('../assets/onboardinIMG1.jpg'),
     logo: require('../assets/AfamiliaLogdddoDesign1.png'),
     title: 'Organize your family life',
     subtitle: 'Manage events, tasks, and memories efficiently.',
@@ -121,11 +130,43 @@ const Onboarding: React.FC = () => {
                 resizeMode="cover"
               />
             </View>
-            <View style={styles.textbox}>
+            <View style={styles.textbox2a}>
               <View style={styles.textbox2}>
                 <Text style={styles.titleType1}>{item.title}</Text>
                 <Text style={styles.subtitleType1}>{item.subtitle}</Text>
               </View>
+            </View>
+            <View style={styles.notifybox}>
+              <View style={styles.notifybox2}>
+                <Image
+                  source={item.image2}
+                  style={styles.notifyimage}
+                  resizeMode="cover"
+                />
+                <View>
+                  <Text style={styles.notifytexttitle}>Lisa John</Text>
+                  <Text style={styles.notifytextsubtitle}>
+                    Completed her chores
+                  </Text>
+                </View>
+              </View>
+              <Text style={styles.notificationtextalart}>now</Text>
+            </View>
+            <View style={styles.notifybox2a}>
+              <View style={styles.notifybox2aa}>
+                <Image
+                  source={item.image3}
+                  style={styles.notifyimage}
+                  resizeMode="cover"
+                />
+                <View>
+                  <Text style={styles.notifytexttitle}>Health Appointment</Text>
+                  <Text style={styles.notifytextsubtitle}>
+                    Reminder you have a health appointment
+                  </Text>
+                </View>
+              </View>
+              <Text style={styles.notificationtextalart}>now</Text>
             </View>
           </View>
         );
@@ -276,7 +317,7 @@ const styles = StyleSheet.create({
   // ONBOARDING SCREEN 2
 
   container2: {
-    backgroundColor: 'red',
+    backgroundColor: '#fff',
     paddingVertical: 48,
     paddingHorizontal: 24,
     position: 'relative',
@@ -289,7 +330,6 @@ const styles = StyleSheet.create({
     height: 450,
     width: 338,
     backgroundColor: '#fff',
-    borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -301,6 +341,83 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     resizeMode: 'center',
     marginTop: 200,
+  },
+
+  notifybox: {
+    width: 346,
+    height: 61,
+    flex: 0,
+    flexDirection: 'row',
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    position: 'absolute',
+    top: '45%',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 0.05,
+    borderBlockColor: '#999999',
+  },
+
+  notifybox2: {
+    width: 138,
+    height: 40,
+    flex: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  notifybox2a: {
+    width: 346,
+    height: 61,
+    flex: 0,
+    flexDirection: 'row',
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    position: 'absolute',
+    top: '55%',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 0.05,
+    borderBlockColor: '#999999',
+  },
+  notifybox2aa: {
+    width: 205,
+    height: 40,
+    flex: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  notifyimage: {
+    height: 40,
+    width: 40,
+    borderRadius: 100,
+    marginLeft: 8,
+  },
+  notificationtextalart: {
+    fontSize: 8,
+    color: '#999999',
+    paddingRight: 8,
+    height: 40,
+  },
+  notifytexttitle: {
+    fontSize: 14,
+    color: '#1B1C1E',
+    marginBottom: 5,
+  },
+  notifytextsubtitle: {
+    fontSize: 8,
+    color: '#999999',
+  },
+
+  textbox2a: {
+    height: 253,
+    width: 335,
+    backgroundColor: '#fff',
+    position: 'absolute',
+    top: '75%',
+    left: '10%',
   },
 
   titleType2: {
@@ -330,7 +447,7 @@ const styles = StyleSheet.create({
   },
   pagination: {
     position: 'absolute',
-    bottom: 50,
+    bottom: 80,
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
