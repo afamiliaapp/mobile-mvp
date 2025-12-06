@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import LinearGradient from 'react-native-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
 
@@ -56,8 +57,9 @@ const onboardingData: OnboardingItem[] = [
     image2: require('../assets/onboardinIMG1.jpg'),
     image3: require('../assets/onboardinIMG1.jpg'),
     logo: require('../assets/AfamiliaLogdddoDesign1.png'),
-    title: 'Organize your family life',
-    subtitle: 'Manage events, tasks, and memories efficiently.',
+    title: 'Stay close, even when apart',
+    subtitle:
+      'Share photos, stories, and milestones privately with the people who matter most.',
     layoutType: 'type3',
   },
 ];
@@ -67,8 +69,10 @@ const Onboarding: React.FC = () => {
   const flatListRef = useRef<FlatList<OnboardingItem>>(null);
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const index = Math.round(event.nativeEvent.contentOffset.x / width);
-    setCurrentIndex(index);
+    const slide = Math.round(
+      event.nativeEvent.contentOffset.x / Dimensions.get('window').width,
+    );
+    setCurrentIndex(slide);
   };
 
   const goNext = () => {
@@ -89,7 +93,7 @@ const Onboarding: React.FC = () => {
         return (
           <View style={styles.container1}>
             <View style={styles.skipbox}>
-              <View style={styles.scrollenght}></View>
+              <View style={styles.scrollenght} />
               <View style={styles.skipbutton}>
                 <Text style={styles.skiptext}>Skip</Text>
               </View>
@@ -172,19 +176,62 @@ const Onboarding: React.FC = () => {
         );
       case 'type3':
         return (
-          <View style={styles.container3}>
-            <Image
-              source={item.image}
-              style={styles.imageType3}
-              resizeMode="cover"
-            />
-            <Text style={styles.titleType3}>{item.title}</Text>
-            <Text style={styles.subtitleType3}>{item.subtitle}</Text>
-            <Image
-              source={item.logo}
-              style={styles.logoType3}
-              resizeMode="contain"
-            />
+          <View style={styles.container2}>
+            <View style={styles.skipbox}>
+              <View style={styles.scrollenght} />
+              <View style={styles.skipbutton}>
+                <Text style={styles.skiptext}>Skip</Text>
+              </View>
+            </View>
+
+            {/**IMAGE BOX */}
+
+            <View style={styles.imagebox1}>
+              <View style={styles.toprowimage}>
+                <View style={styles.imagebox2}>
+                  <Image
+                    source={require('../assets/imagegrid1.jpg')}
+                    style={styles.imagegrid}
+                    resizeMode="cover"
+                  />
+                </View>
+                <View style={styles.imagebox3}>
+                  <Image
+                    source={require('../assets/imagegrid2.jpg')}
+                    style={styles.imagegrid}
+                    resizeMode="cover"
+                  />
+                </View>
+              </View>
+              <View style={styles.bottomrowimage}>
+                <View style={styles.imagebox2}>
+                  <Image
+                    source={require('../assets/imagegrid3.jpg')}
+                    style={styles.imagegrid}
+                    resizeMode="cover"
+                  />
+                </View>
+                <View style={styles.imagebox3}>
+                  <Image
+                    source={require('../assets/imagegrid4.jpg')}
+                    style={styles.imagegrid}
+                    resizeMode="cover"
+                  />
+                </View>
+              </View>
+            </View>
+
+            {/**TEXT SECTION */}
+
+            <View style={styles.titlebox}>
+              {/* Top fading white shadow */}
+              <LinearGradient
+                colors={['rgba(0,0,0,0.15)', 'rgba(255,255,255,0)']}
+                style={styles.topShadow}
+              />
+              <Text style={styles.titleType3}>{item.title}</Text>
+              <Text style={styles.subtitleType3}>{item.subtitle}</Text>
+            </View>
           </View>
         );
       default:
@@ -206,11 +253,39 @@ const Onboarding: React.FC = () => {
         renderItem={renderItem}
       />
       <View style={styles.pagination}>
-        <TouchableOpacity onPress={goBack} style={styles.pageinationbutton}>
-          <Ionicons name="chevron-back" size={18} color="#fff" />
+        {/* BACK BUTTON */}
+        <TouchableOpacity
+          onPress={goBack}
+          style={[
+            styles.pageinationbutton,
+            { backgroundColor: currentIndex === 0 ? '#fff' : '#2C247A' }, // white on first page
+          ]}
+        >
+          <Ionicons
+            name="chevron-back"
+            size={18}
+            color={currentIndex === 0 ? '#2C247A' : '#fff'} // purple icon on first page
+          />
         </TouchableOpacity>
-        <TouchableOpacity onPress={goNext} style={styles.pageinationbutton}>
-          <Ionicons name="chevron-forward" size={18} color="#fff" />
+
+        {/* NEXT BUTTON */}
+        <TouchableOpacity
+          onPress={goNext}
+          style={[
+            styles.pageinationbutton,
+            {
+              backgroundColor:
+                currentIndex === onboardingData.length - 1 ? '#fff' : '#2C247A',
+            }, // white on last page
+          ]}
+        >
+          <Ionicons
+            name="chevron-forward"
+            size={18}
+            color={
+              currentIndex === onboardingData.length - 1 ? '#2C247A' : '#fff'
+            } // purple icon on last page
+          />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -423,43 +498,68 @@ const styles = StyleSheet.create({
   titleType2: {
     fontSize: 26,
     fontWeight: '700',
-    color: '#2C247A',
+    color: '#1B1C1E',
   },
   subtitleType2: {
     fontSize: 16,
-    color: '#555',
+    color: '#999999',
     marginTop: 10,
     textAlign: 'center',
   },
 
-  container3: {
+  //ONBOARDING SCREEN 3
+
+  imagebox1: {
+    height: 500,
+    width: 400,
     backgroundColor: '#fff',
-    width: width,
+    flex: 0,
+    flexDirection: 'column',
+  },
+  toprowimage: {
+    height: '50%',
+    width: '100%',
+    backgroundColor: '#fff',
+    flex: 0,
+    flexDirection: 'row',
+  },
+  bottomrowimage: {
+    height: '50%',
+    width: '100%',
+    backgroundColor: '#fff',
+    flex: 0,
+    flexDirection: 'row',
+    marginTop: 10,
   },
 
-  container: {
-    width: width,
-    height: height,
+  imagebox2: {
+    width: '50%',
+    height: '100%',
+    backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    position: 'relative',
+    transform: [{ rotate: '-5deg' }],
+    borderRadius: 29,
+
+    elevation: 10,
+
+    padding: 10,
   },
-  pagination: {
-    position: 'absolute',
-    bottom: 80,
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 30,
-  },
-  pageinationbutton: {
-    height: 40,
-    width: 40,
-    backgroundColor: '#2C247A',
-    borderRadius: 20,
-    justifyContent: 'center',
+  imagebox3: {
+    width: '50%',
+    height: '100%',
+    backgroundColor: '#fff',
     alignItems: 'center',
+    transform: [{ rotate: '-5deg' }],
+    borderRadius: 29,
+    marginLeft: 10,
+    elevation: 10,
+    padding: 10,
+  },
+
+  imagegrid: {
+    width: 185,
+    height: '100%',
+    borderRadius: 29,
   },
 
   // Type3
@@ -479,13 +579,51 @@ const styles = StyleSheet.create({
   titleType3: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#333',
+    color: '#1B1C1E',
+    marginHorizontal: 20,
     marginBottom: 10,
   },
   subtitleType3: {
-    fontSize: 16,
-    color: '#555',
-    textAlign: 'center',
+    fontSize: 14,
+    color: '#999999',
     marginHorizontal: 20,
+  },
+
+  titlebox: {
+    position: 'absolute',
+    top: '68%',
+    left: 0,
+    width: 410,
+    height: 250,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+
+  topShadow: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 35, // adjust thickness
+  },
+
+  //PAGINATION
+
+  pagination: {
+    position: 'absolute',
+    bottom: 80,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 30,
+  },
+  pageinationbutton: {
+    height: 40,
+    width: 40,
+    backgroundColor: '#2C247A',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
