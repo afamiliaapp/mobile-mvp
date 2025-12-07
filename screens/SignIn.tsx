@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-export default function SignIn() {
+export default function Signin() {
   const [showPassword, setShowPassword] = useState(false);
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -44,24 +44,11 @@ export default function SignIn() {
               <View style={styles.inputbox2}>
                 <Text style={styles.inputtext}>Password</Text>
 
-                <View
-                  style={{
-                    height: 50,
-                    borderWidth: 1,
-                    borderColor: '#ccc',
-                    borderRadius: 10,
-                    paddingHorizontal: 10,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                  }}
-                >
+                <View style={styles.input2form}>
                   <TextInput
                     placeholder="Enter Password"
                     secureTextEntry={!showPassword}
-                    style={{
-                      flex: 1,
-                      height: 60,
-                    }}
+                    style={styles.input2password}
                   />
 
                   <TouchableOpacity
@@ -169,6 +156,17 @@ const styles = StyleSheet.create({
     color: '#6C7278',
     marginBottom: 5,
   },
+  input2form: {
+    height: 50,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  input2password: { flex: 1, height: 60 },
 
   inputbox3: {
     flex: 0,
@@ -234,7 +232,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 0,
     justifyContent: 'center',
-    marginTop: 15,
+    marginTop: 30,
   },
 
   GoogleSigninText: {

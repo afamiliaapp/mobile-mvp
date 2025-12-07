@@ -14,6 +14,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -65,6 +66,7 @@ const onboardingData: OnboardingItem[] = [
 ];
 
 const Onboarding: React.FC = () => {
+  const navigation = useNavigation();
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const flatListRef = useRef<FlatList<OnboardingItem>>(null);
 
@@ -271,11 +273,7 @@ const Onboarding: React.FC = () => {
         {/* NEXT BUTTON OR LINK */}
         {currentIndex === onboardingData.length - 1 ? (
           <TouchableOpacity
-            onPress={() => {
-              // Navigate to your link or screen
-              ///LINK SHOULD BE ADDED HERE  ********
-              // e.g., navigation.navigate('Home');
-            }}
+            onPress={() => navigation.navigate('Signin')}
             style={[
               styles.pageinationbutton,
               { backgroundColor: '#2C247A' }, // keep purple background
