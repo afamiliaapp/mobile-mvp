@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SplashScreen from 'react-native-splash-screen';
 import Onboarding from './screens/Onboarding';
-import SignIn from './screens/SignIn';
+import Signin from './screens/Signin';
 
 const Stack = createNativeStackNavigator();
 
@@ -15,10 +15,10 @@ const App: React.FC = () => {
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{ headerShown: false }}
-        initialRouteName="SignIn"
+        initialRouteName="Onboarding"
       >
         <Stack.Screen name="Onboarding" component={Onboarding} />
-        <Stack.Screen name="SignIn" component={SignIn} />
+        <Stack.Screen name="Signin" component={Signin} />
       </Stack.Navigator>
     </NavigationContainer>
   );
