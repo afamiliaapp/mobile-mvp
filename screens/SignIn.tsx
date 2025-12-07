@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -31,7 +32,7 @@ export default function SignIn() {
                 <TextInput
                   placeholder="Enter Email"
                   style={{
-                    height: 50,
+                    height: 60,
                     borderWidth: 1,
                     borderColor: '#ccc',
                     borderRadius: 10,
@@ -59,6 +60,7 @@ export default function SignIn() {
                     secureTextEntry={!showPassword}
                     style={{
                       flex: 1,
+                      height: 60,
                     }}
                   />
 
@@ -78,7 +80,35 @@ export default function SignIn() {
                 <Text>Forgot Password ?</Text>
               </View>
             </View>
-            <View style={styles.SignInButton}></View>
+
+            <View style={styles.SignInButtonbox}>
+              <View style={styles.SignInButton}>
+                <Text style={styles.SignInButtonText}>Sign In</Text>
+              </View>
+
+              <View style={styles.border}>
+                <View style={styles.borderline}></View>
+                <Text style={styles.borderText}>Or</Text>
+                <View style={styles.borderline}></View>
+              </View>
+
+              <View style={styles.GoogleSignin}>
+                <Image
+                  source={require('../assets/SignIngoogle.png')}
+                  style={{ width: 18, height: 18 }}
+                />
+                <Text style={styles.GoogleSigninText}>
+                  Continue with Google
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          {/** SIGN UP */}
+
+          <View style={styles.signupbox}>
+            <Text style={styles.signup1}>Don’t have an account?</Text>
+            <Text style={styles.signup2}>Sign Up</Text>
           </View>
         </View>
       </View>
@@ -149,10 +179,86 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
 
-  SignInButton: {
+  SignInButtonbox: {
     height: 150,
     width: '100%',
-    backgroundColor: 'green',
+
     marginTop: 40,
+  },
+
+  SignInButton: {
+    height: 48,
+    width: '100%',
+    backgroundColor: '#2C247A',
+
+    borderRadius: 10,
+    borderWidth: 0,
+    alignItems: 'center',
+    flex: 0,
+    justifyContent: 'center',
+  },
+
+  SignInButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  border: {
+    flex: 0,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+    alignItems: 'center',
+  },
+
+  borderline: {
+    borderWidth: 0.5,
+    borderColor: '#999999',
+    height: 0.5,
+    width: '45%',
+  },
+
+  borderText: {
+    color: '#6C7278',
+    fontSize: 12,
+  },
+
+  GoogleSignin: {
+    height: 48,
+    width: '100%',
+    flexDirection: 'row',
+
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#999999',
+    alignItems: 'center',
+    flex: 0,
+    justifyContent: 'center',
+    marginTop: 15,
+  },
+
+  GoogleSigninText: {
+    fontSize: 14,
+    color: '#1B1C1E',
+    marginLeft: 10,
+    fontWeight: 600,
+  },
+
+  signupbox: {
+    flex: 0,
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'center',
+    marginTop: '65%',
+  },
+
+  signup1: {
+    fontSize: 12,
+    color: '#6C7278',
+  },
+  signup2: {
+    fontSize: 12,
+    color: '#2C247A',
+    marginLeft: 5,
   },
 });
