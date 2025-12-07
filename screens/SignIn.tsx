@@ -78,6 +78,7 @@ export default function SignIn() {
                 <Text>Forgot Password ?</Text>
               </View>
             </View>
+            <View style={styles.SignInButton}></View>
           </View>
         </View>
       </View>
@@ -146,5 +147,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 5,
+  },
+
+  SignInButton: {
+    height: 150,
+    width: '100%',
+    backgroundColor: 'green',
+    marginTop: 40,
   },
 });
