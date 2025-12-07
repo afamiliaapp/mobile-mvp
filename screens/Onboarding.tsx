@@ -258,35 +258,41 @@ const Onboarding: React.FC = () => {
           onPress={goBack}
           style={[
             styles.pageinationbutton,
-            { backgroundColor: currentIndex === 0 ? '#fff' : '#2C247A' }, // white on first page
+            { backgroundColor: currentIndex === 0 ? '#fff' : '#2C247A' },
           ]}
         >
           <Ionicons
             name="chevron-back"
             size={18}
-            color={currentIndex === 0 ? '#2C247A' : '#fff'} // purple icon on first page
+            color={currentIndex === 0 ? '#2C247A' : '#fff'}
           />
         </TouchableOpacity>
 
-        {/* NEXT BUTTON */}
-        <TouchableOpacity
-          onPress={goNext}
-          style={[
-            styles.pageinationbutton,
-            {
-              backgroundColor:
-                currentIndex === onboardingData.length - 1 ? '#fff' : '#2C247A',
-            }, // white on last page
-          ]}
-        >
-          <Ionicons
-            name="chevron-forward"
-            size={18}
-            color={
-              currentIndex === onboardingData.length - 1 ? '#2C247A' : '#fff'
-            } // purple icon on last page
-          />
-        </TouchableOpacity>
+        {/* NEXT BUTTON OR LINK */}
+        {currentIndex === onboardingData.length - 1 ? (
+          <TouchableOpacity
+            onPress={() => {
+              // Navigate to your link or screen
+              ///LINK SHOULD BE ADDED HERE  ********
+              // e.g., navigation.navigate('Home');
+            }}
+            style={[
+              styles.pageinationbutton,
+              { backgroundColor: '#2C247A' }, // keep purple background
+            ]}
+          >
+            <Text style={{ color: '#fff', fontWeight: 'bold' }}>
+              <Ionicons name="chevron-forward" size={18} color="#fff" />
+            </Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            onPress={goNext}
+            style={[styles.pageinationbutton, { backgroundColor: '#2C247A' }]}
+          >
+            <Ionicons name="chevron-forward" size={18} color="#fff" />
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
