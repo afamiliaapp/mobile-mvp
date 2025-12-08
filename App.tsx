@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SplashScreen from 'react-native-splash-screen';
 import Onboarding from './screens/Onboarding';
 import Signin from './screens/Signin';
+import Signup from './screens/Signup';
 
 const Stack = createNativeStackNavigator();
 
@@ -15,10 +16,11 @@ const App: React.FC = () => {
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{ headerShown: false }}
-        initialRouteName="Onboarding"
+        initialRouteName="Signup"
       >
         <Stack.Screen name="Onboarding" component={Onboarding} />
         <Stack.Screen name="Signin" component={Signin} />
+        <Stack.Screen name="Signup" component={Signup} />
       </Stack.Navigator>
     </NavigationContainer>
   );
