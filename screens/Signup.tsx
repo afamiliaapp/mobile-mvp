@@ -11,6 +11,7 @@ import {
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 // Example country list (expand as needed)
 const countries = [
@@ -72,6 +73,28 @@ const Signup = () => {
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState(null);
+
+  const [date, setDate] = useState('');
+  const [showPicker, setShowPicker] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const onChange = (event, selectedDate) => {
+    setShowPicker(false);
+
+    if (selectedDate) {
+      const d = selectedDate;
+
+      // Format date (DD/MM/YYYY)
+      const formatted =
+        d.getDate().toString().padStart(2, '0') +
+        '/' +
+        (d.getMonth() + 1).toString().padStart(2, '0') +
+        '/' +
+        d.getFullYear();
+
+      setDate(formatted);
+    }
+  };
 
   return (
     <SafeAreaView>
@@ -254,6 +277,72 @@ const Signup = () => {
                 </View>
               </View>
             </Modal>
+          </View>
+
+          {/** BIRTHDAY INPUT */}
+          <View style={styles.inputbox1}>
+            <Text style={styles.inputtext1}>Birthday</Text>
+
+            {/* TAP WHOLE FIELD TO OPEN PICKER */}
+            <TouchableOpacity
+              style={styles.birthinputContainer}
+              onPress={() => setShowPicker(true)}
+              activeOpacity={0.7}
+            >
+              <TextInput
+                placeholder="Choose birthday"
+                value={date}
+                editable={false} // disable typing
+                style={styles.birthinput}
+              />
+
+              <Ionicons
+                name="calendar-outline"
+                size={20}
+                color="#888"
+                style={styles.calendarIcon}
+              />
+            </TouchableOpacity>
+
+            {showPicker && (
+              <DateTimePicker
+                mode="date"
+                display="calendar"
+                value={new Date()}
+                onChange={onChange}
+              />
+            )}
+          </View>
+
+          {/**ENTER PASSWORD INPUT */}
+          <View style={styles.inputbox1}>
+            <Text style={styles.inputtext1}>Password</Text>
+
+            <View
+              style={{
+                height: 46,
+                borderWidth: 1,
+                borderColor: '#E2E8F9',
+                borderRadius: 10,
+                paddingHorizontal: 14,
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+            >
+              <TextInput
+                placeholder="Enter password"
+                secureTextEntry={!showPassword}
+                style={{ flex: 1 }}
+              />
+
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                <Ionicons
+                  name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                  size={20}
+                  color="#888"
+                />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </View>
@@ -452,5 +541,23 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 12,
     backgroundColor: '#2C247A',
+  },
+
+  birthinputContainer: {
+    position: 'relative',
+    justifyContent: 'center',
+  },
+  birthinput: {
+    height: 46,
+    borderWidth: 1,
+    borderColor: '#E2E8F9',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingRight: 40, // space for icon
+    justifyContent: 'center',
+  },
+  calendarIcon: {
+    position: 'absolute',
+    right: 12,
   },
 });
