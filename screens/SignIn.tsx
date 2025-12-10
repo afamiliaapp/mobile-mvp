@@ -9,9 +9,11 @@ import {
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Signin() {
   const [showPassword, setShowPassword] = useState(false);
+  const navigation = useNavigation();
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -95,7 +97,9 @@ export default function Signin() {
 
           <View style={styles.signupbox}>
             <Text style={styles.signup1}>Don’t have an account?</Text>
-            <Text style={styles.signup2}>Sign Up</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+              <Text style={styles.signup2}>Sign Up</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
