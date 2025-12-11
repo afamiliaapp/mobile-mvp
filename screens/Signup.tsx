@@ -333,7 +333,11 @@ const Signup = () => {
 
           <View style={styles.SignInButtonbox}>
             <View style={styles.SignInButton}>
-              <Text style={styles.SignInButtonText}>Continue</Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('SignupTwo')}
+              >
+                <Text style={styles.SignInButtonText}>Continue</Text>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.border}>
@@ -347,6 +351,7 @@ const Signup = () => {
                 source={require('../assets/SignIngoogle.png')}
                 style={{ width: 18, height: 18 }}
               />
+
               <Text style={styles.GoogleSigninText}>Continue with Google</Text>
             </View>
           </View>
