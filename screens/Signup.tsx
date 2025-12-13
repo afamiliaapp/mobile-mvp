@@ -332,13 +332,11 @@ const Signup = () => {
           {/** SIGN IN  WITH GOOGLE*/}
 
           <View style={styles.SignInButtonbox}>
-            <View style={styles.SignInButton}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('SignupTwo')}
-              >
+            <TouchableOpacity onPress={() => navigation.navigate('SignupTwo')}>
+              <View style={styles.SignInButton}>
                 <Text style={styles.SignInButtonText}>Continue</Text>
-              </TouchableOpacity>
-            </View>
+              </View>{' '}
+            </TouchableOpacity>
 
             <View style={styles.border}>
               <View style={styles.borderline}></View>
