@@ -6,6 +6,7 @@ import {
   FlatList,
   Modal,
   StyleSheet,
+  Image,
 } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -94,7 +95,7 @@ export default function SignupTwo() {
             {' '}
             <Text style={styles.inputtext1}>Set up your family space</Text>{' '}
             <TextInput
-              placeholder="Enter preferred family space nameS"
+              placeholder="Enter preferred family space name"
               style={{
                 height: 46,
                 borderWidth: 1,
@@ -103,6 +104,59 @@ export default function SignupTwo() {
                 paddingHorizontal: 14,
               }}
             />{' '}
+          </View>
+
+          <View style={styles.inputbox3}>
+            <Text style={styles.input3text}>
+              Tell us what matters most to your family right now. We’ll
+              highlight the right tools for you.
+            </Text>
+
+            <View style={styles.iconContainer}>
+              {/** INPUTE ICONS ROW 1 */}
+              <View style={styles.inputiconsrow1}>
+                <View style={styles.inputiconsbox1}>
+                  <Image
+                    source={require('../assets/money-bag-01.png')}
+                    style={{ width: 20, height: 20, marginRight: 10 }}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.icontext}> Saving Money</Text>
+                </View>
+                <View style={styles.inputiconsbox1}>
+                  <Image
+                    source={require('../assets/icons8_stacking 1.png')}
+                    style={{ width: 20, height: 20, marginRight: 10 }}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.icontext}> Staying Organized</Text>
+                </View>
+              </View>
+
+              {/** INPUTE ICONS ROW 2 */}
+              <View style={styles.inputiconsrow1}>
+                <View style={styles.inputiconsbox1}>
+                  <Image
+                    source={require('../assets/camera-ai.png')}
+                    style={{ width: 20, height: 20, marginRight: 10 }}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.icontext}> Sharing Memories</Text>
+                </View>
+                <View style={styles.inputiconsbox1}>
+                  <Image
+                    source={require('../assets/icons8_people_working_together_9 1.png')}
+                    style={{ width: 20, height: 20, marginRight: 10 }}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.icontext}> Staying Connected</Text>
+                </View>
+              </View>
+
+              <View style={styles.iconcountbox}>
+                <Text>0/4</Text>
+              </View>
+            </View>
           </View>
         </View>
       </View>
@@ -194,5 +248,48 @@ const styles = StyleSheet.create({
   itemText: {
     fontSize: 16,
     color: '#000',
+  },
+  inputbox3: {
+    height: 230,
+    backgroundColor: '',
+
+    marginTop: 20,
+  },
+  input3text: {
+    fontSize: 12,
+    color: '#6C7278',
+  },
+
+  iconContainer: {
+    marginTop: 10,
+  },
+
+  inputiconsrow1: {
+    height: 56,
+    flexDirection: 'row',
+    flex: 0,
+    backgroundColor: '',
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  inputiconsbox1: {
+    flex: 0,
+    width: '48%',
+    height: 46,
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    marginRight: 10,
+    borderWidth: 0.5,
+    borderRadius: 10,
+  },
+  icontext: {
+    fontSize: 14,
+    color: '#1B1C1E',
+    fontWeight: 500,
+  },
+  iconcountbox: {
+    marginTop: 15,
   },
 });

@@ -50,8 +50,8 @@ export default function FamilyRoleDropdown() {
         />
       </TouchableOpacity>
 
-      {/* Modal List */}
-      <Modal transparent={true} visible={modalVisible} animationType="fade">
+      {/* Modal */}
+      <Modal transparent visible={modalVisible} animationType="fade">
         <TouchableOpacity
           style={styles.modalOverlay}
           activeOpacity={1}
@@ -61,17 +61,33 @@ export default function FamilyRoleDropdown() {
             <FlatList
               data={familyRoles}
               keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.item}
-                  onPress={() => {
-                    setSelectedRole(item);
-                    setModalVisible(false);
-                  }}
-                >
-                  <Text style={styles.itemText}>{item}</Text>
-                </TouchableOpacity>
-              )}
+              renderItem={({ item }) => {
+                const isSelected = selectedRole === item;
+
+                return (
+                  <TouchableOpacity
+                    style={[
+                      styles.item,
+                      isSelected && styles.selectedItemBorder,
+                      isSelected && {
+                        borderBottomWidth: 2,
+                        borderColor: '',
+                      }, // <-- highlight selected
+                    ]}
+                    onPress={() => {
+                      setSelectedRole(item);
+                      setModalVisible(false);
+                    }}
+                  >
+                    <Text style={styles.itemText}>{item}</Text>
+
+                    {/* Right Radio */}
+                    <View style={styles.radioOuter}>
+                      {isSelected && <View style={styles.radioInner} />}
+                    </View>
+                  </TouchableOpacity>
+                );
+              }}
             />
           </View>
         </TouchableOpacity>
@@ -109,15 +125,44 @@ const styles = StyleSheet.create({
   modalBox: {
     backgroundColor: '#fff',
     borderRadius: 10,
-    paddingVertical: 10,
+    paddingVertical: 5,
     maxHeight: 400,
     marginTop: 100,
   },
+
   item: {
-    padding: 14,
-    borderBottomWidth: 1,
+    paddingHorizontal: 20,
     borderBottomColor: '#eee',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: 50,
   },
+
+  /** NEW — Border for selected item */
+  selectedItemBorder: {
+    borderWidth: 2, // stronger complete border
+    borderColor: '#007AFF',
+    borderRadius: 10,
+    backgroundColor: '#F4F8FF',
+  },
+
+  radioOuter: {
+    height: 18,
+    width: 18,
+    borderRadius: 9,
+    borderWidth: 1,
+    borderColor: '#2C247A',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  radioInner: {
+    height: 10,
+    width: 10,
+    borderRadius: 100,
+    backgroundColor: '#2C247A',
+  },
+
   itemText: {
     fontSize: 16,
     color: '#000',
