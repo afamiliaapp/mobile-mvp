@@ -18,6 +18,19 @@ export default function SignupTwo() {
   const [selectedNumber, setSelectedNumber] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const numbers = Array.from({ length: 10 }, (_, i) => i + 1);
+  const [selectedIcons, setSelectedIcons] = useState([]);
+
+  const toggleIcon = key => {
+    setSelectedIcons(prev => {
+      if (prev.includes(key)) {
+        return prev.filter(item => item !== key);
+      }
+      if (prev.length < 4) {
+        return [...prev, key];
+      }
+      return prev;
+    });
+  };
 
   return (
     <SafeAreaView>
@@ -66,17 +79,29 @@ export default function SignupTwo() {
                   <FlatList
                     data={numbers}
                     keyExtractor={item => item.toString()}
-                    renderItem={({ item }) => (
-                      <TouchableOpacity
-                        style={styles.item}
-                        onPress={() => {
-                          setSelectedNumber(item.toString());
-                          setModalVisible(false);
-                        }}
-                      >
-                        <Text style={styles.itemText}>{item}</Text>
-                      </TouchableOpacity>
-                    )}
+                    renderItem={({ item }) => {
+                      const isSelected = selectedNumber == item.toString();
+
+                      return (
+                        <TouchableOpacity
+                          style={[
+                            styles.item,
+                            isSelected && styles.selectedItem, // add border if selected
+                          ]}
+                          onPress={() => {
+                            setSelectedNumber(item.toString());
+                            setModalVisible(false);
+                          }}
+                        >
+                          <Text style={styles.itemText}>{item}</Text>
+
+                          {/* Radio Button */}
+                          <View style={styles.radioOuter}>
+                            {isSelected && <View style={styles.radioInner} />}
+                          </View>
+                        </TouchableOpacity>
+                      );
+                    }}
                   />
                 </View>
               </TouchableOpacity>
@@ -113,49 +138,74 @@ export default function SignupTwo() {
             </Text>
 
             <View style={styles.iconContainer}>
-              {/** INPUTE ICONS ROW 1 */}
-              <View style={styles.inputiconsrow1}>
-                <View style={styles.inputiconsbox1}>
-                  <Image
-                    source={require('../assets/money-bag-01.png')}
-                    style={{ width: 20, height: 20, marginRight: 10 }}
-                    resizeMode="contain"
-                  />
-                  <Text style={styles.icontext}> Saving Money</Text>
-                </View>
-                <View style={styles.inputiconsbox1}>
-                  <Image
-                    source={require('../assets/icons8_stacking 1.png')}
-                    style={{ width: 20, height: 20, marginRight: 10 }}
-                    resizeMode="contain"
-                  />
-                  <Text style={styles.icontext}> Staying Organized</Text>
-                </View>
-              </View>
-
-              {/** INPUTE ICONS ROW 2 */}
-              <View style={styles.inputiconsrow1}>
-                <View style={styles.inputiconsbox1}>
-                  <Image
-                    source={require('../assets/camera-ai.png')}
-                    style={{ width: 20, height: 20, marginRight: 10 }}
-                    resizeMode="contain"
-                  />
-                  <Text style={styles.icontext}> Sharing Memories</Text>
-                </View>
-                <View style={styles.inputiconsbox1}>
-                  <Image
-                    source={require('../assets/icons8_people_working_together_9 1.png')}
-                    style={{ width: 20, height: 20, marginRight: 10 }}
-                    resizeMode="contain"
-                  />
-                  <Text style={styles.icontext}> Staying Connected</Text>
-                </View>
-              </View>
+              {[
+                {
+                  key: 'saving',
+                  label: 'Saving Money',
+                  icon: require('../assets/money-bag-01.png'),
+                },
+                {
+                  key: 'organize',
+                  label: 'Staying Organized',
+                  icon: require('../assets/icons8_stacking 1.png'),
+                },
+                {
+                  key: 'memories',
+                  label: 'Sharing Memories',
+                  icon: require('../assets/camera-ai.png'),
+                },
+                {
+                  key: 'connect',
+                  label: 'Staying Connected',
+                  icon: require('../assets/icons8_people_working_together_9 1.png'),
+                },
+              ]
+                .reduce((rows, item, index) => {
+                  if (index % 2 === 0) rows.push([]);
+                  rows[rows.length - 1].push(item);
+                  return rows;
+                }, [])
+                .map((row, rowIndex) => (
+                  <View style={styles.inputiconsrow1} key={rowIndex}>
+                    {row.map(item => (
+                      <TouchableOpacity
+                        key={item.key}
+                        style={[
+                          styles.inputiconsbox1,
+                          selectedIcons.includes(item.key) && {
+                            borderColor: '#2C247A',
+                            borderWidth: 1,
+                            borderRadius: 10,
+                          },
+                        ]}
+                        onPress={() => toggleIcon(item.key)}
+                      >
+                        <Image
+                          source={item.icon}
+                          style={{ width: 20, height: 20, marginRight: 10 }}
+                          resizeMode="contain"
+                        />
+                        <Text style={styles.icontext}> {item.label}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                ))}
 
               <View style={styles.iconcountbox}>
-                <Text>0/4</Text>
+                <Text>{selectedIcons.length}/4</Text>
               </View>
+            </View>
+
+            <View>
+              <Text style={styles.termstext}>
+                By continue means you agree to our{' '}
+                <Text style={{ color: '#2C247A' }}>privacy policy </Text> &
+                <Text style={{ color: '#2C247A' }}> terms & conditions</Text>
+              </Text>
+            </View>
+
+            <View style={styles.continueBtn}>
+              <Text style={styles.continuetxt}>Continue</Text>
             </View>
           </View>
         </View>
@@ -193,17 +243,17 @@ const styles = StyleSheet.create({
     width: 50,
     height: 4,
     backgroundColor: '#2C247A',
-    marginTop: 10,
+    marginTop: 12,
     borderRadius: 20,
   },
 
   inputbox: {
     height: 557,
     backgroundColor: '',
-    marginTop: 90,
+    marginTop: 80,
   },
   inputbox1: {
-    marginTop: 20,
+    marginTop: 4,
   },
   inputtext1: {
     marginBottom: 5,
@@ -242,8 +292,8 @@ const styles = StyleSheet.create({
   },
   item: {
     padding: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+
+    height: 50,
   },
   itemText: {
     fontSize: 16,
@@ -251,13 +301,14 @@ const styles = StyleSheet.create({
   },
   inputbox3: {
     height: 230,
-    backgroundColor: '',
 
     marginTop: 20,
   },
   input3text: {
     fontSize: 12,
     color: '#6C7278',
+
+    lineHeight: 20,
   },
 
   iconContainer: {
@@ -269,7 +320,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flex: 0,
     backgroundColor: '',
-    marginTop: 10,
+    marginTop: 2,
     alignItems: 'center',
   },
   inputiconsbox1: {
@@ -281,8 +332,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     marginRight: 10,
-    borderWidth: 0.5,
-    borderRadius: 10,
   },
   icontext: {
     fontSize: 14,
@@ -290,6 +339,60 @@ const styles = StyleSheet.create({
     fontWeight: 500,
   },
   iconcountbox: {
-    marginTop: 15,
+    marginTop: 5,
+  },
+  termstext: {
+    fontSize: 12,
+    lineHeight: 20,
+    marginTop: 10,
+  },
+
+  continueBtn: {
+    height: 48,
+    backgroundColor: '#2C247A',
+    marginTop: 20,
+    borderRadius: 10,
+    flex: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  continuetxt: {
+    fontSize: 16,
+    color: '#fff',
+  },
+  selectedCircle: {
+    width: 16,
+    height: 16,
+    borderRadius: 8, // makes it circular
+    backgroundColor: '#2C247A',
+    position: 'absolute',
+    right: 10, // distance from right edge
+    top: '50%',
+    transform: [{ translateY: -8 }], // center vertically
+  },
+  radioOuter: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#2C247A',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    right: 0,
+    top: '100%',
+    transform: [{ translateY: -10 }],
+  },
+
+  radioInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#2C247A',
+  },
+  selectedItem: {
+    borderWidth: 2,
+    borderColor: '#2C247A',
+    borderRadius: 10, // same as your item border radius
   },
 });
