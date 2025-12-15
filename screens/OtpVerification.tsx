@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6C7278',
     textAlign: 'center',
+
     marginTop: 20,
   },
   otpResendtxt: {
