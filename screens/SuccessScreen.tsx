@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
 
   backbtn: {
     height: 48,
+    marginTop: 10,
 
     width: '100%',
   },

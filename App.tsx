@@ -8,6 +8,7 @@ import Signup from './screens/Signup';
 import SignupTwo from './screens/SignupTwo';
 import OtpVerification from './screens/OtpVerification';
 import SuccessScreen from './screens/SuccessScreen';
+import ForgotPassword from './screens/ForgotPassword';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,7 +20,7 @@ const App: React.FC = () => {
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{ headerShown: false }}
-        initialRouteName="SuccessScreen"
+        initialRouteName="ForgotPassword"
       >
         <Stack.Screen name="Onboarding" component={Onboarding} />
         <Stack.Screen name="Signin" component={Signin} />
@@ -27,6 +28,7 @@ const App: React.FC = () => {
         <Stack.Screen name="SignupTwo" component={SignupTwo} />
         <Stack.Screen name="OtpVerification" component={OtpVerification} />
         <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
       </Stack.Navigator>
     </NavigationContainer>
   );
