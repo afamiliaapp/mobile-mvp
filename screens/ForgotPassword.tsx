@@ -47,7 +47,7 @@ export default function ForgotPassword() {
 
         <View style={styles.signinbox}>
           <Text style={styles.signintxt}>Remember Password?</Text>{' '}
-          <TouchableOpacity onPress={() => Navigation.navigate('Signin')}>
+          <TouchableOpacity onPress={() => navigation.navigate('Signin')}>
             <Text style={styles.signintxt2}>Sign In</Text>
           </TouchableOpacity>
         </View>
@@ -126,9 +126,11 @@ const styles = StyleSheet.create({
   signintxt: {
     fontSize: 12,
     color: '#6C7278',
+    marginRight: 5,
   },
   signintxt2: {
     fontSize: 12,
     color: '#2C247A',
+    fontWeight: 600,
   },
 });
