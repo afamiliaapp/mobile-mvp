@@ -660,5 +660,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#2C247A',
     marginLeft: 5,
+    fontWeight: 600,
   },
 });

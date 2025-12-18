@@ -66,7 +66,11 @@ export default function Signin() {
               </View>
 
               <View style={styles.inputbox3}>
-                <Text>Forgot Password ?</Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('ForgotPassword')}
+                >
+                  <Text style={styles.inputbox3txt}>Forgot Password ?</Text>
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -262,5 +266,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#2C247A',
     marginLeft: 5,
+    fontWeight: 600,
+  },
+  inputbox3txt: {
+    color: '#999999',
+    fontSize: 12,
+    marginTop: 10,
   },
 });

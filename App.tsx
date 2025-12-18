@@ -11,6 +11,7 @@ import SuccessScreen from './screens/SuccessScreen';
 import ForgotPassword from './screens/ForgotPassword';
 import ForgotPassword2 from './screens/ForgotPassword2';
 import SuccessScreen2 from './screens/SuccessScreen2';
+import NavigationBar from './components/NavigationBar';
 
 const Stack = createNativeStackNavigator();
 
@@ -22,7 +23,7 @@ const App: React.FC = () => {
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{ headerShown: false }}
-        initialRouteName="SuccessScreen2"
+        initialRouteName="NavigationBar"
       >
         <Stack.Screen name="Onboarding" component={Onboarding} />
         <Stack.Screen name="Signin" component={Signin} />
@@ -33,6 +34,7 @@ const App: React.FC = () => {
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
         <Stack.Screen name="ForgotPassword2" component={ForgotPassword2} />
         <Stack.Screen name="SuccessScreen2" component={SuccessScreen2} />
+        <Stack.Screen name="NavigationBar" component={NavigationBar} />
       </Stack.Navigator>
     </NavigationContainer>
   );
