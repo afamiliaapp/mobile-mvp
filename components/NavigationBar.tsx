@@ -23,13 +23,13 @@ export default function NavigationBar() {
           source={require('../assets/home-05.png')}
           style={[
             styles.icon,
-            { tintColor: isActive('Home') ? '#2C247A' : '#999' },
+            { tintColor: isActive('Dashboard') ? '#2C247A' : '#999' },
           ]}
         />
         <Text
           style={[
             styles.menutext,
-            { color: isActive('Home') ? '#2C247A' : '#999' },
+            { color: isActive('Dashboard') ? '#2C247A' : '#999' },
           ]}
         >
           Home
@@ -124,7 +124,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     flex: 0,
     flexDirection: 'row',
-
     paddingHorizontal: 24,
     borderRadius: 12,
   },
