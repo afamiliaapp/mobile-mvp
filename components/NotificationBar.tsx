@@ -4,9 +4,9 @@ import React from 'react';
 export default function NotificationBar() {
   return (
     <View style={styles.continer}>
-      <View>
+      <View style={styles.notimagebox}>
         <Image
-          source={require('../assets/notifyimage1.jpg')}
+          source={require('../assets/notifyImage.png')}
           style={styles.notimage}
         />
       </View>
@@ -34,6 +34,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: 2,
+  },
+  notimagebox: {
+    height: 32,
+    width: 32,
+    borderRadius: 400,
+    backgroundColor: '#FFE7CC',
+    borderColor: '#F500204D',
   },
   notimage: {
     height: 32,

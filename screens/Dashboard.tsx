@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import NotificationBar from '../components/NotificationBar';
+import TodaysSchedule from '../components/TodaysSchedule';
 
 export default function Dashboard() {
   return (
@@ -36,6 +37,10 @@ export default function Dashboard() {
             <Text style={styles.activitytext3}>View</Text>
           </View>
         </View>
+      </View>
+
+      <View>
+        <TodaysSchedule />
       </View>
     </View>
   );
@@ -82,6 +87,7 @@ const styles = StyleSheet.create({
     color: '#1B1C1E',
     fontSize: 20,
     marginBottom: 4,
+    fontWeight: 600,
   },
   activitytext3: {
     color: '#2C247A',
