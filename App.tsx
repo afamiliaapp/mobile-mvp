@@ -2,18 +2,10 @@ import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SplashScreen from 'react-native-splash-screen';
-import Onboarding from './screens/Onboarding';
-import Signin from './screens/Signin';
-import Signup from './screens/Signup';
-import SignupTwo from './screens/SignupTwo';
-import OtpVerification from './screens/OtpVerification';
-import SuccessScreen from './screens/SuccessScreen';
-import ForgotPassword from './screens/ForgotPassword';
-import ForgotPassword2 from './screens/ForgotPassword2';
-import SuccessScreen2 from './screens/SuccessScreen2';
-import NavigationBar from './components/NavigationBar';
 
-const Stack = createNativeStackNavigator();
+import Authlayout from '../mobile-mvp/navigation/Authlayout';
+import MainLayout from '../mobile-mvp/navigation/Mainlayout';
+const RootStack = createNativeStackNavigator();
 
 const App: React.FC = () => {
   useEffect(() => {
@@ -21,21 +13,16 @@ const App: React.FC = () => {
   }, []);
   return (
     <NavigationContainer>
-      <Stack.Navigator
+      <RootStack.Navigator
         screenOptions={{ headerShown: false }}
-        initialRouteName="NavigationBar"
+        initialRouteName="Main"
       >
-        <Stack.Screen name="Onboarding" component={Onboarding} />
-        <Stack.Screen name="Signin" component={Signin} />
-        <Stack.Screen name="Signup" component={Signup} />
-        <Stack.Screen name="SignupTwo" component={SignupTwo} />
-        <Stack.Screen name="OtpVerification" component={OtpVerification} />
-        <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-        <Stack.Screen name="ForgotPassword2" component={ForgotPassword2} />
-        <Stack.Screen name="SuccessScreen2" component={SuccessScreen2} />
-        <Stack.Screen name="NavigationBar" component={NavigationBar} />
-      </Stack.Navigator>
+        {/* NO NAV BAR */}
+        <RootStack.Screen name="Auth" component={Authlayout} />
+
+        {/* WITH NAV BAR */}
+        <RootStack.Screen name="Main" component={MainLayout} />
+      </RootStack.Navigator>
     </NavigationContainer>
   );
 };
