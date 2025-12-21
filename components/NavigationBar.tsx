@@ -61,7 +61,7 @@ export default function NavigationBar() {
       {/* CENTER BUTTON */}
       <TouchableOpacity
         style={styles.menubox}
-        onPress={() => navigation.navigate('Create')}
+        onPress={() => navigation.navigate('Menu')}
       >
         <View style={styles.menubox2a}>
           <Image
