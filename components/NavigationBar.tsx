@@ -124,13 +124,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     flex: 0,
     flexDirection: 'row',
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     borderRadius: 12,
   },
 
   menubox: {
     width: 75,
-
     alignItems: 'center',
     justifyContent: 'center',
   },

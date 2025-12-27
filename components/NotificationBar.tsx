@@ -1,7 +1,9 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
+import { useNavigation } from '@react-navigation/native';
 
 export default function NotificationBar() {
+  const navigation = useNavigation();
   return (
     <View style={styles.continer}>
       <View style={styles.notimagebox}>
@@ -16,10 +18,14 @@ export default function NotificationBar() {
       </View>
 
       <View style={styles.belliconbox}>
-        <Image
-          source={require('../assets/notificationbell.png')}
-          style={styles.bellicon}
-        />
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Notificationpage')}
+        >
+          <Image
+            source={require('../assets/notificationbell.png')}
+            style={styles.bellicon}
+          />
+        </TouchableOpacity>
       </View>
     </View>
   );
