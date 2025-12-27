@@ -63,44 +63,42 @@ export default function Notificationpage() {
     ? notifications
     : notifications.slice(0, 3);
   return (
-    <SafeAreaView>
-      <View style={styles.container}>
-        <Text style={styles.notifytxt}>Notification</Text>
-        <BackButton />
+    <View style={styles.container}>
+      <Text style={styles.notifytxt}>Notification</Text>
+      <BackButton />
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={styles.notificationbox}
-        >
-          {displayedNotifications.map(item => (
-            <View key={item.id} style={styles.notificationbox2}>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.subtitle}>{item.subtitle}</Text>
-              <Text style={styles.notedate}>{item.date}</Text>
-            </View>
-          ))}
-        </ScrollView>
-
-        {notifications.length > 3 && (
-          <View style={styles.schedulebox5}>
-            <TouchableOpacity
-              style={styles.scheduleviewbtn2}
-              onPress={() => setShowMore(!showMore)}
-            >
-              <Text style={styles.scheduleviewtxt2}>
-                {showMore ? 'Show less' : 'Show more'}
-              </Text>
-              <Icon
-                name={showMore ? 'chevron-up' : 'chevron-down'}
-                size={12}
-                color="#999999"
-                style={{ marginLeft: 4 }}
-              />
-            </TouchableOpacity>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={styles.notificationbox}
+      >
+        {displayedNotifications.map(item => (
+          <View key={item.id} style={styles.notificationbox2}>
+            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.subtitle}>{item.subtitle}</Text>
+            <Text style={styles.notedate}>{item.date}</Text>
           </View>
-        )}
-      </View>
-    </SafeAreaView>
+        ))}
+      </ScrollView>
+
+      {notifications.length > 3 && (
+        <View style={styles.schedulebox5}>
+          <TouchableOpacity
+            style={styles.scheduleviewbtn2}
+            onPress={() => setShowMore(!showMore)}
+          >
+            <Text style={styles.scheduleviewtxt2}>
+              {showMore ? 'Show less' : 'Show more'}
+            </Text>
+            <Icon
+              name={showMore ? 'chevron-up' : 'chevron-down'}
+              size={12}
+              color="#999999"
+              style={{ marginLeft: 4 }}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
+    </View>
   );
 }
 
@@ -115,7 +113,7 @@ const styles = StyleSheet.create({
   },
 
   notificationbox: {
-    height: 414,
+    height: '80%',
     marginTop: 10,
   },
   notificationbox2: {
@@ -146,9 +144,12 @@ const styles = StyleSheet.create({
   },
   schedulebox5: {
     width: '100%',
+    height: '10%',
     flex: 0,
-    justifyContent: 'center',
+
     alignItems: 'center',
+
+    paddingTop: 15,
   },
   scheduleviewbtn2: {
     flex: 0,
