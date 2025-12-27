@@ -10,6 +10,15 @@ import Calendar from '../screens/Calendar';
 import Menu from '../screens/Menu';
 import NavigationBar from '../components/NavigationBar';
 import Notificationpage from '../screens/Notificationpage';
+import ProfileEdithPage from '../screens/ProfileEdithPage';
+import Family from '../screens/Family';
+import Settings from '../screens/Settings';
+import Subscription from '../screens/Subscription';
+import Rewards from '../screens/Rewards';
+import Legal from '../screens/Legal';
+import Help from '../screens/Help';
+import Info from '../screens/Info';
+import Logout from '../screens/Logout';
 
 const Stack = createNativeStackNavigator();
 
@@ -49,6 +58,19 @@ export default function MainLayout() {
         name="Notificationpage"
         component={withNav(Notificationpage)}
       />
+      <Stack.Screen
+        name="ProfileEdithPage"
+        component={withNav(ProfileEdithPage)}
+      />
+
+      <Stack.Screen name="Family" component={withNav(Family)} />
+      <Stack.Screen name="Settings" component={withNav(Settings)} />
+      <Stack.Screen name="Subscription" component={withNav(Subscription)} />
+      <Stack.Screen name="Rewards" component={withNav(Rewards)} />
+      <Stack.Screen name="Legal" component={withNav(Legal)} />
+      <Stack.Screen name="Help" component={withNav(Help)} />
+      <Stack.Screen name="Info" component={withNav(Info)} />
+      <Stack.Screen name="Logout" component={withNav(Logout)} />
     </Stack.Navigator>
   );
 }
