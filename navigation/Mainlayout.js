@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, StatusBar } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -9,6 +9,7 @@ import Chat from '../screens/Chat';
 import Calendar from '../screens/Calendar';
 import Menu from '../screens/Menu';
 import NavigationBar from '../components/NavigationBar';
+import Notificationpage from '../screens/Notificationpage';
 
 const Stack = createNativeStackNavigator();
 
@@ -16,6 +17,7 @@ const Stack = createNativeStackNavigator();
 function ScreenWithNav({ children }) {
   return (
     <SafeAreaView style={styles.safeArea}>
+      <StatusBar backgroundColor="#000" barStyle="dark-content" />
       <View style={styles.container}>
         <View style={styles.content}>{children}</View>
         <NavigationBar />
@@ -43,6 +45,10 @@ export default function MainLayout() {
       <Stack.Screen name="Chat" component={withNav(Chat)} />
       <Stack.Screen name="Profile" component={withNav(Profile)} />
       <Stack.Screen name="Menu" component={withNav(Menu)} />
+      <Stack.Screen
+        name="Notificationpage"
+        component={withNav(Notificationpage)}
+      />
     </Stack.Navigator>
   );
 }
