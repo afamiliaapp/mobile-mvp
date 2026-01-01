@@ -41,7 +41,11 @@ export default function Profile() {
       </View>
 
       <View style={styles.profileListBox1}>
-        <View style={styles.profileListbox2}>
+        <TouchableOpacity
+          style={styles.profileListbox2}
+          activeOpacity={0.5}
+          onPress={() => navigation.navigate('Family')}
+        >
           <View style={styles.profileListbox3}>
             <Image
               source={require('../assets/peer-to-peer-02.png')}
@@ -51,13 +55,14 @@ export default function Profile() {
             <Text style={styles.profilelistIcontext}>Family</Text>
           </View>
 
-          <View>
-            <TouchableOpacity onPress={() => navigation.navigate('Family')}>
-              <Ionicons name="chevron-forward" size={18} color="#000" />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={styles.profileListbox2}>
+          <Ionicons name="chevron-forward" size={18} color="#000" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.profileListbox2}
+          activeOpacity={0.5}
+          onPress={() => navigation.navigate('Settings')}
+        >
           <View style={styles.profileListbox3}>
             <Image
               source={require('../assets/setting-07.png')}
@@ -67,13 +72,14 @@ export default function Profile() {
             <Text style={styles.profilelistIcontext}>Settings</Text>
           </View>
 
-          <View>
-            <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-              <Ionicons name="chevron-forward" size={18} color="#000" />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={styles.profileListbox2}>
+          <Ionicons name="chevron-forward" size={18} color="#000" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.profileListbox2}
+          activeOpacity={0.5}
+          onPress={() => navigation.navigate('Subscription')}
+        >
           <View style={styles.profileListbox3}>
             <Image
               source={require('../assets/credit-card-validation.png')}
@@ -83,15 +89,14 @@ export default function Profile() {
             <Text style={styles.profilelistIcontext}>Subscription Plan</Text>
           </View>
 
-          <View>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Subscription')}
-            >
-              <Ionicons name="chevron-forward" size={18} color="#000" />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={styles.profileListbox2}>
+          <Ionicons name="chevron-forward" size={18} color="#000" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.profileListbox2}
+          activeOpacity={0.5}
+          onPress={() => navigation.navigate('Rewards')}
+        >
           <View style={styles.profileListbox3}>
             <Image
               source={require('../assets/champion.png')}
@@ -101,13 +106,14 @@ export default function Profile() {
             <Text style={styles.profilelistIcontext}>Rewards</Text>
           </View>
 
-          <View>
-            <TouchableOpacity onPress={() => navigation.navigate('Rewards')}>
-              <Ionicons name="chevron-forward" size={18} color="#000" />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={styles.profileListbox2}>
+          <Ionicons name="chevron-forward" size={18} color="#000" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.profileListbox2}
+          activeOpacity={0.5}
+          onPress={() => navigation.navigate('Legal')}
+        >
           <View style={styles.profileListbox3}>
             <Image
               source={require('../assets/agreement-03.png')}
@@ -117,13 +123,14 @@ export default function Profile() {
             <Text style={styles.profilelistIcontext}>Legal & Compliance</Text>
           </View>
 
-          <View>
-            <TouchableOpacity onPress={() => navigation.navigate('Legal')}>
-              <Ionicons name="chevron-forward" size={18} color="#000" />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={styles.profileListbox2}>
+          <Ionicons name="chevron-forward" size={18} color="#000" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.profileListbox2}
+          activeOpacity={0.5}
+          onPress={() => navigation.navigate('Help')}
+        >
           <View style={styles.profileListbox3}>
             <Image
               source={require('../assets/customer-service-01.png')}
@@ -133,13 +140,14 @@ export default function Profile() {
             <Text style={styles.profilelistIcontext}>Help & Support</Text>
           </View>
 
-          <View>
-            <TouchableOpacity onPress={() => navigation.navigate('Help')}>
-              <Ionicons name="chevron-forward" size={18} color="#000" />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={styles.profileListbox2}>
+          <Ionicons name="chevron-forward" size={18} color="#000" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.profileListbox2}
+          activeOpacity={0.5}
+          onPress={() => navigation.navigate('Info')}
+        >
           <View style={styles.profileListbox3}>
             <Image
               source={require('../assets/mobile-protection.png')}
@@ -149,12 +157,9 @@ export default function Profile() {
             <Text style={styles.profilelistIcontext}>App info</Text>
           </View>
 
-          <View>
-            <TouchableOpacity onPress={() => navigation.navigate('Info')}>
-              <Ionicons name="chevron-forward" size={18} color="#000" />
-            </TouchableOpacity>
-          </View>
-        </View>
+          <Ionicons name="chevron-forward" size={18} color="#000" />
+        </TouchableOpacity>
+
         <View style={styles.profileListbox2a}>
           <TouchableOpacity
             onPress={() => navigation.navigate('Logout')}
