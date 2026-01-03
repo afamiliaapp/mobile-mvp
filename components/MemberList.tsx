@@ -12,12 +12,14 @@ import React, { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { launchImageLibrary } from 'react-native-image-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import BackButton from './BackButton';
 
 export default function MemberList() {
   const [showModal, setShowModal] = useState(false);
   const [showModalEdit, setShowModalEdit] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [editingMemberId, setEditingMemberId] = useState(null);
+  const [showModalShare, setShowModalShare] = useState(false);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -214,7 +216,14 @@ export default function MemberList() {
               <View style={styles.modalTitleBox}>
                 <Text style={styles.modalTitle}>Add/Invite member</Text>
                 <View style={styles.modalsharebox}>
-                  <Text style={styles.modalsharetxt}>Share Link</Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setShowModal(false); // 👈 close invite modal
+                      setShowModalShare(true);
+                    }}
+                  >
+                    <Text style={styles.modalsharetxt}>Share Link</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
 
@@ -482,6 +491,47 @@ export default function MemberList() {
           </View>
         </View>
       </Modal>
+
+      {/* MODAL for SHARE LINK  */}
+      <Modal transparent animationType="slide" visible={showModalShare}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox2}>
+            <ScrollView>
+              <View style={styles.modalTitleBox2}>
+                <Text style={styles.modalTitle}>Share Link</Text>
+                <BackButton />
+              </View>
+
+              {/* ROLE DROPDOWN */}
+              <View>
+                <Text style={styles.modalFormTitle2}>
+                  Share it with anyone you wish to invite to your family space
+                </Text>
+              </View>
+
+              {/* Name */}
+
+              <View>
+                <TextInput
+                  placeholder="Enter name"
+                  style={styles.input}
+                  value={name}
+                  onChangeText={setName}
+                />
+              </View>
+
+              {/* Buttons */}
+              <TouchableOpacity style={styles.sendBtn2}>
+                <Text style={styles.sendText}>Share Via</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => setShowModalShare(false)}>
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -583,6 +633,14 @@ const styles = StyleSheet.create({
     height: '98%',
     marginTop: '100%',
   },
+  modalBox2: {
+    width: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 16,
+    height: '58%',
+    marginTop: '100%',
+  },
 
   modalTitleBox: {
     flex: 0,
@@ -590,6 +648,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginVertical: 20,
   },
+  modalTitleBox2: {
+    flex: 0,
+    justifyContent: 'space-between',
+    flexDirection: 'column',
+    marginVertical: 20,
+  },
+
   modalTitle: {
     fontSize: 20,
     fontWeight: '600',
@@ -617,6 +682,13 @@ const styles = StyleSheet.create({
     color: '#6C7278',
     fontWeight: 500,
     marginBottom: 4,
+  },
+  modalFormTitle2: {
+    fontSize: 12,
+    color: '#6C7278',
+    fontWeight: 500,
+    marginVertical: 8,
+    marginTop: 30,
   },
 
   dropdownTrigger: {
@@ -684,6 +756,14 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     alignItems: 'center',
     marginTop: 6,
+    height: 48,
+  },
+  sendBtn2: {
+    backgroundColor: '#2C247A',
+    padding: 12,
+    borderRadius: 6,
+    alignItems: 'center',
+    marginTop: 25,
     height: 48,
   },
   sendText: {
