@@ -28,7 +28,12 @@ export default function MemberList() {
     });
 
     if (!result.didCancel && result.assets?.length) {
-      setPassport(result.assets[0].uri);
+      const asset = result.assets[0];
+
+      setPassport({
+        uri: asset.uri,
+        name: asset.fileName || 'passport-image.jpg',
+      });
     }
   };
 
@@ -208,15 +213,26 @@ export default function MemberList() {
             )}
 
             {/* Passport upload */}
-            <TouchableOpacity style={styles.uploadBtn} onPress={pickPassport}>
-              <Text style={styles.uploadText}>
-                {passport ? 'Passport Selected' : 'Upload Passport'}
-              </Text>
-            </TouchableOpacity>
 
-            {passport && (
-              <Image source={{ uri: passport }} style={styles.preview} />
-            )}
+            <View>
+              <Text style={styles.modalFormTitle}>Upload Passport</Text>
+
+              <TouchableOpacity style={styles.uploadBtn} onPress={pickPassport}>
+                <Text
+                  style={[
+                    styles.fileName,
+                    { color: passport ? '#1B1C1E' : '#999' },
+                  ]}
+                  numberOfLines={1}
+                >
+                  {passport ? passport.name : 'No file selected'}
+                </Text>
+
+                <Text style={styles.uploadText}>
+                  {passport ? 'Change File' : 'Upload'}
+                </Text>
+              </TouchableOpacity>
+            </View>
 
             {/* Buttons */}
             <TouchableOpacity style={styles.sendBtn} onPress={sendInvite}>
@@ -328,7 +344,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 16,
-    height: '90%',
+    height: '98%',
     marginTop: '100%',
   },
 
@@ -408,6 +424,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 6,
     marginBottom: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+
+  fileName: {
+    flex: 1, // 👈 keeps text on the LEFT
+    fontSize: 13,
+    marginRight: 10,
   },
   uploadText: {
     color: '#666',
@@ -433,6 +457,6 @@ const styles = StyleSheet.create({
   cancelText: {
     textAlign: 'center',
     color: '#999',
-    marginTop: 10,
+    marginTop: 15,
   },
 });
