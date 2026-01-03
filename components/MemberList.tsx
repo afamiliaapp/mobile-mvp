@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
+  ScrollView,
 } from 'react-native';
 import React, { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -14,7 +15,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function MemberList() {
   const [showModal, setShowModal] = useState(false);
+  const [showModalEdit, setShowModalEdit] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [editingMemberId, setEditingMemberId] = useState(null);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -38,18 +41,80 @@ export default function MemberList() {
   };
 
   const sendInvite = () => {
-    console.log({
+    if (!role || !name || !email) {
+      alert('Please fill all required fields');
+      return;
+    }
+
+    const newMember = {
+      id: Date.now(),
       name,
+      role,
+      addedAt: new Date().toLocaleDateString(),
+      avatar: require('../assets/avata.png'), // default avatar
       email,
       birthdate,
       passport,
-    });
+    };
+
+    setMembers(prev => [...prev, newMember]);
+
+    // Reset form
+    setRole('');
+    setName('');
+    setEmail('');
+    setBirthdate(null);
+    setPassport(null);
+    setShowRoleDropdown(false);
 
     setShowModal(false);
   };
 
+  const updateMember = () => {
+    if (!role || !name || !editingMemberId) {
+      alert('Please fill all required fields');
+      return;
+    }
+
+    setMembers(prev =>
+      prev.map(member =>
+        member.id === editingMemberId
+          ? {
+              ...member,
+              name,
+              role,
+              email,
+              birthdate,
+              passport,
+            }
+          : member,
+      ),
+    );
+
+    // Reset & close
+    setEditingMemberId(null);
+    setRole('');
+    setName('');
+    setEmail('');
+    setBirthdate(null);
+    setPassport(null);
+    setShowRoleDropdown(false);
+
+    setShowModalEdit(false);
+  };
+
   const [role, setRole] = useState('');
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
+
+  const [members, setMembers] = useState([
+    {
+      id: 1,
+      name: 'Ifeoma Orji',
+      role: 'Mother',
+      addedAt: '29th Feb 2025',
+      avatar: require('../assets/avata.png'),
+    },
+  ]);
 
   const roles = [
     'Father',
@@ -70,38 +135,68 @@ export default function MemberList() {
 
       <View style={styles.memberlistbox}>
         {/* Existing member */}
-        <View style={styles.memberlistbox2}>
-          <View style={styles.memberlistbox3}>
-            <View style={styles.imagebox}>
-              <Image
-                style={styles.image}
-                source={require('../assets/avata.png')}
-              />
-              <View>
-                <Text style={styles.membertitle}>Ifeoma Orji</Text>
-                <Text style={styles.memberdate}>
-                  Mother | Added 29th Feb 2025
-                </Text>
-              </View>
-            </View>
+        <ScrollView>
+          <View style={styles.memberlistbox2}>
+            {members.map(member => (
+              <View key={member.id} style={styles.memberlistbox3}>
+                <View style={styles.imagebox}>
+                  <Image style={styles.image} source={member.avatar} />
 
-            <View style={styles.imagebox2}>
-              <Image
-                style={styles.image2}
-                source={require('../assets/pencil-edit-01 (1).png')}
-              />
-              <Image
-                style={styles.image2}
-                source={require('../assets/delete-02.png')}
-              />
-            </View>
+                  <View>
+                    <Text style={styles.membertitle}>{member.name}</Text>
+                    <Text style={styles.memberdate}>
+                      {member.role} | Added {member.addedAt}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.imagebox2}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setEditingMemberId(member.id);
+
+                      setRole(member.role);
+                      setName(member.name);
+                      setEmail(member.email || '');
+                      setBirthdate(member.birthdate || null);
+                      setPassport(member.passport || null);
+
+                      setShowModalEdit(true);
+                    }}
+                  >
+                    <Image
+                      style={styles.image2}
+                      source={require('../assets/pencil-edit-01 (1).png')}
+                    />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() =>
+                      setMembers(prev => prev.filter(m => m.id !== member.id))
+                    }
+                  >
+                    <Image
+                      style={styles.image2}
+                      source={require('../assets/delete-02.png')}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
           </View>
-        </View>
+        </ScrollView>
 
         {/* ADD / INVITE */}
         <TouchableOpacity
           style={styles.addmemberbox}
-          onPress={() => setShowModal(true)}
+          onPress={() => {
+            setShowModal(true);
+            setRole('');
+            setName('');
+            setEmail('');
+            setBirthdate(null);
+            setPassport(null);
+          }}
         >
           <Image
             style={styles.addmemberimg}
@@ -111,137 +206,279 @@ export default function MemberList() {
         </TouchableOpacity>
       </View>
 
-      {/* MODAL */}
+      {/* MODAL for ADD / INVITE */}
       <Modal transparent animationType="slide" visible={showModal}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
-            <View style={styles.modalTitleBox}>
-              <Text style={styles.modalTitle}>Add/Invite member</Text>
-              <View style={styles.modalsharebox}>
-                <Text style={styles.modalsharetxt}>Share Link</Text>
-              </View>
-            </View>
-
-            {/* ROLE DROPDOWN */}
-            <View>
-              <Text style={styles.modalFormTitle}>
-                Who are you inviting to your family space?
-              </Text>
-              <TouchableOpacity
-                style={[styles.input, styles.dropdownTrigger]}
-                onPress={() => setShowRoleDropdown(!showRoleDropdown)}
-              >
-                <Text style={{ color: role ? '#000' : '#999' }}>
-                  {role || 'Choose a role'}
-                </Text>
-
-                <Ionicons
-                  name={showRoleDropdown ? 'chevron-up' : 'chevron-down'}
-                  size={18}
-                  color="#999"
-                />
-              </TouchableOpacity>
-
-              {showRoleDropdown && (
-                <View style={styles.dropdown}>
-                  {roles.map(item => (
-                    <TouchableOpacity
-                      key={item}
-                      style={styles.dropdownItem}
-                      onPress={() => {
-                        setRole(item);
-                        setShowRoleDropdown(false);
-                      }}
-                    >
-                      <Text style={styles.dropdownText}>{item}</Text>
-                    </TouchableOpacity>
-                  ))}
+            <ScrollView>
+              <View style={styles.modalTitleBox}>
+                <Text style={styles.modalTitle}>Add/Invite member</Text>
+                <View style={styles.modalsharebox}>
+                  <Text style={styles.modalsharetxt}>Share Link</Text>
                 </View>
-              )}
-            </View>
+              </View>
 
-            {/* Name */}
-
-            <View>
-              <Text style={styles.modalFormTitle}>Name</Text>
-
-              <TextInput
-                placeholder="Enter name"
-                style={styles.input}
-                value={name}
-                onChangeText={setName}
-              />
-            </View>
-
-            {/* Email */}
-
-            <View>
-              <Text style={styles.modalFormTitle}>Email</Text>
-
-              <TextInput
-                placeholder="Enter Email"
-                style={styles.input}
-                keyboardType="email-address"
-                value={email}
-                onChangeText={setEmail}
-              />
-            </View>
-
-            {/* Birthdate */}
-
-            <View>
-              <Text style={styles.modalFormTitle}>Birthdate</Text>
-              <TouchableOpacity
-                style={styles.input}
-                onPress={() => setShowDatePicker(true)}
-              >
-                <Text style={{ color: birthdate ? '#000' : '#999' }}>
-                  {birthdate ? birthdate.toDateString() : 'Enter Birthdate'}
+              {/* ROLE DROPDOWN */}
+              <View>
+                <Text style={styles.modalFormTitle}>
+                  Who are you inviting to your family space?
                 </Text>
-              </TouchableOpacity>
-            </View>
-
-            {showDatePicker && (
-              <DateTimePicker
-                value={birthdate || new Date()}
-                mode="date"
-                onChange={(e, date) => {
-                  setShowDatePicker(false);
-                  if (date) setBirthdate(date);
-                }}
-              />
-            )}
-
-            {/* Passport upload */}
-
-            <View>
-              <Text style={styles.modalFormTitle}>Upload Passport</Text>
-
-              <TouchableOpacity style={styles.uploadBtn} onPress={pickPassport}>
-                <Text
-                  style={[
-                    styles.fileName,
-                    { color: passport ? '#1B1C1E' : '#999' },
-                  ]}
-                  numberOfLines={1}
+                <TouchableOpacity
+                  style={[styles.input, styles.dropdownTrigger]}
+                  onPress={() => setShowRoleDropdown(!showRoleDropdown)}
                 >
-                  {passport ? passport.name : 'No file selected'}
-                </Text>
+                  <Text style={{ color: role ? '#000' : '#999' }}>
+                    {role || 'Choose a role'}
+                  </Text>
 
-                <Text style={styles.uploadText}>
-                  {passport ? 'Change File' : 'Upload'}
-                </Text>
+                  <Ionicons
+                    name={showRoleDropdown ? 'chevron-up' : 'chevron-down'}
+                    size={18}
+                    color="#999"
+                  />
+                </TouchableOpacity>
+
+                {showRoleDropdown && (
+                  <View style={styles.dropdown}>
+                    {roles.map(item => (
+                      <TouchableOpacity
+                        key={item}
+                        style={styles.dropdownItem}
+                        onPress={() => {
+                          setRole(item);
+                          setShowRoleDropdown(false);
+                        }}
+                      >
+                        <Text style={styles.dropdownText}>{item}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+              </View>
+
+              {/* Name */}
+
+              <View>
+                <Text style={styles.modalFormTitle}>Name</Text>
+
+                <TextInput
+                  placeholder="Enter name"
+                  style={styles.input}
+                  value={name}
+                  onChangeText={setName}
+                />
+              </View>
+
+              {/* Email */}
+
+              <View>
+                <Text style={styles.modalFormTitle}>Email</Text>
+
+                <TextInput
+                  placeholder="Enter Email"
+                  style={styles.input}
+                  keyboardType="email-address"
+                  value={email}
+                  onChangeText={setEmail}
+                />
+              </View>
+
+              {/* Birthdate */}
+
+              <View>
+                <Text style={styles.modalFormTitle}>Birthdate</Text>
+                <TouchableOpacity
+                  style={styles.input}
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <Text style={{ color: birthdate ? '#000' : '#999' }}>
+                    {birthdate ? birthdate.toDateString() : 'Enter Birthdate'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {showDatePicker && (
+                <DateTimePicker
+                  value={birthdate || new Date()}
+                  mode="date"
+                  onChange={(e, date) => {
+                    setShowDatePicker(false);
+                    if (date) setBirthdate(date);
+                  }}
+                />
+              )}
+
+              {/* Passport upload */}
+
+              <View>
+                <Text style={styles.modalFormTitle}>Upload Passport</Text>
+
+                <TouchableOpacity
+                  style={styles.uploadBtn}
+                  onPress={pickPassport}
+                >
+                  <Text
+                    style={[
+                      styles.fileName,
+                      { color: passport ? '#1B1C1E' : '#999' },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {passport ? passport.name : 'No file selected'}
+                  </Text>
+
+                  <Text style={styles.uploadText}>
+                    {passport ? 'Change File' : 'Upload'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Buttons */}
+              <TouchableOpacity style={styles.sendBtn} onPress={sendInvite}>
+                <Text style={styles.sendText}>Send Invite</Text>
               </TouchableOpacity>
-            </View>
 
-            {/* Buttons */}
-            <TouchableOpacity style={styles.sendBtn} onPress={sendInvite}>
-              <Text style={styles.sendText}>Send Invite</Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={() => setShowModal(false)}>
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
 
-            <TouchableOpacity onPress={() => setShowModal(false)}>
-              <Text style={styles.cancelText}>Cancel</Text>
-            </TouchableOpacity>
+      {/* MODAL for EDIT MEMBER LIST */}
+      <Modal transparent animationType="slide" visible={showModalEdit}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <ScrollView>
+              <View style={styles.modalTitleBox}>
+                <Text style={styles.modalTitle}>Edit member</Text>
+              </View>
+
+              {/* ROLE DROPDOWN */}
+              <View>
+                <Text style={styles.modalFormTitle}>
+                  Who are you inviting to your family space?
+                </Text>
+                <TouchableOpacity
+                  style={[styles.input, styles.dropdownTrigger]}
+                  onPress={() => setShowRoleDropdown(!showRoleDropdown)}
+                >
+                  <Text style={{ color: role ? '#000' : '#999' }}>
+                    {role || 'Choose a role'}
+                  </Text>
+
+                  <Ionicons
+                    name={showRoleDropdown ? 'chevron-up' : 'chevron-down'}
+                    size={18}
+                    color="#999"
+                  />
+                </TouchableOpacity>
+
+                {showRoleDropdown && (
+                  <View style={styles.dropdown}>
+                    {roles.map(item => (
+                      <TouchableOpacity
+                        key={item}
+                        style={styles.dropdownItem}
+                        onPress={() => {
+                          setRole(item);
+                          setShowRoleDropdown(false);
+                        }}
+                      >
+                        <Text style={styles.dropdownText}>{item}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+              </View>
+
+              {/* Name */}
+
+              <View>
+                <Text style={styles.modalFormTitle}>Name</Text>
+
+                <TextInput
+                  placeholder="Enter name"
+                  style={styles.input}
+                  value={name}
+                  onChangeText={setName}
+                />
+              </View>
+
+              {/* Email */}
+
+              <View>
+                <Text style={styles.modalFormTitle}>Email</Text>
+
+                <TextInput
+                  placeholder="Enter Email"
+                  style={styles.input}
+                  keyboardType="email-address"
+                  value={email}
+                  onChangeText={setEmail}
+                />
+              </View>
+
+              {/* Birthdate */}
+
+              <View>
+                <Text style={styles.modalFormTitle}>Birthdate</Text>
+                <TouchableOpacity
+                  style={styles.input}
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <Text style={{ color: birthdate ? '#000' : '#999' }}>
+                    {birthdate ? birthdate.toDateString() : 'Enter Birthdate'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {showDatePicker && (
+                <DateTimePicker
+                  value={birthdate || new Date()}
+                  mode="date"
+                  onChange={(e, date) => {
+                    setShowDatePicker(false);
+                    if (date) setBirthdate(date);
+                  }}
+                />
+              )}
+
+              {/* Passport upload */}
+
+              <View>
+                <Text style={styles.modalFormTitle}>Upload Passport</Text>
+
+                <TouchableOpacity
+                  style={styles.uploadBtn}
+                  onPress={pickPassport}
+                >
+                  <Text
+                    style={[
+                      styles.fileName,
+                      { color: passport ? '#1B1C1E' : '#999' },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {passport ? passport.name : 'No file selected'}
+                  </Text>
+
+                  <Text style={styles.uploadText}>
+                    {passport ? 'Change File' : 'Upload'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Buttons */}
+              <TouchableOpacity style={styles.sendBtn} onPress={updateMember}>
+                <Text style={styles.sendText}>Save</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => setShowModalEdit(false)}>
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -271,13 +508,12 @@ const styles = StyleSheet.create({
     height: 180,
   },
   memberlistbox3: {
-    height: 30,
-    borderBlockColor: '#E2E8F9',
+    paddingVertical: 6,
+    borderBottomColor: '#E2E8F9',
     borderBottomWidth: 1,
-
-    flex: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
 
   imagebox: {
