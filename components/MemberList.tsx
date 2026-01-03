@@ -10,6 +10,7 @@ import {
 import React, { useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { launchImageLibrary } from 'react-native-image-picker';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function MemberList() {
   const [showModal, setShowModal] = useState(false);
@@ -118,15 +119,22 @@ export default function MemberList() {
 
             {/* ROLE DROPDOWN */}
             <View>
-              <Text>Role</Text>
-
+              <Text style={styles.modalFormTitle}>
+                Who are you inviting to your family space?
+              </Text>
               <TouchableOpacity
-                style={styles.input}
+                style={[styles.input, styles.dropdownTrigger]}
                 onPress={() => setShowRoleDropdown(!showRoleDropdown)}
               >
                 <Text style={{ color: role ? '#000' : '#999' }}>
-                  {role || 'Select Role'}
+                  {role || 'Choose a role'}
                 </Text>
+
+                <Ionicons
+                  name={showRoleDropdown ? 'chevron-up' : 'chevron-down'}
+                  size={18}
+                  color="#999"
+                />
               </TouchableOpacity>
 
               {showRoleDropdown && (
@@ -150,10 +158,10 @@ export default function MemberList() {
             {/* Name */}
 
             <View>
-              <Text>Name</Text>
+              <Text style={styles.modalFormTitle}>Name</Text>
 
               <TextInput
-                placeholder="Full Name"
+                placeholder="Enter name"
                 style={styles.input}
                 value={name}
                 onChangeText={setName}
@@ -163,10 +171,10 @@ export default function MemberList() {
             {/* Email */}
 
             <View>
-              <Text>Email</Text>
+              <Text style={styles.modalFormTitle}>Email</Text>
 
               <TextInput
-                placeholder="Email Address"
+                placeholder="Enter Email"
                 style={styles.input}
                 keyboardType="email-address"
                 value={email}
@@ -177,13 +185,13 @@ export default function MemberList() {
             {/* Birthdate */}
 
             <View>
-              <Text>Birthdate</Text>
+              <Text style={styles.modalFormTitle}>Birthdate</Text>
               <TouchableOpacity
                 style={styles.input}
                 onPress={() => setShowDatePicker(true)}
               >
                 <Text style={{ color: birthdate ? '#000' : '#999' }}>
-                  {birthdate ? birthdate.toDateString() : 'Select Birthdate'}
+                  {birthdate ? birthdate.toDateString() : 'Enter Birthdate'}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -320,7 +328,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 16,
-    height: '75%',
+    height: '90%',
     marginTop: '100%',
   },
 
@@ -328,6 +336,7 @@ const styles = StyleSheet.create({
     flex: 0,
     justifyContent: 'space-between',
     flexDirection: 'row',
+    marginVertical: 20,
   },
   modalTitle: {
     fontSize: 20,
@@ -351,6 +360,19 @@ const styles = StyleSheet.create({
     fontWeight: 400,
     color: '#1B1C1E',
   },
+  modalFormTitle: {
+    fontSize: 12,
+    color: '#6C7278',
+    fontWeight: 500,
+    marginBottom: 4,
+  },
+
+  dropdownTrigger: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
   dropdown: {
     borderWidth: 1,
     borderColor: '#E2E8F9',
@@ -375,7 +397,8 @@ const styles = StyleSheet.create({
     borderColor: '#E2E8F9',
     borderRadius: 6,
     padding: 10,
-    marginBottom: 10,
+    marginBottom: 15,
+    height: 46,
   },
   uploadBtn: {
     borderWidth: 1,
@@ -401,6 +424,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     alignItems: 'center',
     marginTop: 6,
+    height: 48,
   },
   sendText: {
     color: '#fff',
