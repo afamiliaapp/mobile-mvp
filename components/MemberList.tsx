@@ -42,6 +42,22 @@ export default function MemberList() {
     setShowModal(false);
   };
 
+  const [role, setRole] = useState('');
+  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
+
+  const roles = [
+    'Father',
+    'Mother',
+    'Brother',
+    'Sister',
+    'Father-in-law',
+    'Mother-in-law',
+    'Brother-in-law',
+    'Sister-in-law',
+    'Son',
+    'Daughter',
+  ];
+
   return (
     <View>
       <Text style={styles.memberlisttitle}>Member list</Text>
@@ -98,6 +114,37 @@ export default function MemberList() {
               <View style={styles.modalsharebox}>
                 <Text style={styles.modalsharetxt}>Share Link</Text>
               </View>
+            </View>
+
+            {/* ROLE DROPDOWN */}
+            <View>
+              <Text>Role</Text>
+
+              <TouchableOpacity
+                style={styles.input}
+                onPress={() => setShowRoleDropdown(!showRoleDropdown)}
+              >
+                <Text style={{ color: role ? '#000' : '#999' }}>
+                  {role || 'Select Role'}
+                </Text>
+              </TouchableOpacity>
+
+              {showRoleDropdown && (
+                <View style={styles.dropdown}>
+                  {roles.map(item => (
+                    <TouchableOpacity
+                      key={item}
+                      style={styles.dropdownItem}
+                      onPress={() => {
+                        setRole(item);
+                        setShowRoleDropdown(false);
+                      }}
+                    >
+                      <Text style={styles.dropdownText}>{item}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
             </View>
 
             {/* Name */}
@@ -304,6 +351,25 @@ const styles = StyleSheet.create({
     fontWeight: 400,
     color: '#1B1C1E',
   },
+  dropdown: {
+    borderWidth: 1,
+    borderColor: '#E2E8F9',
+    borderRadius: 6,
+    marginBottom: 10,
+    backgroundColor: '#fff',
+  },
+
+  dropdownItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+  },
+
+  dropdownText: {
+    fontSize: 14,
+    color: '#1B1C1E',
+  },
+
   input: {
     borderWidth: 1,
     borderColor: '#E2E8F9',
