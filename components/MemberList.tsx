@@ -20,6 +20,7 @@ export default function MemberList() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [editingMemberId, setEditingMemberId] = useState(null);
   const [showModalShare, setShowModalShare] = useState(false);
+  const [showModalDelete, setShowModalDelete] = useState(false);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -153,6 +154,7 @@ export default function MemberList() {
                 </View>
 
                 <View style={styles.imagebox2}>
+                  {/**EDIT BUTTON */}
                   <TouchableOpacity
                     onPress={() => {
                       setEditingMemberId(member.id);
@@ -172,10 +174,12 @@ export default function MemberList() {
                     />
                   </TouchableOpacity>
 
+                  {/**DELETE BUTTON */}
+
                   <TouchableOpacity
-                    onPress={() =>
-                      setMembers(prev => prev.filter(m => m.id !== member.id))
-                    }
+                    onPress={() => {
+                      setShowModalDelete(true);
+                    }}
                   >
                     <Image
                       style={styles.image2}
@@ -513,7 +517,7 @@ export default function MemberList() {
 
               <View>
                 <TextInput
-                  placeholder="Enter name"
+                  placeholder="yourlink@Afamilia"
                   style={styles.input}
                   value={name}
                   onChangeText={setName}
@@ -528,6 +532,55 @@ export default function MemberList() {
               <TouchableOpacity onPress={() => setShowModalShare(false)}>
                 <Text style={styles.cancelText}>Cancel</Text>
               </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* MODAL for DELETE  */}
+      <Modal transparent animationType="slide" visible={showModalDelete}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalDelBox2}>
+            <ScrollView>
+              <View style={styles.modalTitleBox2}>
+                <Text style={styles.modalTitle}>Delete member</Text>
+              </View>
+
+              {/* ROLE DROPDOWN */}
+              <View>
+                <Text style={styles.modalDeletetext}>
+                  Are you sure you wish to delete this member
+                </Text>
+                <Text style={styles.modalDeletetext}>
+                  This will revoke [Name]’s access to your family space. They
+                  won’t see your calendar, chats, or memories anymore.
+                </Text>
+                <Text style={styles.modalDeletetext}>
+                  I understand this action cannot be undone
+                </Text>
+              </View>
+
+              {/* Name */}
+
+              {/* Buttons */}
+
+              <View style={styles.deleteBox}>
+                <TouchableOpacity
+                  style={styles.cancelbtn}
+                  onPress={() => setShowModalDelete(false)}
+                >
+                  <Text style={styles.cancelText2}>Cancel</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.deletebtn}
+                  onPress={() =>
+                    setMembers(prev => prev.filter(m => m.id !== member.id))
+                  }
+                >
+                  <Text style={styles.sendText}>Continue</Text>
+                </TouchableOpacity>
+              </View>
             </ScrollView>
           </View>
         </View>
@@ -638,6 +691,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 16,
+    height: '58%',
+    marginTop: '100%',
+  },
+
+  modalDelBox2: {
+    width: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 16,
+    paddingHorizontal: 20,
     height: '58%',
     marginTop: '100%',
   },
@@ -774,5 +837,43 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#999',
     marginTop: 15,
+  },
+  cancelText2: {
+    textAlign: 'center',
+    color: '#999',
+  },
+
+  modalDeletetext: {
+    color: '#999999',
+    fontSize: 14,
+    fontWeight: 400,
+    marginVertical: 10,
+  },
+
+  deleteBox: {
+    height: 50,
+    flex: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 40,
+  },
+  deletebtn: {
+    height: 48,
+    width: 152,
+    backgroundColor: '#2C247A',
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cancelbtn: {
+    height: 48,
+    width: 152,
+    backgroundColor: '#fff',
+    borderColor: '#E2E8F9',
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
