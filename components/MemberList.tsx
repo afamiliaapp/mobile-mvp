@@ -8,7 +8,7 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { launchImageLibrary } from 'react-native-image-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -21,11 +21,19 @@ export default function MemberList() {
   const [editingMemberId, setEditingMemberId] = useState(null);
   const [showModalShare, setShowModalShare] = useState(false);
   const [showModalDelete, setShowModalDelete] = useState(false);
+  const [accepted, setAccepted] = useState(false);
+  const [selectedMember, setSelectedMember] = useState(null);
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [birthdate, setBirthdate] = useState(null);
   const [passport, setPassport] = useState(null);
+
+  useEffect(() => {
+    if (!showModalDelete) {
+      setAccepted(false);
+    }
+  }, [showModalDelete]);
 
   const pickPassport = async () => {
     const result = await launchImageLibrary({
@@ -178,6 +186,7 @@ export default function MemberList() {
 
                   <TouchableOpacity
                     onPress={() => {
+                      setSelectedMember(member);
                       setShowModalDelete(true);
                     }}
                   >
@@ -555,9 +564,25 @@ export default function MemberList() {
                   This will revoke [Name]’s access to your family space. They
                   won’t see your calendar, chats, or memories anymore.
                 </Text>
-                <Text style={styles.modalDeletetext}>
-                  I understand this action cannot be undone
-                </Text>
+
+                <TouchableOpacity
+                  style={styles.acceptRow}
+                  onPress={() => setAccepted(!accepted)}
+                  activeOpacity={0.8}
+                >
+                  <View
+                    style={[
+                      styles.radioOuter,
+                      accepted && styles.radioOuterActive,
+                    ]}
+                  >
+                    {accepted && <View style={styles.radioInner} />}
+                  </View>
+
+                  <Text style={styles.modalDeletetext}>
+                    I understand this action cannot be undone
+                  </Text>
+                </TouchableOpacity>
               </View>
 
               {/* Name */}
@@ -573,12 +598,31 @@ export default function MemberList() {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={styles.deletebtn}
-                  onPress={() =>
-                    setMembers(prev => prev.filter(m => m.id !== member.id))
-                  }
+                  style={[
+                    styles.deletebtn,
+                    !accepted && styles.deleteBtnDisabled,
+                  ]}
+                  disabled={!accepted}
+                  onPress={() => {
+                    if (!selectedMember) return;
+
+                    setMembers(prev =>
+                      prev.filter(m => m.id !== selectedMember.id),
+                    );
+
+                    setAccepted(false);
+                    setShowModalDelete(false);
+                    setSelectedMember(null);
+                  }}
                 >
-                  <Text style={styles.sendText}>Continue</Text>
+                  <Text
+                    style={[
+                      styles.sendText,
+                      !accepted && styles.sendTextDisabled,
+                    ]}
+                  >
+                    Continue
+                  </Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>
@@ -875,5 +919,41 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  acceptRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+  },
+
+  radioOuter: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: '#B0B0B0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+
+  radioOuterActive: {
+    borderColor: '#D32F2F',
+  },
+
+  radioInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#D32F2F',
+  },
+
+  deleteBtnDisabled: {
+    opacity: 0.4,
+  },
+
+  sendTextDisabled: {
+    color: '#fff',
   },
 });
