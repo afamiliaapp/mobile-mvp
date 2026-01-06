@@ -2,12 +2,19 @@ import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import React, { useState } from 'react';
 import SettingsBar from '../components/SettingsBar';
 import BackButton from '../components/BackButton';
+import EnableQuietHours from '../components/EnableQuietHours';
 
 export default function Settings() {
   const [switches, setSwitches] = useState({
     financeAccess: false,
     guestPhotos: false,
     guestMemories: false,
+    childrenChores: false,
+    parentApproval: false,
+    showBirthdays: false,
+    showRelationships: false,
+    pushNotification: false,
+    emailNotification: false,
   });
 
   return (
@@ -17,6 +24,9 @@ export default function Settings() {
 
       <ScrollView style={styles.settingsbox}>
         <Text style={styles.titletxt}>Privacy & Permissions</Text>
+
+        {/**Finance Access */}
+
         <View style={styles.settingsbox2}>
           <Text style={styles.titletxt2}>Finance Access</Text>
           <View style={styles.settingsbox3}>
@@ -32,6 +42,8 @@ export default function Settings() {
             />
           </View>
         </View>
+
+        {/**Photos & Memories Access */}
 
         <View style={styles.settingsbox2}>
           <Text style={styles.titletxt2}>Photos & Memories Access</Text>
@@ -58,6 +70,97 @@ export default function Settings() {
               }
             />
           </View>
+        </View>
+
+        {/**Chores Access */}
+
+        <View style={styles.settingsbox2}>
+          <Text style={styles.titletxt2}>Chores Access</Text>
+          <View style={styles.settingsbox3}>
+            <Text style={styles.subtitletxt}>
+              Children can mark chores as completed
+            </Text>
+
+            <Switch
+              value={switches.childrenChores}
+              onValueChange={value =>
+                setSwitches(prev => ({ ...prev, childrenChores: value }))
+              }
+            />
+          </View>
+
+          <View style={styles.settingsbox3}>
+            <Text style={styles.subtitletxt}>
+              Parents must approve before awarding points
+            </Text>
+
+            <Switch
+              value={switches.parentApproval}
+              onValueChange={value =>
+                setSwitches(prev => ({ ...prev, parentApproval: value }))
+              }
+            />
+          </View>
+        </View>
+
+        {/**Data Visibility */}
+
+        <View style={styles.settingsbox2}>
+          <Text style={styles.titletxt2}>Data Visibility</Text>
+          <View style={styles.settingsbox3}>
+            <Text style={styles.subtitletxt}>
+              Show birthdays to all members
+            </Text>
+
+            <Switch
+              value={switches.showBirthdays}
+              onValueChange={value =>
+                setSwitches(prev => ({ ...prev, showBirthdays: value }))
+              }
+            />
+          </View>
+
+          <View style={styles.settingsbox3}>
+            <Text style={styles.subtitletxt}>
+              Show relationships in Family Tree
+            </Text>
+
+            <Switch
+              value={switches.showRelationships}
+              onValueChange={value =>
+                setSwitches(prev => ({ ...prev, showRelationships: value }))
+              }
+            />
+          </View>
+        </View>
+
+        {/**Notifications */}
+
+        <View style={styles.settingsbox2}>
+          <Text style={styles.titletxt2}>Notifications</Text>
+          <View style={styles.settingsbox3}>
+            <Text style={styles.subtitletxt}>Push notifications</Text>
+
+            <Switch
+              value={switches.pushNotification}
+              onValueChange={value =>
+                setSwitches(prev => ({ ...prev, pushNotification: value }))
+              }
+            />
+          </View>
+
+          <View style={styles.settingsbox3}>
+            <Text style={styles.subtitletxt}>Email</Text>
+
+            <Switch
+              value={switches.emailNotification}
+              onValueChange={value =>
+                setSwitches(prev => ({ ...prev, emailNotification: value }))
+              }
+            />
+          </View>
+
+          <EnableQuietHours />
         </View>
       </ScrollView>
     </View>
