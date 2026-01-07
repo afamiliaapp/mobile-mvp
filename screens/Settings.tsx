@@ -1,4 +1,11 @@
-import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  View,
+} from 'react-native';
 import React, { useState } from 'react';
 import SettingsBar from '../components/SettingsBar';
 import BackButton from '../components/BackButton';
@@ -162,6 +169,34 @@ export default function Settings() {
 
           <EnableQuietHours />
         </View>
+
+        {/**Data Visibility */}
+
+        <View style={styles.settingsbox2}>
+          <Text style={styles.titletxt2}>System Default</Text>
+
+          <Text style={styles.themetxt}>Theme</Text>
+
+          <View style={styles.themebox}>
+            <View style={styles.themeitem}>
+              <Image source={require('../assets/sun-03.png')} />
+              <Text>Light</Text>
+            </View>
+
+            <View style={styles.themeitem}>
+              <Image
+                style={styles.themeimg}
+                source={require('../assets/moon-02.png')}
+              />
+              <Text>Dark</Text>
+            </View>
+
+            <View style={styles.themeitem2}>
+              <Image source={require('../assets/smart-phone-02.png')} />
+              <Text>System Default</Text>
+            </View>
+          </View>
+        </View>
       </ScrollView>
     </View>
   );
@@ -208,5 +243,49 @@ const styles = StyleSheet.create({
     fontWeight: 500,
     color: '#6C7278',
     marginVertical: 15,
+  },
+
+  themetxt: {
+    color: '#6C7278',
+    fontSize: 12,
+    marginTop: 20,
+  },
+
+  themebox: {
+    flex: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    height: 50,
+
+    marginTop: 5,
+  },
+
+  themeitem: {
+    flex: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 8,
+    width: 80,
+    alignItems: 'center',
+    borderColor: '#E2E8F9',
+  },
+
+  themeimg: {
+    height: 18,
+    width: 18,
+  },
+
+  themeitem2: {
+    flex: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 8,
+    width: 150,
+    alignItems: 'center',
+    borderColor: '#E2E8F9',
   },
 });
