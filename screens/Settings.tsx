@@ -10,6 +10,7 @@ import React, { useState } from 'react';
 import SettingsBar from '../components/SettingsBar';
 import BackButton from '../components/BackButton';
 import EnableQuietHours from '../components/EnableQuietHours';
+import Themesettings from '../components/Themesettings';
 
 export default function Settings() {
   const [switches, setSwitches] = useState({
@@ -172,31 +173,7 @@ export default function Settings() {
 
         {/**Data Visibility */}
 
-        <View style={styles.settingsbox2}>
-          <Text style={styles.titletxt2}>System Default</Text>
-
-          <Text style={styles.themetxt}>Theme</Text>
-
-          <View style={styles.themebox}>
-            <View style={styles.themeitem}>
-              <Image source={require('../assets/sun-03.png')} />
-              <Text>Light</Text>
-            </View>
-
-            <View style={styles.themeitem}>
-              <Image
-                style={styles.themeimg}
-                source={require('../assets/moon-02.png')}
-              />
-              <Text>Dark</Text>
-            </View>
-
-            <View style={styles.themeitem2}>
-              <Image source={require('../assets/smart-phone-02.png')} />
-              <Text>System Default</Text>
-            </View>
-          </View>
-        </View>
+        <Themesettings />
       </ScrollView>
     </View>
   );
