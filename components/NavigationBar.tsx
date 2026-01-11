@@ -1,35 +1,43 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React from 'react';
+import React, { useContext } from 'react';
 import { useNavigation, useNavigationState } from '@react-navigation/native';
+import { ThemeContext } from '../context/ThemeContext';
 
 export default function NavigationBar() {
   const navigation = useNavigation();
+  const { theme, isDark } = useContext(ThemeContext);
 
   // Get current screen name
   const currentRouteName = useNavigationState(
     state => state.routes[state.index]?.name,
   );
 
-  const isActive = route => route === currentRouteName;
+  const isActive = (route: string) => route === currentRouteName;
+
+  /* 🎨 Theme-based colors */
+  const activeColor = isDark ? '#93C5FD' : '#2C247A';
+  const inactiveColor = isDark ? '#64748B' : '#999';
+  const barBackground = theme.background;
+  const centerButtonBg = activeColor;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: barBackground }]}>
       {/* HOME */}
       <TouchableOpacity
         style={styles.menubox}
-        onPress={() => navigation.navigate('Dashboard')}
+        onPress={() => navigation.navigate('Dashboard' as never)}
       >
         <Image
           source={require('../assets/home-05.png')}
           style={[
             styles.icon,
-            { tintColor: isActive('Dashboard') ? '#2C247A' : '#999' },
+            { tintColor: isActive('Dashboard') ? activeColor : inactiveColor },
           ]}
         />
         <Text
           style={[
             styles.menutext,
-            { color: isActive('Dashboard') ? '#2C247A' : '#999' },
+            { color: isActive('Dashboard') ? activeColor : inactiveColor },
           ]}
         >
           Home
@@ -39,19 +47,19 @@ export default function NavigationBar() {
       {/* CALENDAR */}
       <TouchableOpacity
         style={styles.menubox}
-        onPress={() => navigation.navigate('Calendar')}
+        onPress={() => navigation.navigate('Calendar' as never)}
       >
         <Image
           source={require('../assets/calendar-04.png')}
           style={[
             styles.icon,
-            { tintColor: isActive('Calendar') ? '#2C247A' : '#999' },
+            { tintColor: isActive('Calendar') ? activeColor : inactiveColor },
           ]}
         />
         <Text
           style={[
             styles.menutext,
-            { color: isActive('Calendar') ? '#2C247A' : '#999' },
+            { color: isActive('Calendar') ? activeColor : inactiveColor },
           ]}
         >
           Calendar
@@ -61,12 +69,14 @@ export default function NavigationBar() {
       {/* CENTER BUTTON */}
       <TouchableOpacity
         style={styles.menubox}
-        onPress={() => navigation.navigate('Menu')}
+        onPress={() => navigation.navigate('Menu' as never)}
       >
-        <View style={styles.menubox2a}>
+        <View
+          style={[styles.centerButton, { backgroundColor: centerButtonBg }]}
+        >
           <Image
             source={require('../assets/grid-view.png')}
-            style={{ width: 24, height: 24 }}
+            style={styles.centerIcon}
           />
         </View>
       </TouchableOpacity>
@@ -74,19 +84,19 @@ export default function NavigationBar() {
       {/* CHAT */}
       <TouchableOpacity
         style={styles.menubox}
-        onPress={() => navigation.navigate('Chat')}
+        onPress={() => navigation.navigate('Chat' as never)}
       >
         <Image
           source={require('../assets/bubble-chat.png')}
           style={[
             styles.icon,
-            { tintColor: isActive('Chat') ? '#2C247A' : '#999' },
+            { tintColor: isActive('Chat') ? activeColor : inactiveColor },
           ]}
         />
         <Text
           style={[
             styles.menutext,
-            { color: isActive('Chat') ? '#2C247A' : '#999' },
+            { color: isActive('Chat') ? activeColor : inactiveColor },
           ]}
         >
           Chat
@@ -96,19 +106,19 @@ export default function NavigationBar() {
       {/* PROFILE */}
       <TouchableOpacity
         style={styles.menubox}
-        onPress={() => navigation.navigate('Profile')}
+        onPress={() => navigation.navigate('Profile' as never)}
       >
         <Image
           source={require('../assets/user-circle.png')}
           style={[
             styles.icon,
-            { tintColor: isActive('Profile') ? '#2C247A' : '#999' },
+            { tintColor: isActive('Profile') ? activeColor : inactiveColor },
           ]}
         />
         <Text
           style={[
             styles.menutext,
-            { color: isActive('Profile') ? '#2C247A' : '#999' },
+            { color: isActive('Profile') ? activeColor : inactiveColor },
           ]}
         >
           Profile
@@ -121,11 +131,11 @@ export default function NavigationBar() {
 const styles = StyleSheet.create({
   container: {
     height: 96,
-    backgroundColor: '#fff',
-    flex: 0,
     flexDirection: 'row',
     paddingHorizontal: 20,
     borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
 
   menubox: {
@@ -135,21 +145,28 @@ const styles = StyleSheet.create({
   },
 
   menutext: {
-    color: '#2C247A',
-    fontWeight: 600,
+    fontWeight: '600',
     fontSize: 12,
+    marginTop: 4,
   },
 
-  menubox2: {
-    width: 75,
-    height: 96,
+  icon: {
+    width: 22,
+    height: 22,
+    marginBottom: 2,
   },
-  menubox2a: {
+
+  centerButton: {
     width: 52,
     height: 52,
-    backgroundColor: '#2C247A',
     borderRadius: 100,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  centerIcon: {
+    width: 24,
+    height: 24,
+    tintColor: '#fff',
   },
 });

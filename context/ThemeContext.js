@@ -3,43 +3,34 @@ import { Appearance } from 'react-native';
 
 export const ThemeContext = createContext();
 
+// Light mode colors
 const lightTheme = {
-  mode: 'light',
   background: '#FFFFFF',
-  text: '#1B1C1E',
-  border: '#E2E8F9',
+  titleText: '#1B1C1E', // titles
+  text: '#6C7278',
+  // regular text
 };
 
+// Dark mode colors
 const darkTheme = {
-  mode: 'dark',
-  background: '#0F1115',
+  background: '#020617',
+  titleText: '#FFFFFF', // all text white in dark mode
   text: '#FFFFFF',
-  border: '#2A2D34',
+  subtitle: '#ffffff',
 };
 
 export const ThemeProvider = ({ children }) => {
   const systemScheme = Appearance.getColorScheme();
 
-  const [themeMode, setThemeMode] = useState('system'); // light | dark | system
+  const [themeMode, setThemeMode] = useState('system');
   const [theme, setTheme] = useState(
     systemScheme === 'dark' ? darkTheme : lightTheme,
   );
 
-  // Listen for system theme changes
-  useEffect(() => {
-    const listener = Appearance.addChangeListener(({ colorScheme }) => {
-      if (themeMode === 'system') {
-        setTheme(colorScheme === 'dark' ? darkTheme : lightTheme);
-      }
-    });
+  const isDark =
+    themeMode === 'dark' || (themeMode === 'system' && systemScheme === 'dark');
 
-    return () => listener.remove();
-  }, [themeMode]);
-
-  // Manual theme switch
-  const changeTheme = mode => {
-    setThemeMode(mode);
-
+  const applyTheme = mode => {
     if (mode === 'light') setTheme(lightTheme);
     if (mode === 'dark') setTheme(darkTheme);
     if (mode === 'system') {
@@ -47,8 +38,30 @@ export const ThemeProvider = ({ children }) => {
     }
   };
 
+  const changeTheme = mode => {
+    setThemeMode(mode);
+    applyTheme(mode);
+  };
+
+  useEffect(() => {
+    const sub = Appearance.addChangeListener(({ colorScheme }) => {
+      if (themeMode === 'system') {
+        setTheme(colorScheme === 'dark' ? darkTheme : lightTheme);
+      }
+    });
+
+    return () => sub.remove();
+  }, [themeMode]);
+
   return (
-    <ThemeContext.Provider value={{ theme, themeMode, changeTheme }}>
+    <ThemeContext.Provider
+      value={{
+        theme,
+        themeMode,
+        isDark,
+        changeTheme,
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );
