@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import React, { useState } from 'react';
+import ThemedText from './ThemedText';
 
 export default function EnableQuietHours() {
   const [ShowModalQuietHour, setShowModalQuietHour] = useState(false);
@@ -15,7 +16,7 @@ export default function EnableQuietHours() {
   return (
     <View>
       <View style={styles.settingsbox3}>
-        <Text style={styles.subtitletxt}>Enable Quiet Hours</Text>
+        <ThemedText style={styles.subtitletxt}>Enable Quiet Hours</ThemedText>
 
         <TouchableOpacity
           onPress={() => {
@@ -88,7 +89,7 @@ const styles = StyleSheet.create({
   subtitletxt: {
     fontSize: 12,
     fontWeight: 500,
-    color: '#6C7278',
+
     marginVertical: 15,
   },
 
