@@ -13,16 +13,40 @@ import { ThemeProvider, ThemeContext } from './context/ThemeContext';
 
 const RootStack = createNativeStackNavigator();
 
-/* 🔥 Separate component so we can use useContext */
-const AppNavigator = () => {
-  const { theme } = useContext(ThemeContext);
+/* 🔥 Custom Navigation Themes */
+const LightNavTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: '#FFFFFF',
+    card: '#FFFFFF',
+    text: '#0F172A',
+    border: '#E2E8F9',
+  },
+};
 
-  const navigationTheme = theme.mode === 'dark' ? DarkTheme : DefaultTheme;
+const DarkNavTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    background: '#020617',
+    card: '#020617',
+    text: '#F8FAFC',
+    border: '#1E293B',
+  },
+};
+
+/* 🔥 Navigation wrapper that listens to ThemeContext */
+const AppNavigator = () => {
+  const { theme, isDark } = useContext(ThemeContext);
 
   return (
-    <NavigationContainer theme={navigationTheme}>
+    <NavigationContainer theme={isDark ? DarkNavTheme : LightNavTheme}>
       <RootStack.Navigator
-        screenOptions={{ headerShown: false }}
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: theme.background },
+        }}
         initialRouteName="Main"
       >
         <RootStack.Screen name="Auth" component={Authlayout} />
