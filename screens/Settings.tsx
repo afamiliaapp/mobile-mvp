@@ -36,11 +36,13 @@ export default function Settings() {
           {/**Finance Access */}
 
           <View style={styles.settingsbox2}>
-            <ThemedText style={styles.titletxt2}>Finance Access</ThemedText>
+            <ThemedText variant="title" style={styles.titletxt2}>
+              Finance Access
+            </ThemedText>
             <View style={styles.settingsbox3}>
-              <Text style={styles.subtitletxt}>
+              <ThemedText style={styles.subtitletxt}>
                 Allow children to view family expenses & budgets
-              </Text>
+              </ThemedText>
 
               <Switch
                 value={switches.financeAccess}
@@ -71,9 +73,9 @@ export default function Settings() {
             </View>
 
             <View style={styles.settingsbox3}>
-              <Text style={styles.subtitletxt}>
+              <ThemedText style={styles.subtitletxt}>
                 Allow relatives to upload photos
-              </Text>
+              </ThemedText>
 
               <Switch
                 value={switches.guestMemories}
@@ -87,11 +89,13 @@ export default function Settings() {
           {/**Chores Access */}
 
           <View style={styles.settingsbox2}>
-            <Text style={styles.titletxt2}>Chores Access</Text>
+            <ThemedText variant="title" style={styles.titletxt2}>
+              Chores Access
+            </ThemedText>
             <View style={styles.settingsbox3}>
-              <Text style={styles.subtitletxt}>
+              <ThemedText style={styles.subtitletxt}>
                 Children can mark chores as completed
-              </Text>
+              </ThemedText>
 
               <Switch
                 value={switches.childrenChores}
@@ -102,9 +106,9 @@ export default function Settings() {
             </View>
 
             <View style={styles.settingsbox3}>
-              <Text style={styles.subtitletxt}>
+              <ThemedText style={styles.subtitletxt}>
                 Parents must approve before awarding points
-              </Text>
+              </ThemedText>
 
               <Switch
                 value={switches.parentApproval}
@@ -118,11 +122,13 @@ export default function Settings() {
           {/**Data Visibility */}
 
           <View style={styles.settingsbox2}>
-            <Text style={styles.titletxt2}>Data Visibility</Text>
+            <ThemedText variant="title" style={styles.titletxt2}>
+              Data Visibility
+            </ThemedText>
             <View style={styles.settingsbox3}>
-              <Text style={styles.subtitletxt}>
+              <ThemedText style={styles.subtitletxt}>
                 Show birthdays to all members
-              </Text>
+              </ThemedText>
 
               <Switch
                 value={switches.showBirthdays}
@@ -133,9 +139,9 @@ export default function Settings() {
             </View>
 
             <View style={styles.settingsbox3}>
-              <Text style={styles.subtitletxt}>
+              <ThemedText style={styles.subtitletxt}>
                 Show relationships in Family Tree
-              </Text>
+              </ThemedText>
 
               <Switch
                 value={switches.showRelationships}
@@ -149,9 +155,13 @@ export default function Settings() {
           {/**Notifications */}
 
           <View style={styles.settingsbox2}>
-            <Text style={styles.titletxt2}>Notifications</Text>
+            <ThemedText variant="title" style={styles.titletxt2}>
+              Notifications
+            </ThemedText>
             <View style={styles.settingsbox3}>
-              <Text style={styles.subtitletxt}>Push notifications</Text>
+              <ThemedText style={styles.subtitletxt}>
+                Push notifications
+              </ThemedText>
 
               <Switch
                 value={switches.pushNotification}
@@ -162,7 +172,7 @@ export default function Settings() {
             </View>
 
             <View style={styles.settingsbox3}>
-              <Text style={styles.subtitletxt}>Email</Text>
+              <ThemedText style={styles.subtitletxt}>Email</ThemedText>
 
               <Switch
                 value={switches.emailNotification}
@@ -173,6 +183,26 @@ export default function Settings() {
             </View>
 
             <EnableQuietHours />
+          </View>
+
+          {/**Notifications */}
+
+          <View style={styles.settingsbox2}>
+            <ThemedText variant="title" style={styles.titletxt2}>
+              Security
+            </ThemedText>
+            <View style={styles.settingsbox3}>
+              <ThemedText style={styles.subtitletxt}>
+                Biometric Login
+              </ThemedText>
+
+              <Switch
+                value={switches.pushNotification}
+                onValueChange={value =>
+                  setSwitches(prev => ({ ...prev, pushNotification: value }))
+                }
+              />
+            </View>
           </View>
 
           {/**Data Visibility */}
@@ -222,7 +252,7 @@ const styles = StyleSheet.create({
   subtitletxt: {
     fontSize: 12,
     fontWeight: 500,
-    color: '#6C7278',
+
     marginVertical: 15,
   },
 

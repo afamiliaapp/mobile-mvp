@@ -1,6 +1,7 @@
 import { Image, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import React, { useContext } from 'react';
 import { ThemeContext } from '../context/ThemeContext';
+import ThemedText from './ThemedText';
 
 export default function Themesettings() {
   const { theme, themeMode, changeTheme } = useContext(ThemeContext);
@@ -8,11 +9,14 @@ export default function Themesettings() {
   return (
     <View style={{ backgroundColor: theme.background }}>
       <View style={styles.settingsbox2}>
-        <Text style={[styles.titletxt2, { color: theme.text }]}>
+        <ThemedText
+          variant="title"
+          style={[styles.titletxt2, { color: theme.text }]}
+        >
           System Default
-        </Text>
+        </ThemedText>
 
-        <Text style={styles.themetxt}>Theme</Text>
+        <ThemedText style={styles.themetxt}>Theme</ThemedText>
 
         <View style={styles.themebox}>
           {/* LIGHT */}
@@ -21,7 +25,7 @@ export default function Themesettings() {
             onPress={() => changeTheme('light')}
           >
             <Image source={require('../assets/sun-03.png')} />
-            <Text>Light</Text>
+            <ThemedText variant="title">Light</ThemedText>
           </TouchableOpacity>
 
           {/* DARK */}
@@ -30,7 +34,7 @@ export default function Themesettings() {
             onPress={() => changeTheme('dark')}
           >
             <Image source={require('../assets/moon-02.png')} />
-            <Text>Dark</Text>
+            <ThemedText variant="title">Dark</ThemedText>
           </TouchableOpacity>
 
           {/* SYSTEM */}
@@ -39,7 +43,7 @@ export default function Themesettings() {
             onPress={() => changeTheme('system')}
           >
             <Image source={require('../assets/smart-phone-02.png')} />
-            <Text>System</Text>
+            <ThemedText>System</ThemedText>
           </TouchableOpacity>
         </View>
       </View>
@@ -61,7 +65,6 @@ const styles = StyleSheet.create({
   },
 
   themetxt: {
-    color: '#6C7278',
     fontSize: 12,
     marginTop: 20,
   },
@@ -96,6 +99,5 @@ const styles = StyleSheet.create({
 
   active: {
     borderColor: '#2563EB',
-    backgroundColor: '#EFF6FF',
   },
 });
