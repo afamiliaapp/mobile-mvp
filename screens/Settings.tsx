@@ -14,6 +14,7 @@ import Themesettings from '../components/Themesettings';
 import AppContainer from '../components/AppContainer';
 import { ThemeContext } from '../context/ThemeContext';
 import ThemedText from '../components/ThemedText';
+import DeleteAccount from '../components/DeleteAccount';
 
 export default function Settings() {
   const [switches, setSwitches] = useState({
@@ -192,7 +193,7 @@ export default function Settings() {
             <EnableQuietHours />
           </View>
 
-          {/**Notifications */}
+          {/**Security */}
 
           <View style={styles.settingsbox2}>
             <ThemedText variant="title" style={styles.titletxt2}>
@@ -216,9 +217,7 @@ export default function Settings() {
 
           <Themesettings />
 
-          <TouchableOpacity style={styles.deletebox}>
-            <Text style={styles.delettext}>Delete your Account</Text>
-          </TouchableOpacity>
+          <DeleteAccount />
 
           <View style={styles.savebox}>
             <ThemedText style={styles.savetext}>Save</ThemedText>
@@ -313,19 +312,6 @@ const styles = StyleSheet.create({
     width: 150,
     alignItems: 'center',
     borderColor: '#E2E8F9',
-  },
-
-  deletebox: {
-    flex: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 50,
-    marginVertical: 40,
-  },
-  delettext: {
-    color: '#ED0D0D',
-    fontSize: 16,
-    fontWeight: 500,
   },
 
   savebox: {

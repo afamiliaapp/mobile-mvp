@@ -1,22 +1,27 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React from 'react';
+import React, { useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { ThemeContext } from '../context/ThemeContext';
+import ThemedText from './ThemedText';
 
 export default function ProfileBar() {
   const navigation = useNavigation();
+  const { theme } = useContext(ThemeContext);
   return (
     <View style={styles.continer}>
       <View>
-        <Text style={styles.title}>Profile</Text>
+        <ThemedText variant="title" style={styles.title}>
+          Profile
+        </ThemedText>
       </View>
 
-      <View style={styles.belliconbox}>
+      <View style={[styles.belliconbox, { borderColor: theme.border }]}>
         <TouchableOpacity
           onPress={() => navigation.navigate('Notificationpage')}
         >
           <Image
             source={require('../assets/notificationbell.png')}
-            style={styles.bellicon}
+            style={[styles.bellicon, { tintColor: theme.icon }]} // dynamic icon color
           />
         </TouchableOpacity>
       </View>
@@ -38,7 +43,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 700,
-    color: '#1B1C1E',
   },
 
   belliconbox: {
