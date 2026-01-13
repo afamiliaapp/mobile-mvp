@@ -3,178 +3,181 @@ import React from 'react';
 import ProfileBar from '../components/ProfileBar';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import AppContainer from '../components/AppContainer';
 
 export default function Profile() {
   const navigation = useNavigation();
 
   return (
-    <View style={styles.container}>
-      <ProfileBar />
-      <View style={styles.profilebox}>
-        <View style={styles.profilebox2}>
-          <Image
-            source={require('../assets/notifyImage.png')}
-            style={styles.profileimage}
-          />
+    <AppContainer>
+      <View style={styles.container}>
+        <ProfileBar />
+        <View style={styles.profilebox}>
+          <View style={styles.profilebox2}>
+            <Image
+              source={require('../assets/notifyImage.png')}
+              style={styles.profileimage}
+            />
+
+            <View>
+              <Text style={styles.nametitle}>Sandra Johnson</Text>
+              <Text style={styles.progresstitle}>Progress Indicator</Text>
+              <View style={styles.progressbar} />
+            </View>
+
+            <View style={styles.verifybox}>
+              <Text style={styles.verifytext}>Verified</Text>
+            </View>
+          </View>
 
           <View>
-            <Text style={styles.nametitle}>Sandra Johnson</Text>
-            <Text style={styles.progresstitle}>Progress Indicator</Text>
-            <View style={styles.progressbar} />
-          </View>
-
-          <View style={styles.verifybox}>
-            <Text style={styles.verifytext}>Verified</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('ProfileEdithPage')}
+            >
+              <Image
+                source={require('../assets/pencil-edit-01.png')}
+                style={styles.editicon}
+              />
+            </TouchableOpacity>
           </View>
         </View>
 
-        <View>
+        <View style={styles.profileListBox1}>
           <TouchableOpacity
-            onPress={() => navigation.navigate('ProfileEdithPage')}
+            style={styles.profileListbox2}
+            activeOpacity={0.5}
+            onPress={() => navigation.navigate('Family')}
           >
-            <Image
-              source={require('../assets/pencil-edit-01.png')}
-              style={styles.editicon}
-            />
+            <View style={styles.profileListbox3}>
+              <Image
+                source={require('../assets/peer-to-peer-02.png')}
+                style={styles.profilelistIcon}
+              />
+
+              <Text style={styles.profilelistIcontext}>Family</Text>
+            </View>
+
+            <Ionicons name="chevron-forward" size={18} color="#000" />
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.profileListbox2}
+            activeOpacity={0.5}
+            onPress={() => navigation.navigate('Settings')}
+          >
+            <View style={styles.profileListbox3}>
+              <Image
+                source={require('../assets/setting-07.png')}
+                style={styles.profilelistIcon}
+              />
+
+              <Text style={styles.profilelistIcontext}>Settings</Text>
+            </View>
+
+            <Ionicons name="chevron-forward" size={18} color="#000" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.profileListbox2}
+            activeOpacity={0.5}
+            onPress={() => navigation.navigate('Subscription')}
+          >
+            <View style={styles.profileListbox3}>
+              <Image
+                source={require('../assets/credit-card-validation.png')}
+                style={styles.profilelistIcon}
+              />
+
+              <Text style={styles.profilelistIcontext}>Subscription Plan</Text>
+            </View>
+
+            <Ionicons name="chevron-forward" size={18} color="#000" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.profileListbox2}
+            activeOpacity={0.5}
+            onPress={() => navigation.navigate('Rewards')}
+          >
+            <View style={styles.profileListbox3}>
+              <Image
+                source={require('../assets/champion.png')}
+                style={styles.profilelistIcon}
+              />
+
+              <Text style={styles.profilelistIcontext}>Rewards</Text>
+            </View>
+
+            <Ionicons name="chevron-forward" size={18} color="#000" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.profileListbox2}
+            activeOpacity={0.5}
+            onPress={() => navigation.navigate('Legal')}
+          >
+            <View style={styles.profileListbox3}>
+              <Image
+                source={require('../assets/agreement-03.png')}
+                style={styles.profilelistIcon}
+              />
+
+              <Text style={styles.profilelistIcontext}>Legal & Compliance</Text>
+            </View>
+
+            <Ionicons name="chevron-forward" size={18} color="#000" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.profileListbox2}
+            activeOpacity={0.5}
+            onPress={() => navigation.navigate('Help')}
+          >
+            <View style={styles.profileListbox3}>
+              <Image
+                source={require('../assets/customer-service-01.png')}
+                style={styles.profilelistIcon}
+              />
+
+              <Text style={styles.profilelistIcontext}>Help & Support</Text>
+            </View>
+
+            <Ionicons name="chevron-forward" size={18} color="#000" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.profileListbox2}
+            activeOpacity={0.5}
+            onPress={() => navigation.navigate('Info')}
+          >
+            <View style={styles.profileListbox3}>
+              <Image
+                source={require('../assets/mobile-protection.png')}
+                style={styles.profilelistIcon}
+              />
+
+              <Text style={styles.profilelistIcontext}>App info</Text>
+            </View>
+
+            <Ionicons name="chevron-forward" size={18} color="#000" />
+          </TouchableOpacity>
+
+          <View style={styles.profileListbox2a}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Logout')}
+              style={styles.profileListbox3}
+            >
+              <Image
+                source={require('../assets/logout-square-01.png')}
+                style={styles.profilelistIcon}
+              />
+
+              <Text style={styles.profilelistIcontext2}>Logout</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-
-      <View style={styles.profileListBox1}>
-        <TouchableOpacity
-          style={styles.profileListbox2}
-          activeOpacity={0.5}
-          onPress={() => navigation.navigate('Family')}
-        >
-          <View style={styles.profileListbox3}>
-            <Image
-              source={require('../assets/peer-to-peer-02.png')}
-              style={styles.profilelistIcon}
-            />
-
-            <Text style={styles.profilelistIcontext}>Family</Text>
-          </View>
-
-          <Ionicons name="chevron-forward" size={18} color="#000" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.profileListbox2}
-          activeOpacity={0.5}
-          onPress={() => navigation.navigate('Settings')}
-        >
-          <View style={styles.profileListbox3}>
-            <Image
-              source={require('../assets/setting-07.png')}
-              style={styles.profilelistIcon}
-            />
-
-            <Text style={styles.profilelistIcontext}>Settings</Text>
-          </View>
-
-          <Ionicons name="chevron-forward" size={18} color="#000" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.profileListbox2}
-          activeOpacity={0.5}
-          onPress={() => navigation.navigate('Subscription')}
-        >
-          <View style={styles.profileListbox3}>
-            <Image
-              source={require('../assets/credit-card-validation.png')}
-              style={styles.profilelistIcon}
-            />
-
-            <Text style={styles.profilelistIcontext}>Subscription Plan</Text>
-          </View>
-
-          <Ionicons name="chevron-forward" size={18} color="#000" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.profileListbox2}
-          activeOpacity={0.5}
-          onPress={() => navigation.navigate('Rewards')}
-        >
-          <View style={styles.profileListbox3}>
-            <Image
-              source={require('../assets/champion.png')}
-              style={styles.profilelistIcon}
-            />
-
-            <Text style={styles.profilelistIcontext}>Rewards</Text>
-          </View>
-
-          <Ionicons name="chevron-forward" size={18} color="#000" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.profileListbox2}
-          activeOpacity={0.5}
-          onPress={() => navigation.navigate('Legal')}
-        >
-          <View style={styles.profileListbox3}>
-            <Image
-              source={require('../assets/agreement-03.png')}
-              style={styles.profilelistIcon}
-            />
-
-            <Text style={styles.profilelistIcontext}>Legal & Compliance</Text>
-          </View>
-
-          <Ionicons name="chevron-forward" size={18} color="#000" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.profileListbox2}
-          activeOpacity={0.5}
-          onPress={() => navigation.navigate('Help')}
-        >
-          <View style={styles.profileListbox3}>
-            <Image
-              source={require('../assets/customer-service-01.png')}
-              style={styles.profilelistIcon}
-            />
-
-            <Text style={styles.profilelistIcontext}>Help & Support</Text>
-          </View>
-
-          <Ionicons name="chevron-forward" size={18} color="#000" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.profileListbox2}
-          activeOpacity={0.5}
-          onPress={() => navigation.navigate('Info')}
-        >
-          <View style={styles.profileListbox3}>
-            <Image
-              source={require('../assets/mobile-protection.png')}
-              style={styles.profilelistIcon}
-            />
-
-            <Text style={styles.profilelistIcontext}>App info</Text>
-          </View>
-
-          <Ionicons name="chevron-forward" size={18} color="#000" />
-        </TouchableOpacity>
-
-        <View style={styles.profileListbox2a}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Logout')}
-            style={styles.profileListbox3}
-          >
-            <Image
-              source={require('../assets/logout-square-01.png')}
-              style={styles.profilelistIcon}
-            />
-
-            <Text style={styles.profilelistIcontext2}>Logout</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
+    </AppContainer>
   );
 }
 
