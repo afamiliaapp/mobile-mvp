@@ -1,24 +1,35 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import Icon from 'react-native-vector-icons/Feather';
+import ThemedText from './ThemedText';
 
 export default function TodaysSchedule() {
   return (
     <View style={styles.schedulebox}>
-      <Text style={styles.scheduletitle}>TodaysSchedule</Text>
+      <ThemedText variant="title" style={styles.scheduletitle}>
+        TodaysSchedule
+      </ThemedText>
       <View style={styles.schedulebox2}>
         <View style={styles.schedulebox3}>
-          <Text style={styles.schedulebox3title}>Business meeting</Text>
-          <Text style={styles.schedulebox3text1}>Call project manager </Text>
+          <ThemedText variant="title" style={styles.schedulebox3title}>
+            Business meeting
+          </ThemedText>
+          <ThemedText style={styles.schedulebox3text1}>
+            Call project manager{' '}
+          </ThemedText>
           <View style={styles.scheduledatebox}>
-            <Text style={styles.scheduletimetext}>04:00 PM </Text>
-            <Text style={styles.scheduletimetext}>| 29 Feb 2025 | </Text>
+            <ThemedText style={styles.scheduletimetext}>04:00 PM </ThemedText>
+            <ThemedText style={styles.scheduletimetext}>
+              | 29 Feb 2025 |{' '}
+            </ThemedText>
             <Text style={styles.scheduletimelabel}>Work </Text>
           </View>
         </View>
         <View style={styles.schedulebox4}>
           <View style={styles.scheduleviewbtn}>
-            <Text style={styles.scheduleviewtxt}>View</Text>
+            <ThemedText variant="title" style={styles.scheduleviewtxt}>
+              View
+            </ThemedText>
             <View>
               <Icon name="chevron-right" size={12} color="#999999" />
             </View>
@@ -28,7 +39,9 @@ export default function TodaysSchedule() {
 
       <View style={styles.schedulebox5}>
         <View style={styles.scheduleviewbtn2}>
-          <Text style={styles.scheduleviewtxt2}>Show more</Text>
+          <ThemedText variant="title" style={styles.scheduleviewtxt2}>
+            Show more
+          </ThemedText>
           <View>
             <Icon name="chevron-down" size={12} color="#999999" />
           </View>
@@ -45,7 +58,6 @@ const styles = StyleSheet.create({
     height: 171,
   },
   scheduletitle: {
-    color: '#1B1C1E',
     fontSize: 18,
     fontWeight: 600,
     marginBottom: 20,
@@ -62,13 +74,11 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   schedulebox3title: {
-    color: '#1B1C1E',
     fontSize: 14,
     fontWeight: 500,
     marginBottom: 4,
   },
   schedulebox3text1: {
-    color: '#999999',
     fontSize: 12,
     fontWeight: 400,
     marginBottom: 4,
@@ -82,7 +92,6 @@ const styles = StyleSheet.create({
   scheduletimetext: {
     fontSize: 12,
     fontWeight: 500,
-    color: '#6C7278',
   },
   scheduletimelabel: {
     fontSize: 12,
@@ -110,7 +119,7 @@ const styles = StyleSheet.create({
   },
   scheduleviewtxt: {
     fontSize: 10,
-    color: '#1B1C1E',
+
     fontWeight: 400,
     marginRight: 4,
   },
@@ -133,7 +142,7 @@ const styles = StyleSheet.create({
   },
   scheduleviewtxt2: {
     fontSize: 10,
-    color: '#1B1C1E',
+
     fontWeight: 400,
   },
 });

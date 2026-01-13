@@ -3,20 +3,25 @@ import React from 'react';
 import FamilyManagementBar from '../components/FamilyManagementBar';
 import BackButton from '../components/BackButton';
 import MemberList from '../components/MemberList';
+import AppContainer from '../components/AppContainer';
+import ThemedText from '../components/ThemedText';
+import ThemedTextInput from '../components/ThemedTextInput';
 
 export default function Family() {
   return (
-    <View style={styles.container}>
-      <FamilyManagementBar />
-      <BackButton />
+    <AppContainer>
+      <View style={styles.container}>
+        <FamilyManagementBar />
+        <BackButton />
 
-      <View style={styles.famname}>
-        <Text style={styles.famnametxt}>Family Circle name</Text>
-        <TextInput style={styles.input} placeholder="Enter text" />
+        <View style={styles.famname}>
+          <ThemedText style={styles.famnametxt}>Family Circle name</ThemedText>
+          <ThemedTextInput style={styles.input} placeholder="Enter text" />
+        </View>
+
+        <MemberList />
       </View>
-
-      <MemberList />
-    </View>
+    </AppContainer>
   );
 }
 
@@ -30,16 +35,15 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   famnametxt: {
-    color: '#6C7278',
     fontSize: 12,
     fontWeight: 500,
     marginVertical: 5,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#E2E8F9',
+
     borderRadius: 10,
-    padding: 12,
+    padding: 10,
     fontSize: 16,
   },
 });

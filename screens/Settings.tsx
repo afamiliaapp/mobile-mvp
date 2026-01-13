@@ -1,4 +1,11 @@
-import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  View,
+  TouchableOpacity,
+} from 'react-native';
 import React, { useState, useContext } from 'react';
 import SettingsBar from '../components/SettingsBar';
 import BackButton from '../components/BackButton';
@@ -208,6 +215,14 @@ export default function Settings() {
           {/**Data Visibility */}
 
           <Themesettings />
+
+          <TouchableOpacity style={styles.deletebox}>
+            <Text style={styles.delettext}>Delete your Account</Text>
+          </TouchableOpacity>
+
+          <View style={styles.savebox}>
+            <ThemedText style={styles.savetext}>Save</ThemedText>
+          </View>
         </ScrollView>
       </View>
     </AppContainer>
@@ -298,5 +313,34 @@ const styles = StyleSheet.create({
     width: 150,
     alignItems: 'center',
     borderColor: '#E2E8F9',
+  },
+
+  deletebox: {
+    flex: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 50,
+    marginVertical: 40,
+  },
+  delettext: {
+    color: '#ED0D0D',
+    fontSize: 16,
+    fontWeight: 500,
+  },
+
+  savebox: {
+    height: 60,
+    backgroundColor: '#2C247A',
+    flex: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    marginBottom: 30,
+  },
+
+  savetext: {
+    fontSize: 16,
+    fontWeight: 600,
+    color: '#ffffff',
   },
 });

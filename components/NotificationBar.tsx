@@ -1,9 +1,12 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React from 'react';
+import React, { useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { ThemeContext } from '../context/ThemeContext';
+import ThemedText from './ThemedText';
 
 export default function NotificationBar() {
   const navigation = useNavigation();
+  const { theme } = useContext(ThemeContext); // ac
   return (
     <View style={styles.continer}>
       <View style={styles.notimagebox}>
@@ -13,17 +16,19 @@ export default function NotificationBar() {
         />
       </View>
       <View style={styles.namebox}>
-        <Text style={styles.name}>Hello Sandra</Text>
-        <Text style={styles.date}>Tues 29</Text>
+        <ThemedText variant="title" style={styles.name}>
+          Hello Sandra
+        </ThemedText>
+        <ThemedText style={styles.date}>Tues 29</ThemedText>
       </View>
 
-      <View style={styles.belliconbox}>
+      <View style={[styles.belliconbox, { borderColor: theme.border }]}>
         <TouchableOpacity
           onPress={() => navigation.navigate('Notificationpage')}
         >
           <Image
             source={require('../assets/notificationbell.png')}
-            style={styles.bellicon}
+            style={[styles.bellicon, { tintColor: theme.icon }]} // dynamic icon color
           />
         </TouchableOpacity>
       </View>
@@ -58,7 +63,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 12,
-    color: '#1B1C1E',
+
     fontWeight: 500,
   },
   date: {

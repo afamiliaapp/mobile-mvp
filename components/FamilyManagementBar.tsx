@@ -1,55 +1,61 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React from 'react';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import AppContainer from './AppContainer';
+import ThemedText from './ThemedText';
+import { ThemeContext } from '../context/ThemeContext';
 
 export default function FamilyManagementBar() {
   const navigation = useNavigation();
-  return (
-    <View style={styles.continer}>
-      <View>
-        <Text style={styles.title}>Family Management</Text>
-      </View>
+  const { theme } = useContext(ThemeContext); // access current theme
 
-      <View style={styles.belliconbox}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Notificationpage')}
-        >
-          <Image
-            source={require('../assets/notificationbell.png')}
-            style={styles.bellicon}
-          />
-        </TouchableOpacity>
+  return (
+    <AppContainer>
+      <View style={styles.container}>
+        {/* Title */}
+        <ThemedText variant="title" style={styles.title}>
+          Family Management
+        </ThemedText>
+
+        {/* Bell Icon */}
+        <View style={[styles.belliconbox, { borderColor: theme.border }]}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Notificationpage')}
+          >
+            <Image
+              source={require('../assets/notificationbell.png')}
+              style={[styles.bellicon, { tintColor: theme.icon }]} // dynamic icon color
+            />
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </AppContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  continer: {
+  container: {
     height: 42,
-
-    flex: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 2,
+    marginVertical: 2,
   },
 
   title: {
     fontSize: 28,
-    fontWeight: 700,
-    color: '#1B1C1E',
+    fontWeight: '700',
   },
 
   belliconbox: {
     height: 32,
     width: 32,
-    borderColor: '#E2E8F9',
     borderRadius: 400,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
   },
+
   bellicon: {
     height: 18,
     width: 18,

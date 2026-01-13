@@ -2,47 +2,53 @@ import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import NotificationBar from '../components/NotificationBar';
 import TodaysSchedule from '../components/TodaysSchedule';
+import AppContainer from '../components/AppContainer';
+import ThemedText from '../components/ThemedText';
 
 export default function Dashboard() {
   return (
-    <View style={styles.container}>
-      <NotificationBar />
+    <AppContainer>
+      <View style={styles.container}>
+        <NotificationBar />
 
-      <View style={styles.statbox}>
-        <Text style={styles.statlabel}>Statistics</Text>
-        {/**FIRST ROW */}
-        <View style={styles.activitybox}>
-          <View style={styles.activitybox2}>
-            <Text style={styles.activitytext1}>Members</Text>
-            <Text style={styles.activitytext2}>4</Text>
-            <Text style={styles.activitytext3}>View</Text>
+        <View style={styles.statbox}>
+          <Text variant="title" style={styles.statlabel}>
+            Statistics
+          </Text>
+          {/**FIRST ROW */}
+          <View style={styles.activitybox}>
+            <View style={styles.activitybox2}>
+              <Text style={styles.activitytext1}>Members</Text>
+              <Text style={styles.activitytext2}>4</Text>
+              <ThemedText style={styles.activitytext3}>View</ThemedText>
+            </View>
+            <View style={styles.activitybox2}>
+              <Text style={styles.activitytext1}>Today’s chores</Text>
+              <Text style={styles.activitytext2}>4/10</Text>
+              <Text style={styles.activitytext3}>View</Text>
+            </View>
           </View>
-          <View style={styles.activitybox2}>
-            <Text style={styles.activitytext1}>Today’s chores</Text>
-            <Text style={styles.activitytext2}>4/10</Text>
-            <Text style={styles.activitytext3}>View</Text>
+
+          {/**SECOND ROW */}
+          <View style={styles.activitybox}>
+            <View style={styles.activitybox2}>
+              <Text style={styles.activitytext1}>Budget</Text>
+              <Text style={styles.activitytext2}>4</Text>
+              <Text style={styles.activitytext3}>View</Text>
+            </View>
+            <View style={styles.activitybox2}>
+              <Text style={styles.activitytext1}>Today’s meals</Text>
+              <Text style={styles.activitytext2}>4/10</Text>
+              <Text style={styles.activitytext3}>View</Text>
+            </View>
           </View>
         </View>
 
-        {/**SECOND ROW */}
-        <View style={styles.activitybox}>
-          <View style={styles.activitybox2}>
-            <Text style={styles.activitytext1}>Budget</Text>
-            <Text style={styles.activitytext2}>4</Text>
-            <Text style={styles.activitytext3}>View</Text>
-          </View>
-          <View style={styles.activitybox2}>
-            <Text style={styles.activitytext1}>Today’s meals</Text>
-            <Text style={styles.activitytext2}>4/10</Text>
-            <Text style={styles.activitytext3}>View</Text>
-          </View>
+        <View>
+          <TodaysSchedule />
         </View>
       </View>
-
-      <View>
-        <TodaysSchedule />
-      </View>
-    </View>
+    </AppContainer>
   );
 }
 
@@ -57,7 +63,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   statlabel: {
-    color: '#1B1C1E',
     fontSize: 18,
     fontWeight: 600,
   },
@@ -79,18 +84,15 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   activitytext1: {
-    color: '#999999',
     fontSize: 14,
     marginBottom: 4,
   },
   activitytext2: {
-    color: '#1B1C1E',
     fontSize: 20,
     marginBottom: 4,
     fontWeight: 600,
   },
   activitytext3: {
-    color: '#2C247A',
     fontSize: 10,
     marginBottom: 4,
   },
