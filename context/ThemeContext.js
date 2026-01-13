@@ -7,16 +7,25 @@ export const ThemeContext = createContext();
 const lightTheme = {
   background: '#FFFFFF',
   titleText: '#1B1C1E', // titles
-  text: '#6C7278',
+  text: '#6C7278', // regular text
+  placeholder: '#999999', // placeholder text
+  border: '#E2E8F9', // input/border
+  icon: '#1B1C1E', // icons
+  button: '#2563EB', // primary buttons
+  buttonText: '#FFFFFF', // button text
   // regular text
 };
 
 // Dark mode colors
 const darkTheme = {
   background: '#020617',
-  titleText: '#FFFFFF', // all text white in dark mode
+  titleText: '#FFFFFF',
   text: '#FFFFFF',
-  subtitle: '#ffffff',
+  placeholder: '#9CA3AF',
+  border: '#64748B',
+  icon: '#FFFFFF',
+  button: '#2563EB',
+  buttonText: '#FFFFFF',
 };
 
 export const ThemeProvider = ({ children }) => {

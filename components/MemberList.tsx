@@ -8,11 +8,14 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { launchImageLibrary } from 'react-native-image-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import BackButton from './BackButton';
+import ThemedText from './ThemedText';
+import { ThemeContext } from '../context/ThemeContext';
+import AppContainer from './AppContainer';
 
 export default function MemberList() {
   const [showModal, setShowModal] = useState(false);
@@ -28,6 +31,8 @@ export default function MemberList() {
   const [email, setEmail] = useState('');
   const [birthdate, setBirthdate] = useState(null);
   const [passport, setPassport] = useState(null);
+
+  const { theme } = useContext(ThemeContext);
 
   useEffect(() => {
     if (!showModalDelete) {
@@ -142,7 +147,7 @@ export default function MemberList() {
 
   return (
     <View>
-      <Text style={styles.memberlisttitle}>Member list</Text>
+      <ThemedText style={styles.memberlisttitle}>Member list</ThemedText>
 
       <View style={styles.memberlistbox}>
         {/* Existing member */}
@@ -154,10 +159,12 @@ export default function MemberList() {
                   <Image style={styles.image} source={member.avatar} />
 
                   <View>
-                    <Text style={styles.membertitle}>{member.name}</Text>
-                    <Text style={styles.memberdate}>
+                    <ThemedText variant="title" style={styles.membertitle}>
+                      {member.name}
+                    </ThemedText>
+                    <ThemedText style={styles.memberdate}>
                       {member.role} | Added {member.addedAt}
-                    </Text>
+                    </ThemedText>
                   </View>
                 </View>
 
@@ -166,18 +173,16 @@ export default function MemberList() {
                   <TouchableOpacity
                     onPress={() => {
                       setEditingMemberId(member.id);
-
                       setRole(member.role);
                       setName(member.name);
                       setEmail(member.email || '');
                       setBirthdate(member.birthdate || null);
                       setPassport(member.passport || null);
-
                       setShowModalEdit(true);
                     }}
                   >
                     <Image
-                      style={styles.image2}
+                      style={[styles.image2, { tintColor: theme.icon }]} // theme-aware color
                       source={require('../assets/pencil-edit-01 (1).png')}
                     />
                   </TouchableOpacity>
@@ -646,7 +651,6 @@ const styles = StyleSheet.create({
   },
 
   memberlisttitle: {
-    color: '#6C7278',
     fontSize: 12,
     fontWeight: 500,
     marginTop: 20,
@@ -678,11 +682,9 @@ const styles = StyleSheet.create({
   },
   membertitle: {
     fontSize: 10,
-    color: '#1B1C1E',
   },
   memberdate: {
     fontSize: 8,
-    color: '#999999',
   },
   imagebox2: {
     width: 50,
@@ -723,6 +725,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalBox: {
+    flex: 0,
     width: '100%',
     backgroundColor: '#fff',
     borderRadius: 10,
