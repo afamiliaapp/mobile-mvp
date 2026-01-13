@@ -9,6 +9,8 @@ import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BackButton from '../components/BackButton';
 import Icon from 'react-native-vector-icons/Feather';
+import AppContainer from '../components/AppContainer';
+import ThemedText from '../components/ThemedText';
 
 const notifications = [
   {
@@ -63,42 +65,48 @@ export default function Notificationpage() {
     ? notifications
     : notifications.slice(0, 3);
   return (
-    <View style={styles.container}>
-      <Text style={styles.notifytxt}>Notification</Text>
-      <BackButton />
+    <AppContainer>
+      <View style={styles.container}>
+        <ThemedText variant="title" style={styles.notifytxt}>
+          Notification
+        </ThemedText>
+        <BackButton />
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={styles.notificationbox}
-      >
-        {displayedNotifications.map(item => (
-          <View key={item.id} style={styles.notificationbox2}>
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.subtitle}>{item.subtitle}</Text>
-            <Text style={styles.notedate}>{item.date}</Text>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={styles.notificationbox}
+        >
+          {displayedNotifications.map(item => (
+            <View key={item.id} style={styles.notificationbox2}>
+              <ThemedText variant="title" style={styles.title}>
+                {item.title}
+              </ThemedText>
+              <ThemedText style={styles.subtitle}>{item.subtitle}</ThemedText>
+              <ThemedText style={styles.notedate}>{item.date}</ThemedText>
+            </View>
+          ))}
+        </ScrollView>
+
+        {notifications.length > 3 && (
+          <View style={styles.schedulebox5}>
+            <TouchableOpacity
+              style={styles.scheduleviewbtn2}
+              onPress={() => setShowMore(!showMore)}
+            >
+              <ThemedText variant="title" style={styles.scheduleviewtxt2}>
+                {showMore ? 'Show less' : 'Show more'}
+              </ThemedText>
+              <Icon
+                name={showMore ? 'chevron-up' : 'chevron-down'}
+                size={12}
+                color="#999999"
+                style={{ marginLeft: 4 }}
+              />
+            </TouchableOpacity>
           </View>
-        ))}
-      </ScrollView>
-
-      {notifications.length > 3 && (
-        <View style={styles.schedulebox5}>
-          <TouchableOpacity
-            style={styles.scheduleviewbtn2}
-            onPress={() => setShowMore(!showMore)}
-          >
-            <Text style={styles.scheduleviewtxt2}>
-              {showMore ? 'Show less' : 'Show more'}
-            </Text>
-            <Icon
-              name={showMore ? 'chevron-up' : 'chevron-down'}
-              size={12}
-              color="#999999"
-              style={{ marginLeft: 4 }}
-            />
-          </TouchableOpacity>
-        </View>
-      )}
-    </View>
+        )}
+      </View>
+    </AppContainer>
   );
 }
 
@@ -127,19 +135,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: 500,
-    color: '#1B1C1E',
   },
 
   subtitle: {
     fontSize: 14,
     fontWeight: 500,
-    color: '#999999',
+
     marginVertical: 8,
   },
   notedate: {
     fontSize: 12,
     fontWeight: 400,
-    color: '#6C7278',
+
     marginTop: 2,
   },
   schedulebox5: {
@@ -164,7 +171,7 @@ const styles = StyleSheet.create({
   },
   scheduleviewtxt2: {
     fontSize: 10,
-    color: '#1B1C1E',
+
     fontWeight: 400,
   },
 });
