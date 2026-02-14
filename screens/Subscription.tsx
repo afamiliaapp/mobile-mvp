@@ -63,7 +63,7 @@ export default function Subscription() {
           </ThemedText>
 
           <View style={styles.activePlanBox}>
-            <View>
+            <View style={styles.activePlanBox2}>
               <Text style={styles.activePlanText}>
                 Next billing: October 26, 2025
               </Text>
@@ -178,6 +178,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
     padding: 16,
     position: 'relative',
+    flex: 0,
+    flexDirection: 'row',
+    height: 118,
+    justifyContent: 'space-between',
+  },
+
+  activePlanBox2: {
+    width: '70%',
   },
 
   activePlanText: {
@@ -191,7 +199,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 4,
-    marginTop: 10,
+
     alignSelf: 'flex-start',
   },
 
