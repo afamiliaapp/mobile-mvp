@@ -52,74 +52,75 @@ export default function Subscription() {
       <View style={styles.container}>
         <SubscriptionPlanBar />
         <BackButton />
+        <View style={styles.cardbox}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {/* Current Plan */}
+            <ThemedText variant="title" style={styles.sectionTitle}>
+              Current Plan
+            </ThemedText>
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 40 }}
-        >
-          {/* Current Plan */}
-          <ThemedText variant="title" style={styles.sectionTitle}>
-            Current Plan
-          </ThemedText>
-
-          <View style={styles.activePlanBox}>
-            <View style={styles.activePlanBox2}>
-              <Text style={styles.activePlanText}>
-                Next billing: October 26, 2025
-              </Text>
-              <Text style={styles.activePlanText}>
-                Enjoy unlimited family features and priority support.
-              </Text>
-            </View>
-
-            <View style={styles.activeBadge}>
-              <Text style={{ fontSize: 14 }}>Active</Text>
-            </View>
-
-            <Image
-              style={styles.circleImg}
-              source={require('../assets/Circle 5.png')}
-            />
-          </View>
-
-          {/* Billing Toggle */}
-          <View style={styles.billingSwitch}>
-            {['monthly', 'yearly'].map(type => (
-              <Pressable
-                key={type}
-                style={[
-                  styles.billingButton,
-                  billingType === type && styles.activeBilling,
-                ]}
-                onPress={() => {
-                  setBillingType(type);
-                  setSelectedPlan(plans[type][0].id);
-                }}
-              >
-                <Text
-                  style={[
-                    styles.billingText,
-                    billingType === type && styles.activeBillingText,
-                  ]}
-                >
-                  {type === 'monthly' ? 'Monthly' : 'Yearly'}
+            <View style={styles.activePlanBox}>
+              <View style={styles.activePlanBox2}>
+                <Text style={styles.activePlanText}>
+                  Next billing: October 26, 2025
                 </Text>
-              </Pressable>
+                <Text style={styles.activePlanText}>
+                  Enjoy unlimited family features and priority support.
+                </Text>
+              </View>
+
+              <View style={styles.activeBadge}>
+                <Text style={{ fontSize: 14 }}>Active</Text>
+              </View>
+
+              <Image
+                style={styles.circleImg}
+                source={require('../assets/Circle 5.png')}
+              />
+            </View>
+
+            {/* Billing Toggle */}
+            <View style={styles.billingSwitch}>
+              {['monthly', 'yearly'].map(type => (
+                <Pressable
+                  key={type}
+                  style={[
+                    styles.billingButton,
+                    billingType === type && styles.activeBilling,
+                  ]}
+                  onPress={() => {
+                    setBillingType(type);
+                    setSelectedPlan(plans[type][0].id);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.billingText,
+                      billingType === type && styles.activeBillingText,
+                    ]}
+                  >
+                    {type === 'monthly' ? 'Monthly' : 'Yearly'}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+
+            <ThemedText style={styles.availableText}>
+              Available Plans
+            </ThemedText>
+
+            {/* Plans */}
+
+            {plans[billingType].map(plan => (
+              <PlanCard
+                key={plan.id}
+                plan={plan}
+                selected={selectedPlan === plan.id}
+                onSelect={() => setSelectedPlan(plan.id)}
+              />
             ))}
-          </View>
-
-          <ThemedText style={styles.availableText}>Available Plans</ThemedText>
-
-          {/* Plans */}
-          {plans[billingType].map(plan => (
-            <PlanCard
-              key={plan.id}
-              plan={plan}
-              selected={selectedPlan === plan.id}
-              onSelect={() => setSelectedPlan(plan.id)}
-            />
-          ))}
-        </ScrollView>
+          </ScrollView>
+        </View>
       </View>
     </AppContainer>
   );
@@ -162,8 +163,9 @@ const PlanCard = ({ plan, selected, onSelect }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 0,
     paddingHorizontal: 20,
+    height: '100%',
   },
 
   sectionTitle: {
@@ -247,7 +249,7 @@ const styles = StyleSheet.create({
     borderColor: '#E2E8F9',
     padding: 16,
     marginBottom: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
 
   planHeader: {
@@ -299,5 +301,8 @@ const styles = StyleSheet.create({
 
   activePlanBorder: {
     borderColor: '#007AFF',
+  },
+  cardbox: {
+    height: '90%',
   },
 });
