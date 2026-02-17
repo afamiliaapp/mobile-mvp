@@ -11,10 +11,15 @@ import AppContainer from '../components/AppContainer';
 import SubscriptionPlanBar from '../components/SubscriptionPlanBar';
 import BackButton from '../components/BackButton';
 import ThemedText from '../components/ThemedText';
+import { PaystackWebView } from 'react-native-paystack-webview';
 
 export default function Subscription() {
   const [billingType, setBillingType] = useState('monthly');
   const [selectedPlan, setSelectedPlan] = useState('free');
+
+  // ✅ Paystack states
+  const [showPaystack, setShowPaystack] = useState(false);
+  const [amount, setAmount] = useState(0);
 
   const plans = {
     monthly: [
@@ -47,11 +52,25 @@ export default function Subscription() {
     ],
   };
 
+  // ✅ Handle Subscribe
+  const handleSubscribe = plan => {
+    if (plan.price === 'Free Forever') return;
+
+    const priceMap = {
+      '₦2,500 / month': 250000, // Paystack uses kobo
+      '₦25,000 / year': 2500000,
+    };
+
+    setAmount(priceMap[plan.price]);
+    setShowPaystack(true);
+  };
+
   return (
     <AppContainer>
       <View style={styles.container}>
         <SubscriptionPlanBar />
         <BackButton />
+
         <View style={styles.cardbox}>
           <ScrollView showsVerticalScrollIndicator={false}>
             {/* Current Plan */}
@@ -110,23 +129,42 @@ export default function Subscription() {
             </ThemedText>
 
             {/* Plans */}
-
             {plans[billingType].map(plan => (
               <PlanCard
                 key={plan.id}
                 plan={plan}
                 selected={selectedPlan === plan.id}
                 onSelect={() => setSelectedPlan(plan.id)}
+                onSubscribe={() => handleSubscribe(plan)}
               />
             ))}
           </ScrollView>
         </View>
       </View>
+
+      {/* ✅ PAYSTACK MODAL */}
+      {showPaystack && (
+        <PaystackWebView
+          paystackKey="pk_live_xxxxxxxxxxxxxxxxxxxxx"
+          amount={amount}
+          billingEmail="user@email.com"
+          activityIndicatorColor="green"
+          onCancel={() => {
+            setShowPaystack(false);
+            console.log('Payment Cancelled');
+          }}
+          onSuccess={res => {
+            setShowPaystack(false);
+            console.log('Payment Success:', res);
+          }}
+          autoStart={true}
+        />
+      )}
     </AppContainer>
   );
 }
 
-const PlanCard = ({ plan, selected, onSelect }) => {
+const PlanCard = ({ plan, selected, onSelect, onSubscribe }) => {
   return (
     <Pressable
       style={[styles.planCard, selected && styles.activePlanBorder]}
@@ -151,11 +189,18 @@ const PlanCard = ({ plan, selected, onSelect }) => {
       </View>
 
       {selected && (
-        <View style={styles.subscribeBox}>
+        <Pressable
+          style={styles.subscribeBox}
+          onPress={() => {
+            if (plan.price !== 'Free Forever') {
+              onSubscribe();
+            }
+          }}
+        >
           <ThemedText>
             {plan.price === 'Free Forever' ? 'Current Plan' : 'Subscribe'}
           </ThemedText>
-        </View>
+        </Pressable>
       )}
     </Pressable>
   );
@@ -167,50 +212,41 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     height: '100%',
   },
-
   sectionTitle: {
     fontSize: 16,
     fontWeight: '500',
     marginTop: 25,
   },
-
   activePlanBox: {
     backgroundColor: '#2C247A',
     borderRadius: 10,
     marginTop: 20,
     padding: 16,
     position: 'relative',
-    flex: 0,
     flexDirection: 'row',
     height: 118,
     justifyContent: 'space-between',
   },
-
   activePlanBox2: {
     width: '70%',
   },
-
   activePlanText: {
     color: '#fff',
     fontSize: 12,
     lineHeight: 20,
   },
-
   activeBadge: {
     backgroundColor: '#F2F8F9',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 4,
-
     alignSelf: 'flex-start',
   },
-
   circleImg: {
     position: 'absolute',
     right: 10,
     top: 10,
   },
-
   billingSwitch: {
     flexDirection: 'row',
     borderWidth: 1,
@@ -219,30 +255,24 @@ const styles = StyleSheet.create({
     marginTop: 30,
     overflow: 'hidden',
   },
-
   billingButton: {
     flex: 1,
     paddingVertical: 12,
     alignItems: 'center',
   },
-
   billingText: {
     fontSize: 14,
   },
-
   activeBilling: {
     backgroundColor: '#2C247A',
   },
-
   activeBillingText: {
     color: '#fff',
     fontWeight: '600',
   },
-
   availableText: {
     marginVertical: 20,
   },
-
   planCard: {
     borderRadius: 12,
     borderWidth: 1,
@@ -251,27 +281,22 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     backgroundColor: '#FFFFFF',
   },
-
   planHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-
   planTitle: {
     fontSize: 14,
     marginBottom: 6,
   },
-
   planFeature: {
     fontSize: 13,
     marginBottom: 4,
   },
-
   priceText: {
     marginTop: 10,
     fontWeight: '600',
   },
-
   subscribeBox: {
     marginTop: 16,
     paddingVertical: 12,
@@ -280,7 +305,6 @@ const styles = StyleSheet.create({
     borderColor: '#E2E8F9',
     alignItems: 'center',
   },
-
   radioOuter: {
     width: 24,
     height: 24,
@@ -291,14 +315,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: 10,
   },
-
   radioInner: {
     width: 12,
     height: 12,
     borderRadius: 6,
     backgroundColor: '#007AFF',
   },
-
   activePlanBorder: {
     borderColor: '#007AFF',
   },
