@@ -1,9 +1,61 @@
-import { Image, StyleSheet, Text, View, Pressable } from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  ScrollView,
+} from 'react-native';
 import React, { useState } from 'react';
 import RewardsBar from '../components/RewardsBar';
 import AppContainer from '../components/AppContainer';
 import BackButton from '../components/BackButton';
 import ThemedText from '../components/ThemedText';
+
+const recentActivities = [
+  {
+    id: 1,
+    title: 'Completed weekly chores',
+    time: '2 hours ago',
+    points: '+13 Points',
+  },
+  {
+    id: 2,
+    title: 'Finished reading challenge',
+    time: '5 hours ago',
+    points: '+20 Points',
+  },
+  {
+    id: 3,
+    title: 'Completed workout session',
+    time: '1 day ago',
+    points: '+15 Points',
+  },
+  {
+    id: 4,
+    title: 'Submitted assignment',
+    time: '2 days ago',
+    points: '+25 Points',
+  },
+  {
+    id: 5,
+    title: 'Daily login bonus',
+    time: '3 days ago',
+    points: '+5 Points',
+  },
+  {
+    id: 6,
+    title: 'Daily login bonus',
+    time: '3 days ago',
+    points: '+5 Points',
+  },
+  {
+    id: 7,
+    title: 'Daily login bonus',
+    time: '3 days ago',
+    points: '+5 Points',
+  },
+];
 
 export default function Rewards() {
   const [activeTab, setActiveTab] = useState('tier');
@@ -92,12 +144,7 @@ export default function Rewards() {
             ]}
             onPress={() => setActiveTab('tier')}
           >
-            <Text
-              style={[
-                styles.tiertext,
-                activeTab === 'tier' && styles.activeText,
-              ]}
-            >
+            <Text style={[activeTab === 'tier' && styles.activeText]}>
               Progress Tier
             </Text>
           </Pressable>
@@ -105,11 +152,27 @@ export default function Rewards() {
 
         {/* CONDITIONAL CONTENT */}
         {activeTab === 'activity' ? (
-          <View style={{ marginTop: 20 }}>
-            <Text>Recent Activity Content Here</Text>
-          </View>
+          <ScrollView
+            style={styles.recentscroll}
+            showsVerticalScrollIndicator={false}
+          >
+            {recentActivities.map(item => (
+              <View key={item.id} style={styles.recentsbox}>
+                <View style={styles.recentsbox1}>
+                  <ThemedText variant="title">{item.title}</ThemedText>
+                  <ThemedText variant="body">{item.time}</ThemedText>
+                </View>
+
+                <View style={styles.recentsbox2}>
+                  <ThemedText style={styles.recentsbox2text}>
+                    {item.points}
+                  </ThemedText>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
         ) : (
-          <View style={{ marginTop: 20 }}>
+          <View>
             <Text>Progress Tier Content Here</Text>
           </View>
         )}
@@ -119,6 +182,11 @@ export default function Rewards() {
 }
 
 const styles = StyleSheet.create({
+  recentscroll: {
+    marginTop: 20,
+
+    height: '45%',
+  },
   container1: {
     flex: 0,
     paddingHorizontal: 20,
@@ -127,7 +195,6 @@ const styles = StyleSheet.create({
   container2: {
     flex: 0,
     paddingHorizontal: 20,
-    height: '100%',
   },
 
   rewardheroImg: {
@@ -258,5 +325,38 @@ const styles = StyleSheet.create({
 
   activeText: {
     color: '#FFF',
+  },
+
+  recentsbox: {
+    height: 66,
+    flex: 0,
+    flexDirection: 'row',
+    width: '100%',
+    borderBottomWidth: 1,
+    borderColor: '#E2E8F9',
+    paddingBottom: 40,
+  },
+
+  recentsbox1: {
+    width: '70%',
+    height: 56,
+
+    paddingVertical: 5,
+    flex: 0,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+
+  recentsbox2: {
+    width: '30%',
+    height: 56,
+
+    flex: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  recentsbox2text: {
+    color: '#37BC12',
   },
 });
