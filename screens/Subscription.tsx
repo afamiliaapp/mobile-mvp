@@ -112,14 +112,14 @@ export default function Subscription() {
                     setSelectedPlan(plans[type][0].id);
                   }}
                 >
-                  <Text
+                  <ThemedText
                     style={[
                       styles.billingText,
                       billingType === type && styles.activeBillingText,
                     ]}
                   >
                     {type === 'monthly' ? 'Monthly' : 'Yearly'}
-                  </Text>
+                  </ThemedText>
                 </Pressable>
               ))}
             </View>
@@ -279,7 +279,6 @@ const styles = StyleSheet.create({
     borderColor: '#E2E8F9',
     padding: 16,
     marginBottom: 20,
-    backgroundColor: '#FFFFFF',
   },
   planHeader: {
     flexDirection: 'row',
