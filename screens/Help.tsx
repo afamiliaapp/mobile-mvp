@@ -4,6 +4,7 @@ import BackButton from '../components/BackButton';
 import ThemedText from '../components/ThemedText';
 import React, { useState } from 'react';
 import { View, Pressable, StyleSheet, Image, ScrollView } from 'react-native';
+import Icon from 'react-native-vector-icons/Feather';
 
 export default function Help() {
   const [activeTicket, setActiveTicket] = useState('all');
@@ -185,6 +186,9 @@ export default function Help() {
                 <View style={styles.tickettimebox3}>
                   <View style={styles.ticketviewbox}>
                     <ThemedText style={styles.ticketviewtext}>View</ThemedText>
+                    <View>
+                      <Icon name="chevron-right" size={12} color="#999999" />
+                    </View>
                   </View>
                 </View>
               </View>
@@ -317,7 +321,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#E2E8F0',
     borderRadius: 10,
-    paddingBottom: 15,
+    paddingBottom: 10,
     flex: 0,
     flexDirection: 'row',
     marginBottom: 10,
@@ -352,6 +356,8 @@ const styles = StyleSheet.create({
     height: 22,
     width: 58,
     borderRadius: 6,
+    flex: 0,
+    flexDirection: 'row',
 
     alignItems: 'center',
     justifyContent: 'center',
