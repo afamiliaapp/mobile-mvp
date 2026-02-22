@@ -19,6 +19,7 @@ import Legal from '../screens/Legal';
 import Help from '../screens/Help';
 import Info from '../screens/Info';
 import Logout from '../screens/Logout';
+import SupportChat from '../screens/SupportChat';
 
 const Stack = createNativeStackNavigator();
 
@@ -51,7 +52,7 @@ export default function MainLayout() {
     >
       <Stack.Screen name="Dashboard" component={withNav(Dashboard)} />
       <Stack.Screen name="Calendar" component={withNav(Calendar)} />
-      <Stack.Screen name="Chat" component={withNav(Chat)} />
+      <Stack.Screen name="Chat" component={Chat} />
       <Stack.Screen name="Profile" component={withNav(Profile)} />
       <Stack.Screen name="Menu" component={withNav(Menu)} />
       <Stack.Screen
@@ -71,6 +72,7 @@ export default function MainLayout() {
       <Stack.Screen name="Help" component={withNav(Help)} />
       <Stack.Screen name="Info" component={withNav(Info)} />
       <Stack.Screen name="Logout" component={withNav(Logout)} />
+      <Stack.Screen name="SupportChat" component={SupportChat} />
     </Stack.Navigator>
   );
 }

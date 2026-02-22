@@ -5,8 +5,14 @@ import ThemedText from '../components/ThemedText';
 import React, { useState } from 'react';
 import { View, Pressable, StyleSheet, Image, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Help() {
+  const navigation = useNavigation();
+
+  const handleSendMessage = () => {
+    navigation.navigate('SupportChat');
+  };
   const [activeTicket, setActiveTicket] = useState('all');
 
   // ✅ Dummy Ticket Data
@@ -92,11 +98,11 @@ export default function Help() {
               />
             </View>
 
-            <View style={styles.sendbutton}>
+            <Pressable onPress={handleSendMessage} style={styles.sendbutton}>
               <ThemedText style={styles.sendbuttontxt}>
                 Send us a message
               </ThemedText>
-            </View>
+            </Pressable>
           </View>
 
           <View style={styles.chatintrobo2}>
@@ -106,7 +112,9 @@ export default function Help() {
 
             <View style={styles.clockbox}>
               <Image source={require('../assets/greenclock.png')} />
-              <ThemedText style={styles.clocktext}>Under 5 minutes</ThemedText>
+              <ThemedText variant="body" style={styles.clocktext}>
+                Under 5 minutes
+              </ThemedText>
             </View>
           </View>
         </View>
