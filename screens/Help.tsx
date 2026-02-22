@@ -1,11 +1,51 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
-import React from 'react';
 import AppContainer from '../components/AppContainer';
 import SupportBar from '../components/SupportBar';
 import BackButton from '../components/BackButton';
 import ThemedText from '../components/ThemedText';
+import React, { useState } from 'react';
+import { View, Pressable, StyleSheet, Image, ScrollView } from 'react-native';
 
 export default function Help() {
+  const [activeTicket, setActiveTicket] = useState('all');
+
+  // ✅ Dummy Ticket Data
+  const tickets = [
+    {
+      id: 1,
+      title: 'Payment not successful',
+      time: '2 hours ago',
+      date: '29 feb 2025',
+      status: 'Resolved',
+    },
+    {
+      id: 2,
+      title: 'Unable to login',
+      time: '2 hours ago',
+      date: '29 feb 2025',
+      status: 'closed',
+    },
+    {
+      id: 3,
+      title: 'App crashing',
+      time: '2 hours ago',
+      date: '29 feb 2025',
+      status: 'open',
+    },
+    {
+      id: 4,
+      title: 'Refund request',
+      time: '2 hours ago',
+      date: '29 feb 2025',
+      status: 'Resolved',
+    },
+  ];
+
+  // ✅ Filter Logic
+  const filteredTickets =
+    activeTicket === 'all'
+      ? tickets
+      : tickets.filter(ticket => ticket.status === activeTicket);
+
   return (
     <AppContainer>
       <View style={styles.conatiner}>
@@ -21,8 +61,8 @@ export default function Help() {
           </ThemedText>
         </View>
 
+        {/* Chat Intro Box */}
         <View style={styles.chatintrobox}>
-          {/**SEND MEDDAGE BOX2 */}
           <View style={styles.chatintrobox1}>
             <ThemedText variant="title" style={styles.chatintrobox1text}>
               Start a conversation
@@ -58,8 +98,6 @@ export default function Help() {
             </View>
           </View>
 
-          {/**BOX2 */}
-
           <View style={styles.chatintrobo2}>
             <ThemedText variant="title" style={styles.chatintrobox1text}>
               Our reply time
@@ -67,11 +105,92 @@ export default function Help() {
 
             <View style={styles.clockbox}>
               <Image source={require('../assets/greenclock.png')} />
-
               <ThemedText style={styles.clocktext}>Under 5 minutes</ThemedText>
             </View>
           </View>
         </View>
+
+        {/* Ticket Toggle */}
+        <View style={styles.ticketbox}>
+          <Pressable
+            style={[
+              styles.ticketbox1,
+              activeTicket === 'all' && styles.activeTab,
+            ]}
+            onPress={() => setActiveTicket('all')}
+          >
+            <ThemedText style={activeTicket === 'all' && styles.activeText}>
+              All Ticket
+            </ThemedText>
+          </Pressable>
+
+          <Pressable
+            style={[
+              styles.ticketbox1,
+              activeTicket === 'open' && styles.activeTab,
+            ]}
+            onPress={() => setActiveTicket('open')}
+          >
+            <ThemedText style={activeTicket === 'open' && styles.activeText}>
+              Open Ticket
+            </ThemedText>
+          </Pressable>
+
+          <Pressable
+            style={[
+              styles.ticketbox1,
+              activeTicket === 'closed' && styles.activeTab,
+            ]}
+            onPress={() => setActiveTicket('closed')}
+          >
+            <ThemedText style={activeTicket === 'closed' && styles.activeText}>
+              Closed Ticket
+            </ThemedText>
+          </Pressable>
+        </View>
+
+        {/* Ticket Content */}
+        <ScrollView
+          style={styles.scroll}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        >
+          {filteredTickets.length === 0 ? (
+            <ThemedText>No tickets found.</ThemedText>
+          ) : (
+            filteredTickets.map(ticket => (
+              <View key={ticket.id} style={styles.ticketCard}>
+                <View style={styles.tickettimebox}>
+                  <ThemedText variant="title">{ticket.title}</ThemedText>
+
+                  <View style={styles.tickettimebox2}>
+                    <ThemedText style={{ marginTop: 4, marginHorizontal: 4 }}>
+                      {ticket.time}
+                    </ThemedText>
+
+                    <View style={styles.timebar}></View>
+
+                    <ThemedText style={{ marginTop: 4, marginHorizontal: 4 }}>
+                      {ticket.date}
+                    </ThemedText>
+
+                    <View style={styles.timebar}></View>
+
+                    <ThemedText style={{ marginTop: 4, marginHorizontal: 4 }}>
+                      {ticket.status}
+                    </ThemedText>
+                  </View>
+                </View>
+
+                <View style={styles.tickettimebox3}>
+                  <View style={styles.ticketviewbox}>
+                    <ThemedText style={styles.ticketviewtext}>View</ThemedText>
+                  </View>
+                </View>
+              </View>
+            ))
+          )}
+        </ScrollView>
       </View>
     </AppContainer>
   );
@@ -84,20 +203,18 @@ const styles = StyleSheet.create({
 
   conatiner2: {
     height: 51,
-    marginTop: 60,
-    flex: 0,
-    flexDirection: 'column',
+    marginTop: 40,
     justifyContent: 'space-between',
   },
 
   titletext: {
     fontSize: 16,
-    fontWeight: 500,
+    fontWeight: '500',
   },
 
   text: {
     fontSize: 12,
-    fontWeight: 400,
+    fontWeight: '400',
   },
 
   chatintrobox: {
@@ -106,7 +223,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: '#E2E8F0',
     marginTop: 20,
-    flex: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -116,21 +232,17 @@ const styles = StyleSheet.create({
   chatintrobox1: {
     width: '48%',
     height: 116,
-
-    flex: 0,
     justifyContent: 'space-between',
   },
 
   chatintrobox1text: {
     fontSize: 11,
-    fontWeight: 400,
+    fontWeight: '400',
   },
 
   chatimagebox1: {
     width: '80%',
-
     height: 41,
-    flex: 0,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -140,20 +252,15 @@ const styles = StyleSheet.create({
     width: 40,
     borderRadius: 100,
     marginLeft: -17,
-
-    borderColor: '',
   },
+
   chatimage1: {
     height: 40,
     width: 40,
     borderRadius: 100,
-
-    borderWidth: 0,
   },
 
   sendbutton: {
-    flex: 0,
-    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     height: 40,
@@ -168,7 +275,6 @@ const styles = StyleSheet.create({
   },
 
   clockbox: {
-    flex: 0,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -180,7 +286,87 @@ const styles = StyleSheet.create({
   chatintrobo2: {
     width: '48%',
     height: 116,
+  },
+
+  ticketbox: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderColor: '#F5F5F5',
+    borderRadius: 10,
+    padding: 4,
+    marginTop: 30,
+    borderWidth: 1,
+  },
+
+  ticketbox1: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+
+  activeTab: {
+    backgroundColor: '#2B2B8A',
+  },
+
+  activeText: {
+    color: '#fff',
+  },
+
+  ticketCard: {
+    borderBottomWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 10,
+    paddingBottom: 15,
+    flex: 0,
+    flexDirection: 'row',
+    marginBottom: 10,
+  },
+
+  tickettimebox2: {
+    alignItems: 'center',
 
     flex: 0,
+    flexDirection: 'row',
+  },
+
+  tickettimebox: {
+    width: '75%',
+    height: 56,
+    justifyContent: 'space-between',
+  },
+
+  tickettimebox3: {
+    width: '25%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  timebar: {
+    height: 14,
+    width: 2,
+    backgroundColor: '#000000',
+  },
+
+  ticketviewbox: {
+    height: 22,
+    width: 58,
+    borderRadius: 6,
+
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F9',
+  },
+
+  ticketviewtext: {
+    fontSize: 10,
+  },
+
+  scroll: {
+    height: '42%',
+
+    marginTop: 25,
+    paddingTop: 10,
   },
 });
