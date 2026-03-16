@@ -96,7 +96,7 @@ export default function Legal() {
     {
       id: 10,
       title: 'Contact Us',
-      points: ['Questions? Reach out at'],
+      points: ['Questions? Reach out at:  support@afamilia.app'],
     },
   ];
 
@@ -306,6 +306,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 0,
     paddingHorizontal: 20,
+    paddingTop: 5,
   },
 
   togglebox: {
@@ -335,7 +336,8 @@ const styles = StyleSheet.create({
   },
 
   textbox1: {
-    height: '80%',
+    height: '75%',
+    paddingBottom: 40,
   },
 
   activeText: {

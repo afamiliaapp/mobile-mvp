@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import Icon from 'react-native-vector-icons/Feather';
 import ThemedText from './ThemedText';
@@ -7,8 +7,91 @@ export default function TodaysSchedule() {
   return (
     <View style={styles.schedulebox}>
       <ThemedText variant="title" style={styles.scheduletitle}>
-        TodaysSchedule
+        Today's Schedule
       </ThemedText>
+
+      <View style={styles.schedulebox2}>
+        <View style={styles.schedulebox3}>
+          <ThemedText variant="title" style={styles.schedulebox3title}>
+            Business meeting
+          </ThemedText>
+          <ThemedText style={styles.schedulebox3text1}>
+            Call project manager{' '}
+          </ThemedText>
+          <View style={styles.scheduledatebox}>
+            <ThemedText style={styles.scheduletimetext}>04:00 PM </ThemedText>
+            <ThemedText style={styles.scheduletimetext}>
+              | 29 Feb 2025 |{' '}
+            </ThemedText>
+            <Text style={styles.scheduletimelabel}>Work </Text>
+          </View>
+        </View>
+        <View style={styles.schedulebox4}>
+          <View style={styles.scheduleviewbtn}>
+            <ThemedText variant="title" style={styles.scheduleviewtxt}>
+              View
+            </ThemedText>
+            <View>
+              <Icon name="chevron-right" size={12} color="#999999" />
+            </View>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.schedulebox2}>
+        <View style={styles.schedulebox3}>
+          <ThemedText variant="title" style={styles.schedulebox3title}>
+            Business meeting
+          </ThemedText>
+          <ThemedText style={styles.schedulebox3text1}>
+            Call project manager{' '}
+          </ThemedText>
+          <View style={styles.scheduledatebox}>
+            <ThemedText style={styles.scheduletimetext}>04:00 PM </ThemedText>
+            <ThemedText style={styles.scheduletimetext}>
+              | 29 Feb 2025 |{' '}
+            </ThemedText>
+            <Text style={styles.scheduletimelabel}>Work </Text>
+          </View>
+        </View>
+        <View style={styles.schedulebox4}>
+          <View style={styles.scheduleviewbtn}>
+            <ThemedText variant="title" style={styles.scheduleviewtxt}>
+              View
+            </ThemedText>
+            <View>
+              <Icon name="chevron-right" size={12} color="#999999" />
+            </View>
+          </View>
+        </View>
+      </View>
+      <View style={styles.schedulebox2}>
+        <View style={styles.schedulebox3}>
+          <ThemedText variant="title" style={styles.schedulebox3title}>
+            Business meeting
+          </ThemedText>
+          <ThemedText style={styles.schedulebox3text1}>
+            Call project manager{' '}
+          </ThemedText>
+          <View style={styles.scheduledatebox}>
+            <ThemedText style={styles.scheduletimetext}>04:00 PM </ThemedText>
+            <ThemedText style={styles.scheduletimetext}>
+              | 29 Feb 2025 |{' '}
+            </ThemedText>
+            <Text style={styles.scheduletimelabel}>Work </Text>
+          </View>
+        </View>
+        <View style={styles.schedulebox4}>
+          <View style={styles.scheduleviewbtn}>
+            <ThemedText variant="title" style={styles.scheduleviewtxt}>
+              View
+            </ThemedText>
+            <View>
+              <Icon name="chevron-right" size={12} color="#999999" />
+            </View>
+          </View>
+        </View>
+      </View>
       <View style={styles.schedulebox2}>
         <View style={styles.schedulebox3}>
           <ThemedText variant="title" style={styles.schedulebox3title}>
@@ -55,7 +138,6 @@ const styles = StyleSheet.create({
   schedulebox: {
     marginTop: 30,
     paddingHorizontal: 10,
-    height: 171,
   },
   scheduletitle: {
     fontSize: 18,

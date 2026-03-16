@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import React from 'react';
 import FamilyManagementBar from '../components/FamilyManagementBar';
 import BackButton from '../components/BackButton';
@@ -12,14 +12,20 @@ export default function Family() {
     <AppContainer>
       <View style={styles.container}>
         <FamilyManagementBar />
-        <BackButton />
 
-        <View style={styles.famname}>
-          <ThemedText style={styles.famnametxt}>Family Circle name</ThemedText>
-          <ThemedTextInput style={styles.input} placeholder="Enter text" />
-        </View>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={{ marginBottom: 100 }}
+        >
+          <View style={styles.famname}>
+            <ThemedText style={styles.famnametxt}>
+              Family Circle name
+            </ThemedText>
+            <ThemedTextInput style={styles.input} placeholder="Enter text" />
+          </View>
 
-        <MemberList />
+          <MemberList />
+        </ScrollView>
       </View>
     </AppContainer>
   );
@@ -27,13 +33,13 @@ export default function Family() {
 
 const styles = StyleSheet.create({
   container: {
-    height: '100%',
     paddingHorizontal: 20,
+    paddingVertical: 20,
+
+    height: '100%',
   },
 
-  famname: {
-    marginTop: 40,
-  },
+  famname: {},
   famnametxt: {
     fontSize: 12,
     fontWeight: 500,

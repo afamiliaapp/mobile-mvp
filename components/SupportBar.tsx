@@ -31,13 +31,9 @@ export default function SupportBar() {
 
 const styles = StyleSheet.create({
   continer: {
-    height: 42,
-
-    flex: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 2,
   },
 
   title: {

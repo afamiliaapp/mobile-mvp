@@ -14,6 +14,6 @@ export default function AppContainer({ children }) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 0,
+    flex: 1,
   },
 });

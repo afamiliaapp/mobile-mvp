@@ -10,7 +10,6 @@ export default function Info() {
     <AppContainer>
       <View style={styles.container}>
         <AboutinfoBar />
-        <BackButton />
 
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -130,13 +129,12 @@ export default function Info() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 0, // ✅ important fix
     paddingHorizontal: 20,
+    paddingTop: 10,
+    height: '100%',
   },
 
-  container2: {
-    height: '89%',
-  },
+  container2: {},
 
   abouttext: {
     fontSize: 14,

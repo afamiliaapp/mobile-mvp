@@ -210,6 +210,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 0,
     paddingHorizontal: 20,
+    paddingTop: 10,
+
     height: '100%',
   },
   sectionTitle: {
@@ -325,5 +327,6 @@ const styles = StyleSheet.create({
   },
   cardbox: {
     height: '90%',
+    paddingBottom: 20,
   },
 });
