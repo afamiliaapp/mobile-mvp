@@ -13,6 +13,9 @@ import CalendarBar from '../components/CalendarBar';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Calendar as RNCalendar } from 'react-native-calendars';
 import ThemedText from '../components/ThemedText';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import BackButton from '../components/BackButton';
+import BackButtonModal from '../components/BackButtonModal';
 
 export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -21,9 +24,18 @@ export default function Calendar() {
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+
   const [category, setCategory] = useState('');
+
+  const [date, setDate] = useState(new Date());
+  const [startTime, setStartTime] = useState(new Date());
+  const [endTime, setEndTime] = useState(new Date());
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
+  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+  const [viewModalVisible, setViewModalVisible] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   const changeMonth = direction => {
     const newDate = new Date(currentDate);
@@ -31,22 +43,46 @@ export default function Calendar() {
     setCurrentDate(newDate);
   };
 
+  const handleViewEvent = event => {
+    setSelectedEvent(event);
+    setViewModalVisible(true);
+  };
+
+  const deleteEvent = () => {
+    const updatedEvents = events.filter(e => e !== selectedEvent);
+    setEvents(updatedEvents);
+    setViewModalVisible(false);
+  };
+
   const saveEvent = () => {
+    const formattedDate = date.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+
+    const formattedStartTime = startTime.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
     const newEvent = {
       name,
       description,
-      startDate,
-      endDate,
+      date: formattedDate,
+      time: formattedStartTime,
       category,
     };
 
     setEvents([...events, newEvent]);
 
+    // reset
     setName('');
     setDescription('');
-    setStartDate('');
-    setEndDate('');
     setCategory('');
+    setDate(new Date());
+    setStartTime(new Date());
+    setEndTime(new Date());
 
     setModalVisible(false);
   };
@@ -55,159 +91,423 @@ export default function Calendar() {
   const year = currentDate.getFullYear();
 
   return (
-    <AppContainer>
-      <View style={styles.container}>
-        <CalendarBar />
+    <>
+      <AppContainer>
+        <View style={styles.container}>
+          <CalendarBar />
 
-        <ScrollView style={styles.container2}>
-          {/* MONTH NAVIGATION */}
+          <ScrollView
+            style={styles.container2}
+            keyboardShouldPersistTaps="always"
+            showsVerticalScrollIndicator={false}
+          >
+            {/* MONTH NAVIGATION */}
 
-          <View style={styles.monthChangerbox}>
-            <View style={styles.monthChangerbox2}>
-              <ThemedText style={styles.monthChangertext}>{month}</ThemedText>
-              <ThemedText style={styles.monthChangertext}>{year}</ThemedText>
-            </View>
+            <View style={styles.monthChangerbox}>
+              <View style={styles.monthChangerbox2}>
+                <ThemedText style={styles.monthChangertext}>{month}</ThemedText>
+                <ThemedText style={styles.monthChangertext}>{year}</ThemedText>
+              </View>
 
-            <View style={styles.monthNavBox}>
-              <Pressable
-                style={styles.monthNavBox2}
-                onPress={() => changeMonth(-1)}
-              >
-                <Icon name="chevron-left" size={12} />
-              </Pressable>
+              <View style={styles.monthNavBox}>
+                <Pressable
+                  style={styles.monthNavBox2}
+                  onPress={() => changeMonth(-1)}
+                >
+                  <Icon name="chevron-left" size={12} />
+                </Pressable>
 
-              <Pressable
-                style={styles.monthNavBox2}
-                onPress={() => changeMonth(1)}
-              >
-                <Icon name="chevron-right" size={12} />
-              </Pressable>
-            </View>
-          </View>
-
-          {/* CALENDAR */}
-
-          <View style={styles.CalendarBox}>
-            <RNCalendar
-              current={currentDate.toISOString().split('T')[0]}
-              onDayPress={day => setStartDate(day.dateString)}
-            />
-          </View>
-
-          {/* SCHEDULED APPOINTMENTS */}
-
-          <View style={styles.schedulesearch}>
-            <View style={styles.scheduleBox2}>
-              <ThemedText style={styles.monthChangertext}>
-                Scheduled appointments
-              </ThemedText>
-            </View>
-
-            <View style={styles.searchBox2}>
-              <Icon name="search" size={16} color="#807d7d" />
-            </View>
-          </View>
-
-          {/* NO EVENTS */}
-
-          {events.length === 0 && (
-            <View style={styles.addnewNoteBox}>
-              <ThemedText style={styles.addneweventText1}>
-                No family events yet
-              </ThemedText>
-
-              <ThemedText style={styles.addneweventText2}>
-                Start by adding your first birthday, appointment, or reminder
-              </ThemedText>
-
-              <Pressable
-                style={styles.addnewbutton}
-                onPress={() => setModalVisible(true)}
-              >
-                <Icon name="plus" size={12} color="#fff" />
-                <ThemedText style={{ color: '#fff', fontSize: 12 }}>
-                  New event
-                </ThemedText>
-              </Pressable>
-            </View>
-          )}
-
-          {/* EVENTS */}
-
-          {events.map((event, index) => (
-            <View key={index} style={styles.schedulebox2}>
-              <View style={styles.schedulebox3}>
-                <ThemedText style={styles.schedulebox3title}>
-                  {event.name}
-                </ThemedText>
-
-                <ThemedText style={styles.schedulebox3text1}>
-                  {event.description}
-                </ThemedText>
-
-                <View style={styles.scheduledatebox}>
-                  <ThemedText style={styles.scheduletimetext}>
-                    {event.startDate}
-                  </ThemedText>
-
-                  <Text style={styles.scheduletimelabel}>
-                    {' '}
-                    {event.category}
-                  </Text>
-                </View>
+                <Pressable
+                  style={styles.monthNavBox2}
+                  onPress={() => changeMonth(1)}
+                >
+                  <Icon name="chevron-right" size={12} />
+                </Pressable>
               </View>
             </View>
-          ))}
-        </ScrollView>
-      </View>
 
-      {/* MODAL */}
+            {/* CALENDAR */}
 
-      <Modal visible={modalVisible} animationType="slide">
-        <View style={{ padding: 20 }}>
-          <TextInput
-            placeholder="Event name"
-            value={name}
-            onChangeText={setName}
-            style={styles.input}
-          />
+            <View style={styles.CalendarBox}>
+              <RNCalendar
+                key={currentDate.toISOString()}
+                current={currentDate.toISOString().split('T')[0]}
+                onDayPress={day => setDate(new Date(day.dateString))}
+              />
+            </View>
 
-          <TextInput
-            placeholder="Description"
-            value={description}
-            onChangeText={setDescription}
-            style={styles.input}
-          />
+            {/* SCHEDULED APPOINTMENTS */}
 
-          <View style={{ flexDirection: 'row', gap: 10 }}>
-            <TextInput
-              placeholder="Start date"
-              value={startDate}
-              onChangeText={setStartDate}
-              style={[styles.input, { flex: 1 }]}
-            />
+            <View style={styles.schedulesearch}>
+              <View style={styles.scheduleBox2}>
+                <ThemedText style={styles.monthChangertext}>
+                  Scheduled appointments
+                </ThemedText>
+              </View>
 
-            <TextInput
-              placeholder="End date"
-              value={endDate}
-              onChangeText={setEndDate}
-              style={[styles.input, { flex: 1 }]}
-            />
+              <View style={styles.searchBox2}>
+                <Icon name="search" size={16} color="#807d7d" />
+              </View>
+            </View>
+
+            {/* NO EVENTS */}
+
+            {events.length === 0 && (
+              <View style={styles.addnewNoteBox}>
+                <ThemedText style={styles.addneweventText1}>
+                  No family events yet
+                </ThemedText>
+
+                <ThemedText style={styles.addneweventText2}>
+                  Start by adding your first birthday, appointment, or reminder
+                </ThemedText>
+
+                <Pressable
+                  onPress={() => setModalVisible(true)}
+                  style={({ pressed }) => [
+                    styles.addnewbutton,
+                    pressed && { opacity: 0.6 },
+                  ]}
+                >
+                  <Icon name="plus" size={12} color="#fff" />
+                  <Text style={{ color: '#fff', fontSize: 12 }}>New event</Text>
+                </Pressable>
+              </View>
+            )}
+
+            {/* EVENTS */}
+
+            {events.map((event, index) => (
+              <View key={index} style={styles.schedulebox2}>
+                <View style={styles.schedulebox3}>
+                  <ThemedText variant="title" style={styles.schedulebox3title}>
+                    {event.name}
+                  </ThemedText>
+
+                  <ThemedText style={styles.schedulebox3text1}>
+                    {event.description}
+                  </ThemedText>
+
+                  <View style={styles.scheduledatebox}>
+                    <ThemedText style={styles.scheduletimetext}>
+                      {event.time}
+                    </ThemedText>
+
+                    <ThemedText style={styles.scheduletimetext}>
+                      {' | '} {event.date} {' | '}
+                    </ThemedText>
+
+                    <Text style={styles.scheduletimelabel}>
+                      {event.category}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.schedulebox4}>
+                  <Pressable
+                    style={styles.scheduleviewbtn}
+                    onPress={() => handleViewEvent(event)}
+                  >
+                    <ThemedText variant="title" style={styles.scheduleviewtxt}>
+                      View
+                    </ThemedText>
+
+                    <Icon name="chevron-right" size={12} color="#999999" />
+                  </Pressable>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+      </AppContainer>
+
+      {/*ADD EVENTS MODAL */}
+
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+          }}
+        >
+          <View
+            style={{
+              width: '100%',
+              backgroundColor: '#fff',
+              padding: 20,
+              borderRadius: 12,
+              height: '70%',
+            }}
+          >
+            <View>
+              <ThemedText
+                style={{
+                  fontSize: 20,
+                  color: '#1B1C1E',
+                  marginBottom: 20,
+                  fontWeight: 600,
+                }}
+                variant="title"
+              >
+                Add appointments
+              </ThemedText>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <ThemedText style={styles.formtitle}>Name</ThemedText>
+              <TextInput
+                placeholder="Enter name"
+                value={name}
+                onChangeText={setName}
+                style={styles.input}
+              />
+
+              <ThemedText style={styles.formtitle}>Decription</ThemedText>
+
+              <TextInput
+                placeholder="Enter Description"
+                value={description}
+                onChangeText={setDescription}
+                style={styles.input}
+              />
+
+              <ThemedText style={styles.formtitle}>Start-End time</ThemedText>
+
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <Pressable
+                  style={[styles.input, { flex: 1 }]}
+                  onPress={() => setShowStartTimePicker(true)}
+                >
+                  <Text>
+                    {startTime.toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </Text>
+                </Pressable>
+
+                <Pressable
+                  style={[styles.input, { flex: 1 }]}
+                  onPress={() => setShowEndTimePicker(true)}
+                >
+                  <Text>
+                    {endTime.toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </Text>
+                </Pressable>
+              </View>
+
+              {showStartTimePicker && (
+                <DateTimePicker
+                  value={startTime}
+                  mode="time"
+                  is24Hour={false}
+                  display="default"
+                  onChange={(event, selectedTime) => {
+                    setShowStartTimePicker(false);
+                    if (selectedTime) setStartTime(selectedTime);
+                  }}
+                />
+              )}
+
+              {showEndTimePicker && (
+                <DateTimePicker
+                  value={endTime}
+                  mode="time"
+                  is24Hour={false}
+                  display="default"
+                  onChange={(event, selectedTime) => {
+                    setShowEndTimePicker(false);
+                    if (selectedTime) setEndTime(selectedTime);
+                  }}
+                />
+              )}
+
+              <ThemedText style={styles.formtitle}>Date</ThemedText>
+
+              <Pressable
+                style={styles.input}
+                onPress={() => setShowDatePicker(true)}
+              >
+                <Text>{date.toDateString()}</Text>
+              </Pressable>
+
+              {showDatePicker && (
+                <DateTimePicker
+                  value={date}
+                  mode="date"
+                  display="default"
+                  onChange={(event, selectedDate) => {
+                    setShowDatePicker(false);
+                    if (selectedDate) setDate(selectedDate);
+                  }}
+                />
+              )}
+
+              <ThemedText style={styles.formtitle}>Catergories</ThemedText>
+
+              <TextInput
+                placeholder="Birthday, Meeting, Reminder..."
+                value={category}
+                onChangeText={setCategory}
+                style={styles.input}
+              />
+
+              <Pressable style={styles.saveBtn} onPress={saveEvent}>
+                <Text style={{ color: '#fff' }}>Save</Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.cancelBtn}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text>Cancel</Text>
+              </Pressable>
+            </ScrollView>
           </View>
-
-          <TextInput
-            placeholder="Category"
-            value={category}
-            onChangeText={setCategory}
-            style={styles.input}
-          />
-
-          <Pressable style={styles.saveBtn} onPress={saveEvent}>
-            <Text style={{ color: '#fff' }}>Save</Text>
-          </Pressable>
         </View>
       </Modal>
-    </AppContainer>
+
+      {/**VIEW EVENTS MODAL */}
+      <Modal
+        visible={viewModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setViewModalVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'flex-end',
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: '#fff',
+              paddingHorizontal: 20,
+              paddingTop: 5,
+
+              height: '90%',
+            }}
+          >
+            {selectedEvent && (
+              <>
+                {/* HEADER */}
+                <BackButtonModal
+                  closeModal={() => setViewModalVisible(false)}
+                />
+
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginTop: 20,
+                  }}
+                >
+                  <ThemedText
+                    variant="title"
+                    style={{ fontSize: 16, fontWeight: '500' }}
+                  >
+                    {selectedEvent.name}
+                  </ThemedText>
+
+                  <View style={{ flexDirection: 'row', gap: 20 }}>
+                    <Pressable>
+                      <Icon name="edit" size={14} color="#333" />
+                    </Pressable>
+
+                    <Pressable onPress={deleteEvent}>
+                      <Icon name="trash" size={14} color="red" />
+                    </Pressable>
+                  </View>
+                </View>
+
+                {/* DESCRIPTION */}
+                <View style={{ marginBottom: 20 }}>
+                  <ThemedText style={{ fontSize: 13, marginBottom: 15 }}>
+                    Description
+                  </ThemedText>
+
+                  <ThemedText
+                    style={{
+                      fontSize: 16,
+                      marginBottom: 20,
+                      fontWeight: '500',
+                    }}
+                    variant="title"
+                  >
+                    {selectedEvent.description}
+                  </ThemedText>
+                </View>
+
+                {/* TIME */}
+
+                <View style={{ marginBottom: 20 }}>
+                  <ThemedText
+                    style={{ fontSize: 13, marginBottom: 15 }}
+                    variant="title"
+                  >
+                    Start - End Time
+                  </ThemedText>
+
+                  <ThemedText
+                    style={{
+                      fontSize: 16,
+                      marginBottom: 20,
+                      fontWeight: '500',
+                    }}
+                    variant="title"
+                  >
+                    {selectedEvent.time}
+                  </ThemedText>
+                </View>
+
+                {/* DATE */}
+
+                <View style={{ marginBottom: 20 }}>
+                  <ThemedText style={{ fontSize: 13, marginBottom: 15 }}>
+                    Date
+                  </ThemedText>
+
+                  <ThemedText
+                    style={{
+                      fontSize: 16,
+                      marginBottom: 20,
+                      fontWeight: '500',
+                    }}
+                    variant="title"
+                  >
+                    {selectedEvent.date}
+                  </ThemedText>
+                </View>
+
+                {/* CATEGORY */}
+                <ThemedText style={{ fontSize: 13, marginBottom: 15 }}>
+                  Category
+                </ThemedText>
+
+                <ThemedText
+                  style={{ fontSize: 16, marginBottom: 20, fontWeight: '500' }}
+                  variant="title"
+                >
+                  {selectedEvent.category}
+                </ThemedText>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
+    </>
   );
 }
 
@@ -220,7 +520,6 @@ const styles = StyleSheet.create({
 
   container2: {
     marginTop: '20%',
-    height: '100%',
   },
 
   monthChangerbox: {
@@ -278,7 +577,7 @@ const styles = StyleSheet.create({
 
   searchBox2: {
     padding: 7,
-    backgroundColor: '#fff',
+
     borderWidth: 0.5,
     borderColor: '#c9c3c3',
     borderRadius: 50,
@@ -388,7 +687,7 @@ const styles = StyleSheet.create({
 
   modalContainer: {
     flex: 1,
-    backgroundColor: '#fff',
+
     padding: 20,
     justifyContent: 'center',
   },
@@ -407,7 +706,6 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 15,
     fontSize: 14,
-    backgroundColor: '#fff',
   },
 
   dateRow: {
@@ -442,5 +740,10 @@ const styles = StyleSheet.create({
   cancelBtnText: {
     color: '#333',
     fontSize: 14,
+  },
+
+  formtitle: {
+    fontSize: 12,
+    marginBottom: 5,
   },
 });
