@@ -5,7 +5,7 @@ import AppContainer from './AppContainer';
 import ThemedText from './ThemedText';
 import { ThemeContext } from '../context/ThemeContext';
 
-export default function SettingsBar() {
+export default function CalendarBar() {
   const navigation = useNavigation();
   const { theme } = useContext(ThemeContext); // access current theme
 
@@ -14,7 +14,7 @@ export default function SettingsBar() {
       <View style={styles.container}>
         {/* Title */}
         <ThemedText variant="title" style={styles.title}>
-          Settings
+          Calendar
         </ThemedText>
 
         {/* Bell Icon */}

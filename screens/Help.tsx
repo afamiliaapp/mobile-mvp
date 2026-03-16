@@ -57,151 +57,155 @@ export default function Help() {
     <AppContainer>
       <View style={styles.conatiner}>
         <SupportBar />
-        <BackButton />
 
-        <View style={styles.conatiner2}>
-          <ThemedText style={styles.titletext} variant="title">
-            Hi Victor!
-          </ThemedText>
-          <ThemedText style={styles.text} variant="body">
-            Ask us anything or share your Review with us!
-          </ThemedText>
-        </View>
-
-        {/* Chat Intro Box */}
-        <View style={styles.chatintrobox}>
-          <View style={styles.chatintrobox1}>
-            <ThemedText variant="title" style={styles.chatintrobox1text}>
-              Start a conversation
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles.conatiner2}>
+            <ThemedText style={styles.titletext} variant="title">
+              Hi Victor!
             </ThemedText>
+            <ThemedText style={styles.text} variant="body">
+              Ask us anything or share your Review with us!
+            </ThemedText>
+          </View>
 
-            <View style={styles.chatimagebox1}>
-              <Image
-                style={styles.chatimage1}
-                source={require('../assets/chatimg1.png')}
-              />
-              <Image
-                style={styles.chatimage}
-                source={require('../assets/chatimg2.png')}
-              />
-              <Image
-                style={styles.chatimage}
-                source={require('../assets/chatimg3.png')}
-              />
-              <Image
-                style={styles.chatimage}
-                source={require('../assets/chatimg4.png')}
-              />
-              <Image
-                style={styles.chatimage}
-                source={require('../assets/chatimg5.png')}
-              />
+          {/* Chat Intro Box */}
+          <View style={styles.chatintrobox}>
+            <View style={styles.chatintrobox1}>
+              <ThemedText variant="title" style={styles.chatintrobox1text}>
+                Start a conversation
+              </ThemedText>
+
+              <View style={styles.chatimagebox1}>
+                <Image
+                  style={styles.chatimage1}
+                  source={require('../assets/chatimg1.png')}
+                />
+                <Image
+                  style={styles.chatimage}
+                  source={require('../assets/chatimg2.png')}
+                />
+                <Image
+                  style={styles.chatimage}
+                  source={require('../assets/chatimg3.png')}
+                />
+                <Image
+                  style={styles.chatimage}
+                  source={require('../assets/chatimg4.png')}
+                />
+                <Image
+                  style={styles.chatimage}
+                  source={require('../assets/chatimg5.png')}
+                />
+              </View>
+
+              <Pressable onPress={handleSendMessage} style={styles.sendbutton}>
+                <ThemedText style={styles.sendbuttontxt}>
+                  Send us a message
+                </ThemedText>
+              </Pressable>
             </View>
 
-            <Pressable onPress={handleSendMessage} style={styles.sendbutton}>
-              <ThemedText style={styles.sendbuttontxt}>
-                Send us a message
+            <View style={styles.chatintrobo2}>
+              <ThemedText variant="title" style={styles.chatintrobox1text}>
+                Our reply time
+              </ThemedText>
+
+              <View style={styles.clockbox}>
+                <Image source={require('../assets/greenclock.png')} />
+                <ThemedText variant="body" style={styles.clocktext}>
+                  Under 5 minutes
+                </ThemedText>
+              </View>
+            </View>
+          </View>
+
+          {/* Ticket Toggle */}
+          <View style={styles.ticketbox}>
+            <Pressable
+              style={[
+                styles.ticketbox1,
+                activeTicket === 'all' && styles.activeTab,
+              ]}
+              onPress={() => setActiveTicket('all')}
+            >
+              <ThemedText style={activeTicket === 'all' && styles.activeText}>
+                All Ticket
+              </ThemedText>
+            </Pressable>
+
+            <Pressable
+              style={[
+                styles.ticketbox1,
+                activeTicket === 'open' && styles.activeTab,
+              ]}
+              onPress={() => setActiveTicket('open')}
+            >
+              <ThemedText style={activeTicket === 'open' && styles.activeText}>
+                Open Ticket
+              </ThemedText>
+            </Pressable>
+
+            <Pressable
+              style={[
+                styles.ticketbox1,
+                activeTicket === 'closed' && styles.activeTab,
+              ]}
+              onPress={() => setActiveTicket('closed')}
+            >
+              <ThemedText
+                style={activeTicket === 'closed' && styles.activeText}
+              >
+                Closed Ticket
               </ThemedText>
             </Pressable>
           </View>
 
-          <View style={styles.chatintrobo2}>
-            <ThemedText variant="title" style={styles.chatintrobox1text}>
-              Our reply time
-            </ThemedText>
-
-            <View style={styles.clockbox}>
-              <Image source={require('../assets/greenclock.png')} />
-              <ThemedText variant="body" style={styles.clocktext}>
-                Under 5 minutes
-              </ThemedText>
-            </View>
-          </View>
-        </View>
-
-        {/* Ticket Toggle */}
-        <View style={styles.ticketbox}>
-          <Pressable
-            style={[
-              styles.ticketbox1,
-              activeTicket === 'all' && styles.activeTab,
-            ]}
-            onPress={() => setActiveTicket('all')}
+          {/* Ticket Content */}
+          <ScrollView
+            style={styles.scroll}
+            showsVerticalScrollIndicator={false}
           >
-            <ThemedText style={activeTicket === 'all' && styles.activeText}>
-              All Ticket
-            </ThemedText>
-          </Pressable>
+            {filteredTickets.length === 0 ? (
+              <ThemedText>No tickets found.</ThemedText>
+            ) : (
+              filteredTickets.map(ticket => (
+                <View key={ticket.id} style={styles.ticketCard}>
+                  <View style={styles.tickettimebox}>
+                    <ThemedText variant="title">{ticket.title}</ThemedText>
 
-          <Pressable
-            style={[
-              styles.ticketbox1,
-              activeTicket === 'open' && styles.activeTab,
-            ]}
-            onPress={() => setActiveTicket('open')}
-          >
-            <ThemedText style={activeTicket === 'open' && styles.activeText}>
-              Open Ticket
-            </ThemedText>
-          </Pressable>
+                    <View style={styles.tickettimebox2}>
+                      <ThemedText style={{ marginTop: 4, marginHorizontal: 4 }}>
+                        {ticket.time}
+                      </ThemedText>
 
-          <Pressable
-            style={[
-              styles.ticketbox1,
-              activeTicket === 'closed' && styles.activeTab,
-            ]}
-            onPress={() => setActiveTicket('closed')}
-          >
-            <ThemedText style={activeTicket === 'closed' && styles.activeText}>
-              Closed Ticket
-            </ThemedText>
-          </Pressable>
-        </View>
+                      <View style={styles.timebar}></View>
 
-        {/* Ticket Content */}
-        <ScrollView
-          style={styles.scroll}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 100 }}
-        >
-          {filteredTickets.length === 0 ? (
-            <ThemedText>No tickets found.</ThemedText>
-          ) : (
-            filteredTickets.map(ticket => (
-              <View key={ticket.id} style={styles.ticketCard}>
-                <View style={styles.tickettimebox}>
-                  <ThemedText variant="title">{ticket.title}</ThemedText>
+                      <ThemedText style={{ marginTop: 4, marginHorizontal: 4 }}>
+                        {ticket.date}
+                      </ThemedText>
 
-                  <View style={styles.tickettimebox2}>
-                    <ThemedText style={{ marginTop: 4, marginHorizontal: 4 }}>
-                      {ticket.time}
-                    </ThemedText>
+                      <View style={styles.timebar}></View>
 
-                    <View style={styles.timebar}></View>
-
-                    <ThemedText style={{ marginTop: 4, marginHorizontal: 4 }}>
-                      {ticket.date}
-                    </ThemedText>
-
-                    <View style={styles.timebar}></View>
-
-                    <ThemedText style={{ marginTop: 4, marginHorizontal: 4 }}>
-                      {ticket.status}
-                    </ThemedText>
+                      <ThemedText style={{ marginTop: 4, marginHorizontal: 4 }}>
+                        {ticket.status}
+                      </ThemedText>
+                    </View>
                   </View>
-                </View>
 
-                <View style={styles.tickettimebox3}>
-                  <View style={styles.ticketviewbox}>
-                    <ThemedText style={styles.ticketviewtext}>View</ThemedText>
-                    <View>
-                      <Icon name="chevron-right" size={12} color="#999999" />
+                  <View style={styles.tickettimebox3}>
+                    <View style={styles.ticketviewbox}>
+                      <ThemedText style={styles.ticketviewtext}>
+                        View
+                      </ThemedText>
+                      <View>
+                        <Icon name="chevron-right" size={12} color="#999999" />
+                      </View>
                     </View>
                   </View>
                 </View>
-              </View>
-            ))
-          )}
+              ))
+            )}
+          </ScrollView>
         </ScrollView>
       </View>
     </AppContainer>
@@ -211,11 +215,15 @@ export default function Help() {
 const styles = StyleSheet.create({
   conatiner: {
     paddingHorizontal: 20,
+    height: '100%',
+    flex: 1,
+
+    paddingTop: 10,
   },
 
   conatiner2: {
     height: 51,
-    marginTop: 40,
+    marginTop: 20,
     justifyContent: 'space-between',
   },
 
@@ -230,7 +238,6 @@ const styles = StyleSheet.create({
   },
 
   chatintrobox: {
-    height: 138,
     borderWidth: 1,
     borderRadius: 10,
     borderColor: '#E2E8F0',
@@ -239,6 +246,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
+    paddingVertical: 10,
   },
 
   chatintrobox1: {

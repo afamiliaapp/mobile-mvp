@@ -27,11 +27,11 @@ const Stack = createNativeStackNavigator();
 function ScreenWithNav({ children }) {
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar backgroundColor="#000" barStyle="dark-content" />
+      <StatusBar backgroundColor="#fff" barStyle="dark-content" />
       <View style={styles.container}>
         <View style={styles.content}>{children}</View>
-        <NavigationBar />
       </View>
+      <NavigationBar />
     </SafeAreaView>
   );
 }
@@ -81,11 +81,17 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#fff',
+    backgroundColor: 'yellow',
+    justifyContent: 'space-between',
   },
   container: {
-    flex: 1,
+    flex: 0,
+    height: '85%',
+
+    backgroundColor: 'green',
   },
   content: {
     flex: 1,
+    backgroundColor: '#0c4af3e5',
   },
 });

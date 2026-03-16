@@ -151,7 +151,7 @@ export default function MemberList() {
 
       <View style={styles.memberlistbox}>
         {/* Existing member */}
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.memberlistbox2}>
             {members.map(member => (
               <View key={member.id} style={styles.memberlistbox3}>
@@ -729,9 +729,10 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: '#fff',
     borderRadius: 10,
-    padding: 16,
+    paddingHorizontal: 16,
     height: '98%',
-    marginTop: '100%',
+    marginTop: '80%',
+    paddingBottom: 20,
   },
   modalBox2: {
     width: '100%',
@@ -739,7 +740,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 16,
     height: '58%',
-    marginTop: '100%',
+    marginTop: '90%',
   },
 
   modalDelBox2: {

@@ -278,29 +278,28 @@ export default function Rewards() {
 const styles = StyleSheet.create({
   recentscroll: {
     marginTop: 20,
+    paddingBottom: 30,
 
-    height: '45%',
+    height: '30%',
   },
 
   progressscroll: {
     marginTop: 20,
 
-    height: '44%',
+    height: '30%',
   },
   container1: {
-    flex: 0,
     paddingHorizontal: 20,
-    height: 'auto',
+
+    paddingTop: 5,
   },
   container2: {
-    flex: 0,
+    flex: 1,
     paddingHorizontal: 20,
   },
 
   rewardheroImg: {
-    height: 135,
-
-    marginTop: 15,
+    paddingVertical: 20,
     flex: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',

@@ -15,6 +15,7 @@ import AppContainer from '../components/AppContainer';
 import { ThemeContext } from '../context/ThemeContext';
 import ThemedText from '../components/ThemedText';
 import DeleteAccount from '../components/DeleteAccount';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Settings() {
   const [switches, setSwitches] = useState({
@@ -36,7 +37,10 @@ export default function Settings() {
         <SettingsBar />
         <BackButton />
 
-        <ScrollView style={styles.settingsbox}>
+        <ScrollView
+          style={styles.settingsbox}
+          showsVerticalScrollIndicator={false}
+        >
           <ThemedText variant="title" style={styles.titletxt}>
             Privacy & Permissions
           </ThemedText>
@@ -230,18 +234,19 @@ export default function Settings() {
 
 const styles = StyleSheet.create({
   container: {
-    height: '100%',
     paddingHorizontal: 20,
+    paddingTop: 10,
+
+    height: '100%',
   },
 
   settingsbox: {
-    height: '100%',
+    paddingTop: 20,
+    paddingBottom: 40,
   },
   titletxt: {
     fontSize: 16,
     fontWeight: 500,
-
-    marginVertical: 15,
   },
 
   settingsbox2: {
@@ -315,13 +320,13 @@ const styles = StyleSheet.create({
   },
 
   savebox: {
-    height: 60,
     backgroundColor: '#2C247A',
     flex: 0,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
-    marginBottom: 30,
+    paddingVertical: 20,
+    marginBottom: 40,
   },
 
   savetext: {

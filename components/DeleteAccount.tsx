@@ -84,8 +84,8 @@ const styles = StyleSheet.create({
     flex: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    height: 50,
-    marginVertical: 40,
+
+    paddingVertical: 40,
   },
   delettext: {
     color: '#ED0D0D',
@@ -113,8 +113,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 16,
     paddingHorizontal: 20,
-    height: '40%',
-    marginTop: '130%',
+    height: '50%',
+    marginTop: '100%',
   },
 
   modalTitleBox: {
