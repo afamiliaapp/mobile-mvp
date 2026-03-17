@@ -52,7 +52,7 @@ export default function MainLayout() {
     >
       <Stack.Screen name="Dashboard" component={withNav(Dashboard)} />
       <Stack.Screen name="Calendar" component={withNav(Calendar)} />
-      <Stack.Screen name="Chat" component={Chat} />
+      <Stack.Screen name="Chat" component={withNav(Chat)} />
       <Stack.Screen name="Profile" component={withNav(Profile)} />
       <Stack.Screen name="Menu" component={withNav(Menu)} />
       <Stack.Screen

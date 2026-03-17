@@ -14,7 +14,6 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Calendar as RNCalendar } from 'react-native-calendars';
 import ThemedText from '../components/ThemedText';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import BackButton from '../components/BackButton';
 import BackButtonModal from '../components/BackButtonModal';
 
 export default function Calendar() {
