@@ -57,8 +57,8 @@ const styles = StyleSheet.create({
     flex: 0,
     paddingHorizontal: 20,
     paddingTop: 20,
-    paddingBottom: 30,
-    height: '94%',
+    paddingBottom: 10,
+    height: '100%',
   },
   statbox: {
     marginTop: 30,

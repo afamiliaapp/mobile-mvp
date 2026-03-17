@@ -36,6 +36,8 @@ export default function Calendar() {
   const [showEndTimePicker, setShowEndTimePicker] = useState(false);
   const [viewModalVisible, setViewModalVisible] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
   const changeMonth = direction => {
     const newDate = new Date(currentDate);
@@ -51,6 +53,8 @@ export default function Calendar() {
   const deleteEvent = () => {
     const updatedEvents = events.filter(e => e !== selectedEvent);
     setEvents(updatedEvents);
+
+    setDeleteModalVisible(false);
     setViewModalVisible(false);
   };
 
@@ -85,6 +89,23 @@ export default function Calendar() {
     setEndTime(new Date());
 
     setModalVisible(false);
+  };
+
+  const updateEvent = () => {
+    const updatedEvents = events.map(e =>
+      e === selectedEvent
+        ? {
+            ...e,
+            name,
+            description,
+            category,
+          }
+        : e,
+    );
+
+    setEvents(updatedEvents);
+    setEditModalVisible(false);
+    setViewModalVisible(false);
   };
 
   const month = currentDate.toLocaleString('default', { month: 'long' });
@@ -422,11 +443,19 @@ export default function Calendar() {
                   </ThemedText>
 
                   <View style={{ flexDirection: 'row', gap: 20 }}>
-                    <Pressable>
+                    <Pressable
+                      onPress={() => {
+                        setName(selectedEvent.name);
+                        setDescription(selectedEvent.description);
+                        setCategory(selectedEvent.category);
+
+                        setEditModalVisible(true);
+                      }}
+                    >
                       <Icon name="edit" size={14} color="#333" />
                     </Pressable>
 
-                    <Pressable onPress={deleteEvent}>
+                    <Pressable onPress={() => setDeleteModalVisible(true)}>
                       <Icon name="trash" size={14} color="red" />
                     </Pressable>
                   </View>
@@ -504,6 +533,147 @@ export default function Calendar() {
                 </ThemedText>
               </>
             )}
+          </View>
+        </View>
+      </Modal>
+
+      {/**EDIT APPOINTMENT MODAL */}
+
+      <Modal
+        visible={editModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setEditModalVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+          }}
+        >
+          <View
+            style={{
+              width: '100%',
+              backgroundColor: '#fff',
+              padding: 20,
+              borderRadius: 12,
+              height: '70%',
+            }}
+          >
+            <ThemedText
+              style={{
+                fontSize: 20,
+                marginBottom: 20,
+                fontWeight: '600',
+              }}
+            >
+              Edit appointments
+            </ThemedText>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <ThemedText style={styles.formtitle}>Name</ThemedText>
+              <TextInput
+                value={name}
+                onChangeText={setName}
+                style={styles.input}
+              />
+
+              <ThemedText style={styles.formtitle}>Description</ThemedText>
+              <TextInput
+                value={description}
+                onChangeText={setDescription}
+                style={styles.input}
+              />
+
+              <ThemedText style={styles.formtitle}>Category</ThemedText>
+              <TextInput
+                value={category}
+                onChangeText={setCategory}
+                style={styles.input}
+              />
+
+              <Pressable style={styles.saveBtn} onPress={updateEvent}>
+                <Text style={{ color: '#fff' }}>Update</Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.cancelBtn}
+                onPress={() => setEditModalVisible(false)}
+              >
+                <Text>Cancel</Text>
+              </Pressable>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* DELETE CONFIRMATION MODAL */}
+      <Modal
+        visible={deleteModalVisible}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setDeleteModalVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+          }}
+        >
+          <View
+            style={{
+              width: '100%',
+              backgroundColor: '#fff',
+              paddingHorizontal: 20,
+              paddingVertical: 30,
+              borderRadius: 12,
+            }}
+          >
+            {/* TITLE */}
+            <ThemedText
+              style={{
+                fontSize: 20,
+                fontWeight: '600',
+                marginBottom: 15,
+              }}
+              variant="title"
+            >
+              Delete Appointment
+            </ThemedText>
+
+            {/* WARNING TEXT */}
+            <ThemedText
+              style={{
+                fontSize: 14,
+                color: '#666',
+                marginBottom: 25,
+              }}
+            >
+              When you delete this appointment, you lose your appointment.
+            </ThemedText>
+
+            {/* BUTTONS */}
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              {/* CLOSE BUTTON */}
+              <Pressable
+                style={[styles.cancelBtn, { flex: 1, backgroundColor: '#fff' }]}
+                onPress={() => setDeleteModalVisible(false)}
+              >
+                <Text>Close</Text>
+              </Pressable>
+
+              {/* DELETE BUTTON */}
+              <Pressable
+                style={[styles.saveBtn, { flex: 1, backgroundColor: 'red' }]}
+                onPress={deleteEvent}
+              >
+                <Text style={{ color: '#fff' }}>Delete</Text>
+              </Pressable>
+            </View>
           </View>
         </View>
       </Modal>
