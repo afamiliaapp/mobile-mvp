@@ -24,6 +24,8 @@ const CY = height - BOTTOM_MARGIN - CIRCLE_SIZE / 2;
 const RADIUS = 140; // The distance of the icons from the center
 
 const ITEMS = [
+  { id: 'chores', label: 'Chores', icon: 'check-square', route: 'Chores' },
+  { id: 'expenses', label: 'Expenses', icon: 'credit-card', route: 'Expenses' },
   { id: 'photos', label: 'Photos', icon: 'image', route: 'Photos' },
   {
     id: 'child-control',
@@ -31,14 +33,12 @@ const ITEMS = [
     icon: 'shield',
     route: 'ChildControl',
   },
-  { id: 'expenses', label: 'Expenses', icon: 'credit-card', route: 'Expenses' },
   {
     id: 'meal-planner',
     label: 'Meal Planner',
     icon: 'coffee',
     route: 'MealPlanner',
   },
-  { id: 'chores', label: 'Chores', icon: 'check-square', route: 'Chores' },
 ];
 
 // 3. Calculate Arc Positions (180 to 360 degrees)
