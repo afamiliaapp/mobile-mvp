@@ -7,8 +7,8 @@ import Dashboard from '../screens/Dashboard';
 import Profile from '../screens/Profile';
 import Chat from '../screens/Chat';
 import Calendar from '../screens/Calendar';
-import Menu from '../screens/Menu';
 import NavigationBar from '../components/NavigationBar';
+import Menu from '../screens/Menu';
 import Notificationpage from '../screens/Notificationpage';
 import ProfileEdithPage from '../screens/ProfileEdithPage';
 import Family from '../screens/Family';
@@ -23,20 +23,23 @@ import SupportChat from '../screens/SupportChat';
 
 const Stack = createNativeStackNavigator();
 
-/* Layout wrapper so navbar has navigation context */
 function ScreenWithNav({ children }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
-      <View style={styles.container}>
-        <View style={styles.content}>{children}</View>
-      </View>
+
+      {/* Screen content */}
+      <View style={styles.content}>{children}</View>
+
+      {/* Nav bar always visible */}
       <NavigationBar />
+
+      {/* Menu overlay — sits above content but below nothing, nav bar stays visible */}
+      <Menu />
     </SafeAreaView>
   );
 }
 
-/* Helper to wrap screens */
 const withNav = Screen => props =>
   (
     <ScreenWithNav>
@@ -54,7 +57,6 @@ export default function MainLayout() {
       <Stack.Screen name="Calendar" component={withNav(Calendar)} />
       <Stack.Screen name="Chat" component={withNav(Chat)} />
       <Stack.Screen name="Profile" component={withNav(Profile)} />
-      <Stack.Screen name="Menu" component={withNav(Menu)} />
       <Stack.Screen
         name="Notificationpage"
         component={withNav(Notificationpage)}
@@ -63,7 +65,6 @@ export default function MainLayout() {
         name="ProfileEdithPage"
         component={withNav(ProfileEdithPage)}
       />
-
       <Stack.Screen name="Family" component={withNav(Family)} />
       <Stack.Screen name="Settings" component={withNav(Settings)} />
       <Stack.Screen name="Subscription" component={withNav(Subscription)} />
@@ -81,17 +82,8 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#fff',
-    backgroundColor: 'yellow',
-    justifyContent: 'space-between',
-  },
-  container: {
-    flex: 0,
-    height: '85%',
-
-    backgroundColor: 'green',
   },
   content: {
     flex: 1,
-    backgroundColor: '#0c4af3e5',
   },
 });

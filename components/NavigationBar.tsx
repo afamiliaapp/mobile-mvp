@@ -9,25 +9,20 @@ import {
 import React, { useContext } from 'react';
 import { useNavigation, useNavigationState } from '@react-navigation/native';
 import { ThemeContext } from '../context/ThemeContext';
+import { useMenu } from '../context/Menucontex';
 
 const { width } = Dimensions.get('window');
-
 const isTablet = width >= 768;
-
-// Better scaling
-const scale = size => {
-  const baseWidth = isTablet ? 768 : 375;
-  return (width / baseWidth) * size;
-};
+const scale = size => (width / (isTablet ? 768 : 375)) * size;
 
 export default function NavigationBar() {
   const navigation = useNavigation();
   const { theme, isDark } = useContext(ThemeContext);
+  const { openMenu } = useMenu();
 
   const currentRouteName = useNavigationState(
     state => state.routes[state.index]?.name,
   );
-
   const isActive = route => route === currentRouteName;
 
   const activeColor = isDark ? '#93C5FD' : '#2C247A';
@@ -80,11 +75,8 @@ export default function NavigationBar() {
         </Text>
       </TouchableOpacity>
 
-      {/* CENTER BUTTON */}
-      <TouchableOpacity
-        style={styles.menubox}
-        onPress={() => navigation.navigate('Menu')}
-      >
+      {/* CENTER BUTTON — opens radial menu overlay */}
+      <TouchableOpacity style={styles.menubox} onPress={openMenu}>
         <View style={styles.centerButton}>
           <Image
             source={require('../assets/grid-view.png')}
@@ -145,43 +137,33 @@ const styles = StyleSheet.create({
     height: isTablet ? scale(70) : scale(90),
     flexDirection: 'row',
     paddingHorizontal: scale(16),
-    borderRadius: scale(14),
     alignItems: 'center',
     justifyContent: 'space-between',
-
-    bottom: isTablet ? 0 : 0,
-    left: isTablet ? 0 : 0,
-    right: isTablet ? 0 : 0,
     elevation: 10,
   },
-
   menubox: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   menutext: {
     fontWeight: '600',
     fontSize: isTablet ? scale(14) : scale(11),
     marginTop: scale(4),
   },
-
   icon: {
-    width: isTablet ? scale(22) : scale(22),
-    height: isTablet ? scale(22) : scale(22),
+    width: scale(22),
+    height: scale(22),
     marginBottom: scale(2),
   },
-
   centerButton: {
-    width: isTablet ? scale(52) : scale(52),
-    height: isTablet ? scale(52) : scale(52),
+    width: scale(52),
+    height: scale(52),
     borderRadius: 100,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#2C247A',
   },
-
   centerIcon: {
     width: isTablet ? scale(20) : scale(24),
     height: isTablet ? scale(20) : scale(24),

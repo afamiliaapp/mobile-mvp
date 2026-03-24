@@ -10,10 +10,11 @@ import SplashScreen from 'react-native-splash-screen';
 import Authlayout from '../mobile-mvp/navigation/Authlayout';
 import MainLayout from '../mobile-mvp/navigation/Mainlayout';
 import { ThemeProvider, ThemeContext } from './context/ThemeContext';
+import { EventsProvider } from './context/Eventscontext';
+import { MenuProvider } from './context/Menucontex';
 
 const RootStack = createNativeStackNavigator();
 
-/* 🔥 Custom Navigation Themes */
 const LightNavTheme = {
   ...DefaultTheme,
   colors: {
@@ -36,10 +37,8 @@ const DarkNavTheme = {
   },
 };
 
-/* 🔥 Navigation wrapper that listens to ThemeContext */
 const AppNavigator = () => {
   const { theme, isDark } = useContext(ThemeContext);
-
   return (
     <NavigationContainer theme={isDark ? DarkNavTheme : LightNavTheme}>
       <RootStack.Navigator
@@ -63,7 +62,11 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider>
-      <AppNavigator />
+      <EventsProvider>
+        <MenuProvider>
+          <AppNavigator />
+        </MenuProvider>
+      </EventsProvider>
     </ThemeProvider>
   );
 };
