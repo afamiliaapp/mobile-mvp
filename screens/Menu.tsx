@@ -13,11 +13,19 @@ import { useMenu } from '../context/Menucontex';
 
 const { width, height } = Dimensions.get('window');
 
-const CIRCLE_SIZE = 64;
+// 1. Reduced size by 2px (64 -> 62)
+const CIRCLE_SIZE = 62;
+const BOTTOM_MARGIN = 40;
+
+// 2. Position the anchor at the bottom center
 const CX = width / 2;
-const CY = height / 2;
+const CY = height - BOTTOM_MARGIN - CIRCLE_SIZE / 2;
+
+const RADIUS = 140; // The distance of the icons from the center
 
 const ITEMS = [
+  { id: 'chores', label: 'Chores', icon: 'check-square', route: 'Chores' },
+  { id: 'expenses', label: 'Expenses', icon: 'credit-card', route: 'Expenses' },
   { id: 'photos', label: 'Photos', icon: 'image', route: 'Photos' },
   {
     id: 'child-control',
@@ -25,23 +33,23 @@ const ITEMS = [
     icon: 'shield',
     route: 'ChildControl',
   },
-  { id: 'expenses', label: 'Expenses', icon: 'credit-card', route: 'Expenses' },
   {
     id: 'meal-planner',
     label: 'Meal Planner',
     icon: 'coffee',
     route: 'MealPlanner',
   },
-  { id: 'chores', label: 'Chores', icon: 'check-square', route: 'Chores' },
 ];
 
-const OFFSETS = [
-  { x: -30, y: -160 }, // Photos
-  { x: 130, y: -110 }, // Child Control
-  { x: -160, y: -50 }, // Expenses
-  { x: 130, y: 20 }, // Meal Planner
-  { x: -160, y: 80 }, // Chores
-];
+// 3. Calculate Arc Positions (180 to 360 degrees)
+const GET_ARC_POSITIONS = (index, total) => {
+  // Distribute items evenly from Math.PI (180°) to 2*Math.PI (360°)
+  const angle = Math.PI + index * (Math.PI / (total - 1));
+  return {
+    x: RADIUS * Math.cos(angle),
+    y: RADIUS * Math.sin(angle),
+  };
+};
 
 export default function Menu() {
   const { menuOpen, closeMenu } = useMenu();
@@ -65,7 +73,7 @@ export default function Menu() {
             useNativeDriver: true,
             tension: 100,
             friction: 8,
-            delay: i * 70,
+            delay: i * 50,
           }),
         ),
       ).start();
@@ -100,23 +108,23 @@ export default function Menu() {
 
   return (
     <View style={styles.root} pointerEvents="box-none">
-      {/* BACKDROP */}
       <Animated.View style={[styles.backdrop, { opacity: backdropAnim }]}>
         <Pressable style={StyleSheet.absoluteFill} onPress={closeMenu} />
       </Animated.View>
 
-      {/* MENU ITEMS */}
       {ITEMS.map((item, i) => {
-        const off = OFFSETS[i];
+        // Calculate the perfect arc position for each item
+        const pos = GET_ARC_POSITIONS(i, ITEMS.length);
         const anim = itemAnims[i];
+
         return (
           <Animated.View
             key={item.id}
             style={[
               styles.itemWrapper,
               {
-                left: CX + off.x - CIRCLE_SIZE / 2,
-                top: CY + off.y - CIRCLE_SIZE / 2 - 30,
+                left: CX + pos.x - CIRCLE_SIZE / 2,
+                top: CY + pos.y - CIRCLE_SIZE / 2,
               },
               {
                 opacity: anim,
@@ -130,14 +138,16 @@ export default function Menu() {
                   {
                     translateY: anim.interpolate({
                       inputRange: [0, 1],
-                      outputRange: [15, 0],
+                      outputRange: [20, 0],
                     }),
                   },
                 ],
               },
             ]}
           >
-            <Text style={styles.itemLabel}>{item.label}</Text>
+            <View style={styles.labelContainer}>
+              <Text style={styles.itemLabel}>{item.label}</Text>
+            </View>
             <Pressable
               style={({ pressed }) => [
                 styles.itemCircle,
@@ -151,7 +161,7 @@ export default function Menu() {
         );
       })}
 
-      {/* CLOSE BUTTON */}
+      {/* CLOSE BUTTON (Pinned to the bottom center) */}
       <Animated.View
         style={[
           styles.closeWrapper,
@@ -181,12 +191,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: CIRCLE_SIZE,
   },
+  labelContainer: {
+    position: 'absolute',
+    top: -25, // Moves label above the circle
+    width: 100,
+    alignItems: 'center',
+  },
   itemLabel: {
-    fontSize: 12,
-    fontWeight: '500',
+    fontSize: 11,
+    fontWeight: '600',
     color: '#1B1C1E',
     textAlign: 'center',
-    marginBottom: 6,
   },
   itemCircle: {
     width: CIRCLE_SIZE,
