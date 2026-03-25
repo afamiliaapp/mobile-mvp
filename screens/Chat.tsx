@@ -36,6 +36,7 @@ export default function Chat() {
       name: selectedMember,
       text: `Just started a chat with ${selectedMember}`,
       time: 'Just now',
+      lastSeen: '45 minutes ago',
       unread: false,
       group: false,
     };
