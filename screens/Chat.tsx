@@ -1,3 +1,4 @@
+'use client';
 import { Image, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { useState } from 'react';
 import AppContainer from '../components/AppContainer';
@@ -5,31 +6,19 @@ import ChatBar from '../components/ChatBar';
 import ThemedText from '../components/ThemedText';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Search from '../components/Search';
-
-const messages = [
-  {
-    name: 'Milinndra',
-    text: 'Why would you go to tropical...',
-    time: '2 hours ago',
-    unread: true,
-    group: false,
-  },
-  {
-    name: 'Family Group',
-    text: 'Meeting at 5pm',
-    time: '1 hour ago',
-    unread: false,
-    group: true,
-  },
-];
+import ChatRoom from '../components/ChatRoom';
 
 export default function Chat() {
   const [activeTab, setActiveTab] = useState('all');
   const [chatModalVisible, setChatModalVisible] = useState(false);
   const [selectedMember, setSelectedMember] = useState('');
-  const [chatStarted, setChatStarted] = useState(false);
 
-  const filteredMessages = messages.filter(msg => {
+  // Initialize as an empty array so .filter() works immediately
+  const [chatMessages, setChatMessages] = useState([]);
+
+  const [activeChat, setActiveChat] = useState(null); // Holds the member object or null
+
+  const filteredMessages = (chatMessages || []).filter(msg => {
     if (activeTab === 'unread') return msg.unread;
     if (activeTab === 'group') return msg.group;
     return true;
@@ -39,6 +28,28 @@ export default function Chat() {
     setChatModalVisible(false);
     setSelectedMember('');
   };
+
+  const startNewChat = () => {
+    if (!selectedMember) return;
+
+    const newMessage = {
+      name: selectedMember,
+      text: `Just started a chat with ${selectedMember}`,
+      time: 'Just now',
+      unread: false,
+      group: false,
+    };
+
+    setChatMessages(prev => [newMessage, ...prev]);
+    setActiveChat(newMessage); // <--- Open the chat page immediately
+    closeModal();
+  };
+
+  // If a chat is active, show the Chat Room UI
+  // Inside your main Chat function...
+  if (activeChat) {
+    return <ChatRoom member={activeChat} onBack={() => setActiveChat(null)} />;
+  }
 
   return (
     <>
@@ -55,7 +66,9 @@ export default function Chat() {
               ]}
               onPress={() => setActiveTab('all')}
             >
-              <ThemedText>All</ThemedText>
+              <ThemedText style={activeTab === 'all' && { color: '#fff' }}>
+                All
+              </ThemedText>
             </Pressable>
 
             <Pressable
@@ -65,7 +78,9 @@ export default function Chat() {
               ]}
               onPress={() => setActiveTab('unread')}
             >
-              <ThemedText>Unread(20)</ThemedText>
+              <ThemedText style={activeTab === 'unread' && { color: '#fff' }}>
+                Unread({chatMessages.filter(m => m.unread).length})
+              </ThemedText>
             </Pressable>
 
             <Pressable
@@ -75,66 +90,60 @@ export default function Chat() {
               ]}
               onPress={() => setActiveTab('group')}
             >
-              <ThemedText>Group(20)</ThemedText>
+              <ThemedText style={activeTab === 'group' && { color: '#fff' }}>
+                Group
+              </ThemedText>
             </Pressable>
           </View>
 
-          {/* SEARCH */}
           <Search />
 
-          {/* MESSAGES */}
-          {chatStarted && (
+          {/* CONTENT AREA */}
+          {chatMessages.length > 0 ? (
             <View style={styles.messagescontainer}>
               {filteredMessages.map((event, index) => (
-                <View key={index} style={styles.messagesbox}>
-                  <View style={styles.messagesbox2}>
-                    <View style={styles.avatarWrapper}>
-                      <Image
-                        source={require('../assets/avata.png')}
-                        style={styles.avatar}
-                      />
-                    </View>
-
-                    <View style={styles.messagesbox3}>
-                      <ThemedText variant="title" style={styles.titletext}>
-                        {event.name}
-                      </ThemedText>
-
-                      <ThemedText style={styles.titletext2}>
-                        {event.text}
-                      </ThemedText>
-                    </View>
-                  </View>
-
-                  <View style={styles.messagesbox4}>
-                    <ThemedText style={styles.titletext2}>
-                      {event.time}
-                    </ThemedText>
-
-                    {event.unread && (
-                      <View style={styles.messagesbox5}>
-                        <ThemedText style={styles.messagescounter}>
-                          1
+                <Pressable key={index} onPress={() => setActiveChat(event)}>
+                  <View key={index} style={styles.messagesbox}>
+                    <View style={styles.messagesbox2}>
+                      <View style={styles.avatarWrapper}>
+                        <Image
+                          source={require('../assets/avata.png')}
+                          style={styles.avatar}
+                        />
+                      </View>
+                      <View style={styles.messagesbox3}>
+                        <ThemedText variant="title" style={styles.titletext}>
+                          {event.name}
+                        </ThemedText>
+                        <ThemedText style={styles.titletext2}>
+                          {event.text}
                         </ThemedText>
                       </View>
-                    )}
+                    </View>
+                    <View style={styles.messagesbox4}>
+                      <ThemedText style={styles.titletext2}>
+                        {event.time}
+                      </ThemedText>
+                      {event.unread && (
+                        <View style={styles.messagesbox5}>
+                          <ThemedText style={styles.messagescounter}>
+                            1
+                          </ThemedText>
+                        </View>
+                      )}
+                    </View>
                   </View>
-                </View>
+                </Pressable>
               ))}
             </View>
-          )}
-
-          {/* START CHAT */}
-          {!chatStarted && (
+          ) : (
             <View style={styles.nomessageBox}>
               <ThemedText variant="title" style={{ fontSize: 16 }}>
                 Start Chat
               </ThemedText>
-
               <ThemedText style={{ textAlign: 'center', marginVertical: 10 }}>
                 Feel free to start a conversation with your family member
               </ThemedText>
-
               <Pressable
                 style={styles.startnewchat}
                 onPress={() => setChatModalVisible(true)}
@@ -156,15 +165,12 @@ export default function Chat() {
         transparent
         onRequestClose={closeModal}
       >
-        {/* OUTSIDE CLICK */}
         <Pressable style={styles.overlay} onPress={closeModal}>
-          {/* INSIDE MODAL (PREVENT CLOSE) */}
           <Pressable
             style={styles.modalContent}
             onPress={e => e.stopPropagation()}
           >
             <ThemedText style={styles.modalTitle}>New Chat</ThemedText>
-
             <ThemedText style={styles.label}>Member</ThemedText>
 
             <View style={styles.selector}>
@@ -175,25 +181,25 @@ export default function Chat() {
               <Pressable
                 key={index}
                 onPress={() => setSelectedMember(member)}
-                style={styles.memberItem}
+                style={[
+                  styles.memberItem,
+                  selectedMember === member && { backgroundColor: '#F0EEFF' },
+                ]}
               >
-                <Text>{member}</Text>
+                <Text
+                  style={
+                    selectedMember === member ? { fontWeight: 'bold' } : {}
+                  }
+                >
+                  {member}
+                </Text>
               </Pressable>
             ))}
 
-            {/* CHAT BUTTON */}
-            <Pressable
-              style={styles.chatButton}
-              onPress={() => {
-                if (!selectedMember) return;
-                setChatStarted(true);
-                closeModal();
-              }}
-            >
-              <Text style={{ color: '#fff' }}>Chat</Text>
+            <Pressable style={styles.chatButton} onPress={startNewChat}>
+              <Text style={{ color: '#fff' }}>Chat Now</Text>
             </Pressable>
 
-            {/* CANCEL BUTTON */}
             <Pressable style={styles.cancelButton} onPress={closeModal}>
               <Text style={{ color: '#333' }}>Cancel</Text>
             </Pressable>
@@ -210,13 +216,11 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     height: '100%',
   },
-
   overlay: {
     flex: 1,
     justifyContent: 'flex-end',
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
-
   modalContent: {
     backgroundColor: '#fff',
     paddingHorizontal: 20,
@@ -226,30 +230,27 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 12,
     height: '55%',
   },
-
   modalTitle: {
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 20,
   },
-
   label: {
     fontSize: 12,
     marginBottom: 5,
   },
-
   selector: {
     borderWidth: 1,
     borderColor: '#2C247A',
     borderRadius: 8,
     padding: 12,
-    marginBottom: 20,
+    marginBottom: 10,
   },
-
   memberItem: {
-    paddingVertical: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderRadius: 5,
   },
-
   chatButton: {
     backgroundColor: '#2C247A',
     padding: 14,
@@ -257,7 +258,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 20,
   },
-
   cancelButton: {
     padding: 14,
     borderRadius: 8,
@@ -266,59 +266,52 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
   },
-
   avatarWrapper: {
     borderWidth: 0.5,
     borderRadius: 50,
     backgroundColor: '#FFE7CC',
   },
-
   avatar: {
     width: 39,
     height: 39,
     borderRadius: 50,
   },
-
   messagetogglebox: {
     flexDirection: 'row',
     borderWidth: 0.5,
     marginTop: '10%',
     borderRadius: 5,
+    overflow: 'hidden',
   },
-
   messagetogglebox2: {
     paddingVertical: 15,
     alignItems: 'center',
-    width: 117,
+    flex: 1,
   },
-
   activeTab: {
     backgroundColor: '#2C247A',
   },
-
-  messagescontainer: {},
-
+  messagescontainer: {
+    marginTop: 10,
+  },
   messagesbox: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderBottomWidth: 0.5,
+    borderColor: '#eee',
     paddingBottom: 10,
     marginTop: 20,
   },
-
   messagesbox2: {
     flexDirection: 'row',
-    width: '70%',
+    flex: 1,
   },
-
   messagesbox3: {
     marginLeft: 15,
   },
-
   messagesbox4: {
     alignItems: 'flex-end',
   },
-
   messagesbox5: {
     backgroundColor: '#2C247A',
     height: 19,
@@ -328,26 +321,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 10,
   },
-
   messagescounter: {
     fontSize: 9,
     color: '#fff',
   },
-
   titletext: {
     fontSize: 14,
   },
-
   titletext2: {
     fontSize: 12,
+    color: '#666',
   },
-
   nomessageBox: {
     alignItems: 'center',
     marginTop: '30%',
     paddingHorizontal: 50,
   },
-
   startnewchat: {
     backgroundColor: '#2C247A',
     paddingHorizontal: 14,
@@ -357,7 +346,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 5,
   },
-
   titletext3: {
     color: 'white',
     fontSize: 12,
