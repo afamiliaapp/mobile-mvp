@@ -17,8 +17,12 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { launchImageLibrary } from 'react-native-image-picker';
-import { CameraRoll } from '@react-native-camera-roll/camera-roll'; // CLI Gallery Save
+import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import ThemedText from './ThemedText';
+
+// 1. IMPORT YOUR CALL SCREENS
+import CallScreen from './CallScreen';
+import VideoCallScreen from './VideoCallScreen';
 
 const { width, height } = Dimensions.get('window');
 
@@ -27,6 +31,11 @@ export default function ChatRoom({ member, onBack }) {
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+
+  // 2. ADD CALL VISIBILITY STATES
+  const [isVoiceCallVisible, setIsVoiceCallVisible] = useState(false);
+  const [isVideoCallVisible, setIsVideoCallVisible] = useState(false);
+
   const flatListRef = useRef(null);
 
   const formatTime = () => {
@@ -36,23 +45,13 @@ export default function ChatRoom({ member, onBack }) {
     });
   };
 
-  // 1. SAVE TO GALLERY LOGIC
   const saveImage = async () => {
     try {
-      if (Platform.OS === 'android' && !(await hasAndroidPermission())) {
-        return;
-      }
       await CameraRoll.saveAsset(selectedImage, { type: 'photo' });
       Alert.alert('Success', 'Image saved to gallery!');
     } catch (error) {
       Alert.alert('Error', 'Could not save image.');
     }
-  };
-
-  // Android Permission Helper
-  const hasAndroidPermission = async () => {
-    // Standard permission check logic would go here
-    return true;
   };
 
   const handlePickImage = () => {
@@ -92,7 +91,7 @@ export default function ChatRoom({ member, onBack }) {
       setTimeout(() => {
         const reply = {
           id: (Date.now() + 1).toString(),
-          text: 'Hi.. How are you today?.',
+          text: 'That looks great! Let me know if you need anything else.',
           sender: 'them',
           time: formatTime(),
         };
@@ -133,7 +132,6 @@ export default function ChatRoom({ member, onBack }) {
           {item.text}
         </Text>
       )}
-
       <View style={styles.messageFooter}>
         <Text
           style={[
@@ -179,14 +177,20 @@ export default function ChatRoom({ member, onBack }) {
             {isTyping ? 'typing...' : 'online'}
           </ThemedText>
         </View>
+
+        {/* 3. UPDATED ICONS WITH PRESSABLES */}
         <View style={styles.actionIcons}>
-          <Icon
-            name="video"
-            size={20}
-            color="#666"
-            style={{ marginRight: 25 }}
-          />
-          <Icon name="phone" size={20} color="#666" />
+          <Pressable onPress={() => setIsVideoCallVisible(true)}>
+            <Icon
+              name="video"
+              size={20}
+              color="#666"
+              style={{ marginRight: 25 }}
+            />
+          </Pressable>
+          <Pressable onPress={() => setIsVoiceCallVisible(true)}>
+            <Icon name="phone" size={20} color="#666" />
+          </Pressable>
         </View>
       </View>
 
@@ -233,7 +237,20 @@ export default function ChatRoom({ member, onBack }) {
         </View>
       </View>
 
-      {/* FULLSCREEN IMAGE MODAL WITH SAVE BUTTON */}
+      {/* 4. ADD THE CALL OVERLAY MODALS */}
+      <CallScreen
+        visible={isVoiceCallVisible}
+        member={member}
+        onEndCall={() => setIsVoiceCallVisible(false)}
+      />
+
+      <VideoCallScreen
+        visible={isVideoCallVisible}
+        member={member}
+        onEndCall={() => setIsVideoCallVisible(false)}
+      />
+
+      {/* IMAGE FULLSCREEN MODAL */}
       <Modal visible={!!selectedImage} transparent={false} animationType="fade">
         <View style={styles.fullscreenContainer}>
           <View style={styles.modalHeader}>
