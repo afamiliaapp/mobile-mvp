@@ -48,7 +48,15 @@ export default function Chat() {
   // If a chat is active, show the Chat Room UI
   // Inside your main Chat function...
   if (activeChat) {
-    return <ChatRoom member={activeChat} onBack={() => setActiveChat(null)} />;
+    return (
+      <Modal
+        visible={activeChat !== null}
+        animationType="slide"
+        onRequestClose={() => setActiveChat(null)}
+      >
+        <ChatRoom member={activeChat} onBack={() => setActiveChat(null)} />
+      </Modal>
+    );
   }
 
   return (
