@@ -9,17 +9,17 @@ import {
   Modal,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Sound from 'react-native-sound'; // CLI Sound Library
+import Sound from 'react-native-sound';
 
-// Enable playback in silence mode for iOS
 Sound.setCategory('Playback');
 
 const CallScreen = ({ visible, member, onEndCall }) => {
   const [callStatus, setCallStatus] = useState('Calling..');
   const [seconds, setSeconds] = useState(0);
   const [isConnected, setIsConnected] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isVideoOff, setIsVideoOff] = useState(false);
 
-  // Ref to store the sound object so we can stop it later
   const ringtone = useRef(null);
 
   useEffect(() => {
@@ -27,25 +27,18 @@ const CallScreen = ({ visible, member, onEndCall }) => {
     let connectionTimeout;
 
     if (visible) {
-      // 1. INITIALIZE & PLAY SOUND
       ringtone.current = new Sound('ringing.mp3', Sound.MAIN_BUNDLE, error => {
-        if (error) {
-          console.log('failed to load the sound', error);
-          return;
-        }
-        // Loop the ringing sound
+        if (error) return;
         ringtone.current.setNumberOfLoops(-1);
         ringtone.current.play();
       });
 
-      // 2. SIMULATE CONNECTION
       connectionTimeout = setTimeout(() => {
-        stopRinging(); // Stop sound when connected
+        stopRinging();
         setCallStatus('Connected');
         setIsConnected(true);
       }, 4000);
 
-      // 3. TIMER LOGIC
       if (isConnected) {
         timer = setInterval(() => {
           setSeconds(prev => prev + 1);
@@ -108,6 +101,7 @@ const CallScreen = ({ visible, member, onEndCall }) => {
         </View>
 
         <View style={styles.actions}>
+          {/* 1. END CALL (LEFT) */}
           <TouchableOpacity
             style={[styles.actionBtn, styles.endCall]}
             onPress={onEndCall}
@@ -119,7 +113,33 @@ const CallScreen = ({ visible, member, onEndCall }) => {
               style={{ transform: [{ rotate: '135deg' }] }}
             />
           </TouchableOpacity>
-          {/* Other action buttons... */}
+
+          {/* 2. VIDEO & 3. MUTE (Beside it) */}
+          {isConnected && (
+            <>
+              <TouchableOpacity
+                style={styles.actionBtn}
+                onPress={() => setIsVideoOff(!isVideoOff)}
+              >
+                <Ionicons
+                  name={isVideoOff ? 'videocam-off' : 'videocam'}
+                  size={24}
+                  color={isVideoOff ? '#E53935' : '#2C247A'}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.actionBtn}
+                onPress={() => setIsMuted(!isMuted)}
+              >
+                <Ionicons
+                  name={isMuted ? 'mic-off' : 'mic'}
+                  size={24}
+                  color={isMuted ? '#E53935' : '#2C247A'}
+                />
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </View>
     </Modal>
@@ -133,7 +153,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     justifyContent: 'space-between',
-    paddingVertical: 50,
+    paddingVertical: 60,
   },
   topBar: { paddingHorizontal: 20 },
   backBtn: {
@@ -150,9 +170,10 @@ const styles = StyleSheet.create({
   status: { color: '#999', marginTop: 8, fontSize: 18 },
   timer: { color: '#666', marginTop: 4, fontSize: 16, fontWeight: '500' },
   actions: {
-    flexDirection: 'row',
+    flexDirection: 'row', // Ensures left-to-right order
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 30,
   },
   actionBtn: {
     width: 60,
@@ -161,7 +182,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 15,
+    marginHorizontal: 10, // Spacing between buttons
   },
-  endCall: { backgroundColor: '#E53935' },
+  endCall: {
+    backgroundColor: '#E53935',
+  },
 });
