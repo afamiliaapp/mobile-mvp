@@ -9,16 +9,18 @@ import {
   ScrollView,
   Dimensions,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // Added useEffect
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Added this
 import AppContainer from '../components/AppContainer';
 import ChatBar from '../components/ChatBar';
 import ThemedText from '../components/ThemedText';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Search from '../components/Search';
 import ChatRoom from '../components/ChatRoom';
-import NewGroup from '../components/NewGroup'; // Ensure this file exists with the code from the previous step
+import NewGroup from '../components/NewGroup';
 
 const { height } = Dimensions.get('window');
+const STORAGE_KEY = '@chat_messages';
 
 export default function Chat() {
   const [activeTab, setActiveTab] = useState('all');
@@ -26,61 +28,72 @@ export default function Chat() {
   const [activeChat, setActiveChat] = useState(null);
   const [selectedMember, setSelectedMember] = useState('');
 
-  // Initial Mock Data
-  const [chatMessages, setChatMessages] = useState([
-    {
-      id: '1',
-      name: 'Tayo White',
-      text: 'See you at the reunion!',
-      time: '10:24 AM',
-      unread: true,
-      group: false,
-    },
-    {
-      id: '2',
-      name: 'Family Group',
-      text: 'Fred: I am bringing the drinks',
-      time: '9:15 AM',
-      unread: false,
-      group: true,
-    },
-  ]);
+  // 1. Initialize as empty array
+  const [chatMessages, setChatMessages] = useState([]);
 
-  // Filter logic for tabs
+  // 2. Load data on Mount - No default data anymore
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem(STORAGE_KEY);
+        if (jsonValue !== null) {
+          setChatMessages(JSON.parse(jsonValue));
+        }
+        // If null, we do nothing; chatMessages stays as []
+      } catch (e) {
+        console.error('Failed to load chats', e);
+      }
+    };
+    loadData();
+  }, []);
+
+  // 3. Persist logic
+  const persistChats = async newList => {
+    try {
+      setChatMessages(newList);
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newList));
+    } catch (e) {
+      console.error('Failed to save chats', e);
+    }
+  };
+
+  const handleCreateGroup = groupData => {
+    const newGroup = {
+      ...groupData,
+      id: Date.now().toString(),
+      group: true,
+      text: 'Group created',
+      time: new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    };
+    persistChats([newGroup, ...chatMessages]);
+    setChatModalVisible(false);
+    setActiveChat(newGroup);
+  };
+
+  const startNewChat = () => {
+    if (!selectedMember) return;
+    const newChat = {
+      id: Date.now().toString(),
+      name: selectedMember,
+      text: `Chat started with ${selectedMember}`,
+      time: 'Just now',
+      unread: false,
+      group: false,
+    };
+    persistChats([newChat, ...chatMessages]);
+    setChatModalVisible(false);
+    setActiveChat(newChat);
+    setSelectedMember('');
+  };
+
   const filteredMessages = chatMessages.filter(msg => {
     if (activeTab === 'unread') return msg.unread;
     if (activeTab === 'group') return msg.group;
     return true;
   });
-
-  // Handle creating a simple 1-on-1 chat
-  const startNewChat = () => {
-    if (!selectedMember) return;
-    const newMessage = {
-      id: Date.now().toString(),
-      name: selectedMember,
-      text: `Started a chat with ${selectedMember}`,
-      time: 'Just now',
-      unread: false,
-      group: false,
-    };
-    setChatMessages(prev => [newMessage, ...prev]);
-    setActiveChat(newMessage);
-    setChatModalVisible(false);
-    setSelectedMember('');
-  };
-
-  // Handle creating a new group from NewGroup.js
-  const handleCreateGroup = groupData => {
-    const newGroupEntry = {
-      ...groupData,
-      id: Date.now().toString(),
-    };
-    setChatMessages(prev => [newGroupEntry, ...prev]);
-    setChatModalVisible(false);
-    setActiveChat(newGroupEntry);
-  };
-
   return (
     <>
       <AppContainer>
