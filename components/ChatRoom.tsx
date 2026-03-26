@@ -19,6 +19,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import ThemedText from './ThemedText';
+import FamilyGroupInfo from '../components/FamilyGroupInfo';
 
 // 1. IMPORT YOUR CALL SCREENS
 import CallScreen from './CallScreen';
@@ -31,6 +32,10 @@ export default function ChatRoom({ member, onBack }) {
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [isInfoVisible, setIsInfoVisible] = useState(false);
+  const [currentGroupName, setCurrentGroupName] = useState(
+    member?.name || 'Family Group',
+  );
 
   // 2. ADD CALL VISIBILITY STATES
   const [isVoiceCallVisible, setIsVoiceCallVisible] = useState(false);
@@ -168,9 +173,7 @@ export default function ChatRoom({ member, onBack }) {
             source={require('../assets/avata.png')}
             style={styles.largeAvatar}
           />
-          <ThemedText style={styles.userName}>
-            {member?.name || 'Member'}
-          </ThemedText>
+          <ThemedText style={styles.userName}>{currentGroupName}</ThemedText>
           <ThemedText
             style={[styles.lastSeen, isTyping && styles.typingHeaderLabel]}
           >
@@ -188,8 +191,19 @@ export default function ChatRoom({ member, onBack }) {
               style={{ marginRight: 25 }}
             />
           </Pressable>
+
           <Pressable onPress={() => setIsVoiceCallVisible(true)}>
-            <Icon name="phone" size={20} color="#666" />
+            <Icon
+              name="phone"
+              size={20}
+              color="#666"
+              style={{ marginRight: 25 }}
+            />
+          </Pressable>
+
+          {/* 1. UPDATE INFO PRESSABLE */}
+          <Pressable onPress={() => setIsInfoVisible(true)}>
+            <Icon name="info" size={20} color="#666" />
           </Pressable>
         </View>
       </View>
@@ -249,6 +263,15 @@ export default function ChatRoom({ member, onBack }) {
         member={member}
         onEndCall={() => setIsVideoCallVisible(false)}
       />
+
+      {/* 2. ADD THE INFO MODAL */}
+      <Modal visible={isInfoVisible} animationType="slide">
+        <FamilyGroupInfo
+          groupName={currentGroupName}
+          setGroupName={setCurrentGroupName} // Pass the setter
+          onClose={() => setIsInfoVisible(false)}
+        />
+      </Modal>
 
       {/* IMAGE FULLSCREEN MODAL */}
       <Modal visible={!!selectedImage} transparent={false} animationType="fade">
