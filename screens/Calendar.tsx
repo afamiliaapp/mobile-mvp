@@ -7,8 +7,10 @@ import {
   Modal,
   TextInput,
   Pressable,
+  Animated,
+  PanResponder,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import AppContainer from '../components/AppContainer';
 import CalendarBar from '../components/CalendarBar';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -18,11 +20,106 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import BackButtonModal from '../components/BackButtonModal';
 import { useEvents } from '../context/Eventscontext';
 
+// ─── Swipeable event row ───────────────────────────────────────────────────────
+const SWIPE_OPEN = -80; // px revealed when fully open
+
+function SwipeableEventRow({ event, onView, onDeleteRequest }) {
+  const translateX = useRef(new Animated.Value(0)).current;
+  const isOpen = useRef(false);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      // Only capture horizontal gestures
+      onMoveShouldSetPanResponder: (_, g) =>
+        Math.abs(g.dx) > 8 && Math.abs(g.dy) < 15,
+      onPanResponderMove: (_, g) => {
+        const base = isOpen.current ? SWIPE_OPEN : 0;
+        const next = Math.max(SWIPE_OPEN, Math.min(0, base + g.dx));
+        translateX.setValue(next);
+      },
+      onPanResponderRelease: (_, g) => {
+        // Open if swiped left past half-way, or nudged while already open
+        const shouldOpen =
+          g.dx < SWIPE_OPEN / 2 || (isOpen.current && g.dx < 10);
+        isOpen.current = shouldOpen;
+        Animated.spring(translateX, {
+          toValue: shouldOpen ? SWIPE_OPEN : 0,
+          useNativeDriver: true,
+          tension: 80,
+          friction: 12,
+        }).start();
+      },
+    }),
+  ).current;
+
+  const snapClosed = () => {
+    isOpen.current = false;
+    Animated.spring(translateX, {
+      toValue: 0,
+      useNativeDriver: true,
+      tension: 80,
+      friction: 12,
+    }).start();
+  };
+
+  return (
+    <View style={styles.swipeWrapper}>
+      {/* RED DELETE ZONE — sits behind the sliding row */}
+      <Pressable
+        style={styles.deleteReveal}
+        onPress={() => {
+          snapClosed();
+          onDeleteRequest(event);
+        }}
+      >
+        <Icon name="trash" size={18} color="#fff" />
+      </Pressable>
+
+      {/* SLIDING ROW */}
+      <Animated.View
+        style={[styles.schedulebox2, { transform: [{ translateX }] }]}
+        {...panResponder.panHandlers}
+      >
+        <View style={styles.schedulebox3}>
+          <ThemedText variant="title" style={styles.schedulebox3title}>
+            {event.name}
+          </ThemedText>
+          <ThemedText style={styles.schedulebox3text1}>
+            {event.description}
+          </ThemedText>
+          <View style={styles.scheduledatebox}>
+            <ThemedText style={styles.scheduletimetext}>
+              {event.time}
+            </ThemedText>
+            <ThemedText style={styles.scheduletimetext}>
+              {' | '} {event.date} {' | '}
+            </ThemedText>
+            <Text style={styles.scheduletimelabel}>{event.category}</Text>
+          </View>
+        </View>
+
+        <View style={styles.schedulebox4}>
+          <Pressable
+            style={styles.scheduleviewbtn}
+            onPress={() => onView(event)}
+          >
+            <ThemedText variant="title" style={styles.scheduleviewtxt}>
+              View
+            </ThemedText>
+            <Icon name="chevron-right" size={12} color="#999999" />
+          </Pressable>
+        </View>
+      </Animated.View>
+    </View>
+  );
+}
+
+// ─── Main Calendar screen ──────────────────────────────────────────────────────
 export default function Calendar() {
   const { events, setEvents } = useEvents();
 
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(null); // ← NEW: tracks tapped calendar date
+  const [selectedDate, setSelectedDate] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
   const [name, setName] = useState('');
@@ -41,6 +138,9 @@ export default function Calendar() {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
+  // Unified delete target — set by swipe OR by view-modal trash icon
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
   const changeMonth = direction => {
     const newDate = new Date(currentDate);
     newDate.setMonth(newDate.getMonth() + direction);
@@ -52,13 +152,18 @@ export default function Calendar() {
     setViewModalVisible(true);
   };
 
-  const deleteEvent = () => {
-    setEvents(events.filter(e => e !== selectedEvent));
+  const openDeleteModal = target => {
+    setDeleteTarget(target);
+    setDeleteModalVisible(true);
+  };
+
+  const confirmDelete = () => {
+    setEvents(events.filter(e => e !== deleteTarget));
+    setDeleteTarget(null);
     setDeleteModalVisible(false);
     setViewModalVisible(false);
   };
 
-  // ─── Helper: format a Date → "DD Mon YYYY" to match stored event.date ───────
   const formatDateLabel = d =>
     d.toLocaleDateString('en-GB', {
       day: '2-digit',
@@ -66,20 +171,16 @@ export default function Calendar() {
       year: 'numeric',
     });
 
-  // ─── Helper: format "YYYY-MM-DD" string → "DD Mon YYYY" ──────────────────────
   const formatYMDtoLabel = ymd => {
     const [y, m, day] = ymd.split('-').map(Number);
     return formatDateLabel(new Date(y, m - 1, day));
   };
 
-  // ─── Events filtered to the tapped date (or all events if none tapped) ────────
   const filteredEvents = selectedDate
     ? events.filter(e => e.date === formatYMDtoLabel(selectedDate))
     : events;
 
-  // ─── Build markedDates so every day that has an event gets a dot ──────────────
   const markedDates = events.reduce((acc, event) => {
-    // Convert "DD Mon YYYY" → Date → "YYYY-MM-DD"
     const parts = event.date.split(' ');
     const monthMap = {
       Jan: 0,
@@ -97,13 +198,10 @@ export default function Calendar() {
     };
     const d = new Date(Number(parts[2]), monthMap[parts[1]], Number(parts[0]));
     const key = d.toISOString().split('T')[0];
-    if (!acc[key]) {
-      acc[key] = { marked: true, dotColor: '#2C247A' };
-    }
+    if (!acc[key]) acc[key] = { marked: true, dotColor: '#2C247A' };
     return acc;
   }, {});
 
-  // Highlight the currently selected date
   if (selectedDate) {
     markedDates[selectedDate] = {
       ...(markedDates[selectedDate] || {}),
@@ -114,12 +212,10 @@ export default function Calendar() {
 
   const saveEvent = () => {
     const formattedDate = formatDateLabel(date);
-
     const formattedStartTime = startTime.toLocaleTimeString([], {
       hour: '2-digit',
       minute: '2-digit',
     });
-
     const newEvent = {
       name,
       description,
@@ -127,16 +223,13 @@ export default function Calendar() {
       time: formattedStartTime,
       category,
     };
-
     setEvents([...events, newEvent]);
-
     setName('');
     setDescription('');
     setCategory('');
     setDate(new Date());
     setStartTime(new Date());
     setEndTime(new Date());
-
     setModalVisible(false);
   };
 
@@ -151,13 +244,9 @@ export default function Calendar() {
 
   const month = currentDate.toLocaleString('default', { month: 'long' });
   const year = currentDate.getFullYear();
-
-  // ─── Label shown above the events list ───────────────────────────────────────
   const eventsHeading = selectedDate
     ? `Events on ${formatYMDtoLabel(selectedDate)}`
     : 'Scheduled appointments';
-
-  // Show FAB when a date is selected and it has at least one event
   const showFAB = selectedDate && filteredEvents.length > 0;
 
   return (
@@ -177,7 +266,6 @@ export default function Calendar() {
                 <ThemedText style={styles.monthChangertext}>{month}</ThemedText>
                 <ThemedText style={styles.monthChangertext}>{year}</ThemedText>
               </View>
-
               <View style={styles.monthNavBox}>
                 <Pressable
                   style={styles.monthNavBox2}
@@ -185,7 +273,6 @@ export default function Calendar() {
                 >
                   <Icon name="chevron-left" size={12} />
                 </Pressable>
-
                 <Pressable
                   style={styles.monthNavBox2}
                   onPress={() => changeMonth(1)}
@@ -202,9 +289,8 @@ export default function Calendar() {
                 current={currentDate.toISOString().split('T')[0]}
                 markedDates={markedDates}
                 onDayPress={day => {
-                  // Set both the form date AND the filter date
                   setDate(new Date(day.dateString));
-                  setSelectedDate(day.dateString); // ← NEW
+                  setSelectedDate(day.dateString);
                 }}
               />
             </View>
@@ -221,7 +307,7 @@ export default function Calendar() {
               </View>
             </View>
 
-            {/* NO EVENTS (empty state) */}
+            {/* NO EVENTS */}
             {filteredEvents.length === 0 && (
               <View style={styles.addnewNoteBox}>
                 <ThemedText style={styles.addneweventText1}>
@@ -247,46 +333,19 @@ export default function Calendar() {
               </View>
             )}
 
-            {/* EVENTS LIST */}
+            {/* EVENTS LIST — swipeable */}
             {filteredEvents.map((event, index) => (
-              <View key={index} style={styles.schedulebox2}>
-                <View style={styles.schedulebox3}>
-                  <ThemedText variant="title" style={styles.schedulebox3title}>
-                    {event.name}
-                  </ThemedText>
-                  <ThemedText style={styles.schedulebox3text1}>
-                    {event.description}
-                  </ThemedText>
-                  <View style={styles.scheduledatebox}>
-                    <ThemedText style={styles.scheduletimetext}>
-                      {event.time}
-                    </ThemedText>
-                    <ThemedText style={styles.scheduletimetext}>
-                      {' | '} {event.date} {' | '}
-                    </ThemedText>
-                    <Text style={styles.scheduletimelabel}>
-                      {event.category}
-                    </Text>
-                  </View>
-                </View>
-
-                <View style={styles.schedulebox4}>
-                  <Pressable
-                    style={styles.scheduleviewbtn}
-                    onPress={() => handleViewEvent(event)}
-                  >
-                    <ThemedText variant="title" style={styles.scheduleviewtxt}>
-                      View
-                    </ThemedText>
-                    <Icon name="chevron-right" size={12} color="#999999" />
-                  </Pressable>
-                </View>
-              </View>
+              <SwipeableEventRow
+                key={index}
+                event={event}
+                onView={handleViewEvent}
+                onDeleteRequest={openDeleteModal}
+              />
             ))}
           </ScrollView>
         </View>
 
-        {/* FLOATING ADD BUTTON — visible when selected date already has events */}
+        {/* FLOATING ADD BUTTON */}
         {showFAB && (
           <Pressable
             onPress={() => setModalVisible(true)}
@@ -305,7 +364,7 @@ export default function Calendar() {
       <Modal
         visible={modalVisible}
         animationType="slide"
-        transparent={true}
+        transparent
         onRequestClose={() => setModalVisible(false)}
       >
         <View
@@ -336,7 +395,6 @@ export default function Calendar() {
             >
               Add appointments
             </ThemedText>
-
             <ScrollView showsVerticalScrollIndicator={false}>
               <ThemedText style={styles.formtitle}>Name</ThemedText>
               <TextInput
@@ -345,7 +403,6 @@ export default function Calendar() {
                 onChangeText={setName}
                 style={styles.input}
               />
-
               <ThemedText style={styles.formtitle}>Description</ThemedText>
               <TextInput
                 placeholder="Enter Description"
@@ -353,7 +410,6 @@ export default function Calendar() {
                 onChangeText={setDescription}
                 style={styles.input}
               />
-
               <ThemedText style={styles.formtitle}>Start-End time</ThemedText>
               <View style={{ flexDirection: 'row', gap: 10 }}>
                 <Pressable
@@ -379,16 +435,15 @@ export default function Calendar() {
                   </Text>
                 </Pressable>
               </View>
-
               {showStartTimePicker && (
                 <DateTimePicker
                   value={startTime}
                   mode="time"
                   is24Hour={false}
                   display="default"
-                  onChange={(event, selectedTime) => {
+                  onChange={(e, t) => {
                     setShowStartTimePicker(false);
-                    if (selectedTime) setStartTime(selectedTime);
+                    if (t) setStartTime(t);
                   }}
                 />
               )}
@@ -398,13 +453,12 @@ export default function Calendar() {
                   mode="time"
                   is24Hour={false}
                   display="default"
-                  onChange={(event, selectedTime) => {
+                  onChange={(e, t) => {
                     setShowEndTimePicker(false);
-                    if (selectedTime) setEndTime(selectedTime);
+                    if (t) setEndTime(t);
                   }}
                 />
               )}
-
               <ThemedText style={styles.formtitle}>Date</ThemedText>
               <Pressable
                 style={styles.input}
@@ -417,13 +471,12 @@ export default function Calendar() {
                   value={date}
                   mode="date"
                   display="default"
-                  onChange={(event, selectedDate) => {
+                  onChange={(e, d) => {
                     setShowDatePicker(false);
-                    if (selectedDate) setDate(selectedDate);
+                    if (d) setDate(d);
                   }}
                 />
               )}
-
               <ThemedText style={styles.formtitle}>Categories</ThemedText>
               <TextInput
                 placeholder="Birthday, Meeting, Reminder..."
@@ -431,7 +484,6 @@ export default function Calendar() {
                 onChangeText={setCategory}
                 style={styles.input}
               />
-
               <Pressable style={styles.saveBtn} onPress={saveEvent}>
                 <Text style={{ color: '#fff' }}>Save</Text>
               </Pressable>
@@ -450,7 +502,7 @@ export default function Calendar() {
       <Modal
         visible={viewModalVisible}
         animationType="slide"
-        transparent={true}
+        transparent
         onRequestClose={() => setViewModalVisible(false)}
       >
         <View style={{ flex: 1, justifyContent: 'flex-end' }}>
@@ -492,12 +544,11 @@ export default function Calendar() {
                     >
                       <Icon name="edit" size={14} color="#333" />
                     </Pressable>
-                    <Pressable onPress={() => setDeleteModalVisible(true)}>
+                    <Pressable onPress={() => openDeleteModal(selectedEvent)}>
                       <Icon name="trash" size={14} color="red" />
                     </Pressable>
                   </View>
                 </View>
-
                 <View style={{ marginBottom: 20 }}>
                   <ThemedText style={{ fontSize: 13, marginBottom: 15 }}>
                     Description
@@ -565,7 +616,7 @@ export default function Calendar() {
       <Modal
         visible={editModalVisible}
         animationType="slide"
-        transparent={true}
+        transparent
         onRequestClose={() => setEditModalVisible(false)}
       >
         <View
@@ -623,11 +674,11 @@ export default function Calendar() {
         </View>
       </Modal>
 
-      {/* DELETE MODAL */}
+      {/* DELETE CONFIRMATION MODAL */}
       <Modal
         visible={deleteModalVisible}
         animationType="fade"
-        transparent={true}
+        transparent
         onRequestClose={() => setDeleteModalVisible(false)}
       >
         <View
@@ -656,18 +707,28 @@ export default function Calendar() {
             <ThemedText
               style={{ fontSize: 14, color: '#666', marginBottom: 25 }}
             >
-              When you delete this appointment, you lose your appointment.
+              Are you sure you want to delete{' '}
+              <Text style={{ fontWeight: '700', color: '#1B1C1E' }}>
+                {deleteTarget?.name}
+              </Text>
+              ? This cannot be undone.
             </ThemedText>
             <View style={{ flexDirection: 'row', gap: 10 }}>
               <Pressable
                 style={[styles.cancelBtn, { flex: 1 }]}
-                onPress={() => setDeleteModalVisible(false)}
+                onPress={() => {
+                  setDeleteTarget(null);
+                  setDeleteModalVisible(false);
+                }}
               >
-                <Text>Close</Text>
+                <Text>Cancel</Text>
               </Pressable>
               <Pressable
-                style={[styles.saveBtn, { flex: 1, backgroundColor: 'red' }]}
-                onPress={deleteEvent}
+                style={[
+                  styles.saveBtn,
+                  { flex: 1, backgroundColor: '#E53E3E' },
+                ]}
+                onPress={confirmDelete}
               >
                 <Text style={{ color: '#fff' }}>Delete</Text>
               </Pressable>
@@ -757,12 +818,29 @@ const styles = StyleSheet.create({
     width: 120,
     gap: 6,
   },
-  schedulebox2: {
-    height: 95,
+
+  // Swipe
+  swipeWrapper: {
+    position: 'relative',
+    overflow: 'hidden',
+    marginTop: 10,
     borderTopColor: '#E2E8F9',
     borderTopWidth: 1,
+  },
+  deleteReveal: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: 80,
+    backgroundColor: '#E53E3E',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  schedulebox2: {
+    height: 95,
     flexDirection: 'row',
-    marginTop: 10,
+    backgroundColor: '#fff',
   },
   schedulebox3: { width: '75%', marginTop: 12 },
   schedulebox3title: { fontSize: 14, fontWeight: '500', marginBottom: 4 },
@@ -796,6 +874,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scheduleviewtxt: { fontSize: 10, fontWeight: '400', marginRight: 4 },
+
   modalContainer: { flex: 1, padding: 20, justifyContent: 'center' },
   input: {
     borderWidth: 1,
