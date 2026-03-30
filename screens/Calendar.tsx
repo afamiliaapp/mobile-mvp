@@ -141,6 +141,32 @@ export default function Calendar() {
   // Unified delete target — set by swipe OR by view-modal trash icon
   const [deleteTarget, setDeleteTarget] = useState(null);
 
+  // Search
+  const [searchVisible, setSearchVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchAnim = useRef(new Animated.Value(0)).current;
+  const searchInputRef = useRef(null);
+
+  const toggleSearch = () => {
+    if (searchVisible) {
+      Animated.timing(searchAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: false,
+      }).start(() => {
+        setSearchVisible(false);
+        setSearchQuery('');
+      });
+    } else {
+      setSearchVisible(true);
+      Animated.timing(searchAnim, {
+        toValue: 1,
+        duration: 220,
+        useNativeDriver: false,
+      }).start(() => searchInputRef.current?.focus());
+    }
+  };
+
   const changeMonth = direction => {
     const newDate = new Date(currentDate);
     newDate.setMonth(newDate.getMonth() + direction);
@@ -176,9 +202,22 @@ export default function Calendar() {
     return formatDateLabel(new Date(y, m - 1, day));
   };
 
-  const filteredEvents = selectedDate
-    ? events.filter(e => e.date === formatYMDtoLabel(selectedDate))
-    : events;
+  const filteredEvents = (() => {
+    let list = selectedDate
+      ? events.filter(e => e.date === formatYMDtoLabel(selectedDate))
+      : events;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        e =>
+          e.name?.toLowerCase().includes(q) ||
+          e.description?.toLowerCase().includes(q) ||
+          e.category?.toLowerCase().includes(q) ||
+          e.date?.toLowerCase().includes(q),
+      );
+    }
+    return list;
+  })();
 
   const markedDates = events.reduce((acc, event) => {
     const parts = event.date.split(' ');
@@ -295,41 +334,112 @@ export default function Calendar() {
               />
             </View>
 
-            {/* SECTION HEADER */}
+            {/* SECTION HEADER + SEARCH */}
             <View style={styles.schedulesearch}>
-              <View style={styles.scheduleBox2}>
-                <ThemedText style={styles.monthChangertext}>
-                  {eventsHeading}
-                </ThemedText>
-              </View>
-              <View style={styles.searchBox2}>
-                <Icon name="search" size={16} color="#807d7d" />
-              </View>
+              {/* Title — fades out when search is open */}
+              {!searchVisible && (
+                <View style={styles.scheduleBox2}>
+                  <ThemedText style={styles.monthChangertext}>
+                    {eventsHeading}
+                  </ThemedText>
+                </View>
+              )}
+
+              {/* Animated search input */}
+              {searchVisible && (
+                <Animated.View
+                  style={[
+                    styles.searchInputWrap,
+                    {
+                      opacity: searchAnim,
+                      width: searchAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ['0%', '82%'],
+                      }),
+                    },
+                  ]}
+                >
+                  <Icon
+                    name="search"
+                    size={13}
+                    color="#807d7d"
+                    style={{ marginRight: 6 }}
+                  />
+                  <TextInput
+                    ref={searchInputRef}
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    placeholder="Search events…"
+                    placeholderTextColor="#aaa"
+                    style={styles.searchInput}
+                    returnKeyType="search"
+                  />
+                  {searchQuery.length > 0 && (
+                    <Pressable onPress={() => setSearchQuery('')}>
+                      <Icon name="times-circle" size={13} color="#aaa" />
+                    </Pressable>
+                  )}
+                </Animated.View>
+              )}
+
+              {/* Search toggle icon */}
+              <Pressable
+                style={[
+                  styles.searchBox2,
+                  searchVisible && { borderColor: '#2C247A' },
+                ]}
+                onPress={toggleSearch}
+              >
+                <Icon
+                  name={searchVisible ? 'times' : 'search'}
+                  size={15}
+                  color={searchVisible ? '#2C247A' : '#807d7d'}
+                />
+              </Pressable>
             </View>
+
+            {/* SEARCH RESULTS HINT */}
+            {searchVisible && searchQuery.trim().length > 0 && (
+              <ThemedText style={styles.searchHint}>
+                {filteredEvents.length === 0
+                  ? 'No events match your search'
+                  : `${filteredEvents.length} result${
+                      filteredEvents.length > 1 ? 's' : ''
+                    } found`}
+              </ThemedText>
+            )}
 
             {/* NO EVENTS */}
             {filteredEvents.length === 0 && (
               <View style={styles.addnewNoteBox}>
                 <ThemedText style={styles.addneweventText1}>
-                  {selectedDate
+                  {searchQuery.trim()
+                    ? 'No matching events'
+                    : selectedDate
                     ? 'No events on this day'
                     : 'No family events yet'}
                 </ThemedText>
                 <ThemedText style={styles.addneweventText2}>
-                  {selectedDate
+                  {searchQuery.trim()
+                    ? 'Try a different name, category, or date'
+                    : selectedDate
                     ? 'Tap the button below to add one'
                     : 'Start by adding your first birthday, appointment, or reminder'}
                 </ThemedText>
-                <Pressable
-                  onPress={() => setModalVisible(true)}
-                  style={({ pressed }) => [
-                    styles.addnewbutton,
-                    pressed && { opacity: 0.6 },
-                  ]}
-                >
-                  <Icon name="plus" size={12} color="#fff" />
-                  <Text style={{ color: '#fff', fontSize: 12 }}>New event</Text>
-                </Pressable>
+                {!searchQuery.trim() && (
+                  <Pressable
+                    onPress={() => setModalVisible(true)}
+                    style={({ pressed }) => [
+                      styles.addnewbutton,
+                      pressed && { opacity: 0.6 },
+                    ]}
+                  >
+                    <Icon name="plus" size={12} color="#fff" />
+                    <Text style={{ color: '#fff', fontSize: 12 }}>
+                      New event
+                    </Text>
+                  </Pressable>
+                )}
               </View>
             )}
 
@@ -788,6 +898,29 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: '#c9c3c3',
     borderRadius: 50,
+  },
+  searchInputWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#2C247A',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: '#F7F6FF',
+    overflow: 'hidden',
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 13,
+    color: '#1B1C1E',
+    paddingVertical: 0,
+  },
+  searchHint: {
+    fontSize: 11,
+    color: '#999',
+    marginTop: 6,
+    marginLeft: 2,
   },
   addnewNoteBox: {
     padding: 50,
