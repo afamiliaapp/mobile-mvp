@@ -1,3 +1,4 @@
+'use client';
 import {
   ScrollView,
   StyleSheet,
@@ -15,12 +16,13 @@ import { Calendar as RNCalendar } from 'react-native-calendars';
 import ThemedText from '../components/ThemedText';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import BackButtonModal from '../components/BackButtonModal';
-import { useEvents } from '../context/Eventscontext'; // ← import context
+import { useEvents } from '../context/Eventscontext';
 
 export default function Calendar() {
-  const { events, setEvents } = useEvents(); // ← use shared state
+  const { events, setEvents } = useEvents();
 
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null); // ← NEW: tracks tapped calendar date
   const [modalVisible, setModalVisible] = useState(false);
 
   const [name, setName] = useState('');
@@ -56,12 +58,62 @@ export default function Calendar() {
     setViewModalVisible(false);
   };
 
-  const saveEvent = () => {
-    const formattedDate = date.toLocaleDateString('en-GB', {
+  // ─── Helper: format a Date → "DD Mon YYYY" to match stored event.date ───────
+  const formatDateLabel = d =>
+    d.toLocaleDateString('en-GB', {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
     });
+
+  // ─── Helper: format "YYYY-MM-DD" string → "DD Mon YYYY" ──────────────────────
+  const formatYMDtoLabel = ymd => {
+    const [y, m, day] = ymd.split('-').map(Number);
+    return formatDateLabel(new Date(y, m - 1, day));
+  };
+
+  // ─── Events filtered to the tapped date (or all events if none tapped) ────────
+  const filteredEvents = selectedDate
+    ? events.filter(e => e.date === formatYMDtoLabel(selectedDate))
+    : events;
+
+  // ─── Build markedDates so every day that has an event gets a dot ──────────────
+  const markedDates = events.reduce((acc, event) => {
+    // Convert "DD Mon YYYY" → Date → "YYYY-MM-DD"
+    const parts = event.date.split(' ');
+    const monthMap = {
+      Jan: 0,
+      Feb: 1,
+      Mar: 2,
+      Apr: 3,
+      May: 4,
+      Jun: 5,
+      Jul: 6,
+      Aug: 7,
+      Sep: 8,
+      Oct: 9,
+      Nov: 10,
+      Dec: 11,
+    };
+    const d = new Date(Number(parts[2]), monthMap[parts[1]], Number(parts[0]));
+    const key = d.toISOString().split('T')[0];
+    if (!acc[key]) {
+      acc[key] = { marked: true, dotColor: '#2C247A' };
+    }
+    return acc;
+  }, {});
+
+  // Highlight the currently selected date
+  if (selectedDate) {
+    markedDates[selectedDate] = {
+      ...(markedDates[selectedDate] || {}),
+      selected: true,
+      selectedColor: '#2C247A',
+    };
+  }
+
+  const saveEvent = () => {
+    const formattedDate = formatDateLabel(date);
 
     const formattedStartTime = startTime.toLocaleTimeString([], {
       hour: '2-digit',
@@ -99,6 +151,14 @@ export default function Calendar() {
 
   const month = currentDate.toLocaleString('default', { month: 'long' });
   const year = currentDate.getFullYear();
+
+  // ─── Label shown above the events list ───────────────────────────────────────
+  const eventsHeading = selectedDate
+    ? `Events on ${formatYMDtoLabel(selectedDate)}`
+    : 'Scheduled appointments';
+
+  // Show FAB when a date is selected and it has at least one event
+  const showFAB = selectedDate && filteredEvents.length > 0;
 
   return (
     <>
@@ -140,15 +200,20 @@ export default function Calendar() {
               <RNCalendar
                 key={currentDate.toISOString()}
                 current={currentDate.toISOString().split('T')[0]}
-                onDayPress={day => setDate(new Date(day.dateString))}
+                markedDates={markedDates}
+                onDayPress={day => {
+                  // Set both the form date AND the filter date
+                  setDate(new Date(day.dateString));
+                  setSelectedDate(day.dateString); // ← NEW
+                }}
               />
             </View>
 
-            {/* SCHEDULED APPOINTMENTS */}
+            {/* SECTION HEADER */}
             <View style={styles.schedulesearch}>
               <View style={styles.scheduleBox2}>
                 <ThemedText style={styles.monthChangertext}>
-                  Scheduled appointments
+                  {eventsHeading}
                 </ThemedText>
               </View>
               <View style={styles.searchBox2}>
@@ -156,14 +221,18 @@ export default function Calendar() {
               </View>
             </View>
 
-            {/* NO EVENTS */}
-            {events.length === 0 && (
+            {/* NO EVENTS (empty state) */}
+            {filteredEvents.length === 0 && (
               <View style={styles.addnewNoteBox}>
                 <ThemedText style={styles.addneweventText1}>
-                  No family events yet
+                  {selectedDate
+                    ? 'No events on this day'
+                    : 'No family events yet'}
                 </ThemedText>
                 <ThemedText style={styles.addneweventText2}>
-                  Start by adding your first birthday, appointment, or reminder
+                  {selectedDate
+                    ? 'Tap the button below to add one'
+                    : 'Start by adding your first birthday, appointment, or reminder'}
                 </ThemedText>
                 <Pressable
                   onPress={() => setModalVisible(true)}
@@ -179,7 +248,7 @@ export default function Calendar() {
             )}
 
             {/* EVENTS LIST */}
-            {events.map((event, index) => (
+            {filteredEvents.map((event, index) => (
               <View key={index} style={styles.schedulebox2}>
                 <View style={styles.schedulebox3}>
                   <ThemedText variant="title" style={styles.schedulebox3title}>
@@ -216,6 +285,20 @@ export default function Calendar() {
             ))}
           </ScrollView>
         </View>
+
+        {/* FLOATING ADD BUTTON — visible when selected date already has events */}
+        {showFAB && (
+          <Pressable
+            onPress={() => setModalVisible(true)}
+            style={({ pressed }) => [
+              styles.fab,
+              pressed && { opacity: 0.75, transform: [{ scale: 0.96 }] },
+            ]}
+          >
+            <Icon name="plus" size={12} color="#000" />
+            <Text style={styles.fabText}>New event</Text>
+          </Pressable>
+        )}
       </AppContainer>
 
       {/* ADD EVENTS MODAL */}
@@ -738,4 +821,27 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
   },
   formtitle: { fontSize: 12, marginBottom: 5 },
+  fab: {
+    position: 'absolute',
+    bottom: 18,
+    right: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#fff',
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    borderRadius: 10,
+    shadowColor: '#4d4d4e',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  fabText: {
+    color: '#000',
+    fontSize: 14,
+    fontWeight: '600',
+    letterSpacing: 0.3,
+  },
 });
