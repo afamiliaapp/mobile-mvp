@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   StatusBar,
   Modal,
+  TextInput,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import AddGroupMembers from '../components/AddGroupMembers';
@@ -22,14 +23,32 @@ const FamilyGroupInfo = ({
   setGroupImage,
   onClose,
 }) => {
+  // ✅ members state lives INSIDE the component
+  const [members, setMembers] = useState(
+    Array.from({ length: 6 }, (_, index) => ({
+      id: String(index + 1),
+      name: [
+        'Milendra',
+        'John Doe',
+        'Sarah Connor',
+        'David Lee',
+        'Amaka Obi',
+        'Tunde Bello',
+      ][index],
+      avatar: `https://randomuser.me/api/portraits/${
+        index % 2 === 0 ? 'women' : 'men'
+      }/${index + 40}.jpg`,
+    })),
+  );
+
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const members = Array.from({ length: 4 }, (_, index) => ({
-    id: String(index + 1),
-    name: 'Milenndra',
-    avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-  }));
+  const filteredMembers = members.filter(m =>
+    m.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   const renderMember = ({ item }) => (
     <View style={styles.memberRow}>
@@ -45,7 +64,6 @@ const FamilyGroupInfo = ({
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Header with Back Button */}
       <View style={styles.topNav}>
         <TouchableOpacity onPress={onClose} style={styles.backBtn}>
           <Icon name="chevron-left" size={28} color="#2C247A" />
@@ -54,7 +72,6 @@ const FamilyGroupInfo = ({
 
       <View style={styles.header}>
         <View style={styles.groupHeader}>
-          {/* UPDATED AVATAR — empty until image is set */}
           <View style={styles.groupAvatarContainer}>
             {groupImage ? (
               <Image source={{ uri: groupImage }} style={styles.groupAvatar} />
@@ -64,9 +81,8 @@ const FamilyGroupInfo = ({
               </View>
             )}
           </View>
-
           <Text style={styles.groupTitle}>{groupName}</Text>
-          <Text style={styles.memberCount}>(25 Members)</Text>
+          <Text style={styles.memberCount}>({members.length} Members)</Text>
         </View>
 
         <View style={styles.actionButtons}>
@@ -99,20 +115,71 @@ const FamilyGroupInfo = ({
         </View>
       </View>
 
+      {/* SECTION HEADER WITH SEARCH TOGGLE */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Group Members</Text>
-        <TouchableOpacity>
-          <Icon name="search" size={20} color="#8E8E93" />
+        <Text style={styles.sectionTitle}>
+          Group Members
+          {searchQuery.length > 0 && (
+            <Text style={styles.resultCount}>
+              {' '}
+              ({filteredMembers.length} found)
+            </Text>
+          )}
+        </Text>
+        <TouchableOpacity
+          onPress={() => {
+            setIsSearchVisible(prev => !prev);
+            setSearchQuery('');
+          }}
+        >
+          <Icon
+            name={isSearchVisible ? 'x' : 'search'}
+            size={20}
+            color={isSearchVisible ? '#FF3B30' : '#8E8E93'}
+          />
         </TouchableOpacity>
       </View>
 
-      <FlatList
-        data={members}
-        renderItem={renderMember}
-        keyExtractor={item => item.id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listContainer}
-      />
+      {/* SEARCH INPUT */}
+      {isSearchVisible && (
+        <View style={styles.searchContainer}>
+          <Icon
+            name="search"
+            size={16}
+            color="#8E8E93"
+            style={{ marginRight: 8 }}
+          />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search members..."
+            placeholderTextColor="#A9A9A9"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            autoFocus
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <Icon name="x-circle" size={16} color="#A9A9A9" />
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
+
+      {/* MEMBER LIST */}
+      {filteredMembers.length > 0 ? (
+        <FlatList
+          data={filteredMembers}
+          renderItem={renderMember}
+          keyExtractor={item => item.id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContainer}
+        />
+      ) : (
+        <View style={styles.emptySearch}>
+          <Icon name="users" size={40} color="#eee" />
+          <Text style={styles.emptySearchText}>No member found</Text>
+        </View>
+      )}
 
       {/* ADD MEMBERS MODAL */}
       <Modal
@@ -121,7 +188,13 @@ const FamilyGroupInfo = ({
         transparent={true}
         onRequestClose={() => setIsAddModalVisible(false)}
       >
-        <AddGroupMembers onSave={() => setIsAddModalVisible(false)} />
+        <AddGroupMembers
+          onSave={() => setIsAddModalVisible(false)}
+          onAddMembers={newMembers => {
+            setMembers(prev => [...prev, ...newMembers]);
+            setIsAddModalVisible(false);
+          }}
+        />
       </Modal>
 
       {/* EDIT GROUP MODAL */}
@@ -144,12 +217,7 @@ const FamilyGroupInfo = ({
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
   topNav: { paddingHorizontal: 10, paddingVertical: 10 },
-  header: {
-    paddingHorizontal: 16,
-    paddingBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-  },
+  header: { paddingHorizontal: 16, paddingBottom: 20 },
   groupHeader: { alignItems: 'center', marginBottom: 20 },
   groupAvatarContainer: {
     width: 90,
@@ -190,10 +258,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#F8F8F8',
+    paddingVertical: 22,
   },
   sectionTitle: { fontSize: 16, fontWeight: '600', color: '#1C1C1E' },
+  resultCount: { fontSize: 14, color: '#8E8E93', fontWeight: '400' },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginVertical: 10,
+    paddingHorizontal: 12,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#E5E5EA',
+  },
+  searchInput: { flex: 1, fontSize: 15, color: '#1C1C1E' },
+  emptySearch: { alignItems: 'center', marginTop: '30%' },
+  emptySearchText: { marginTop: 10, fontSize: 15, color: '#8E8E93' },
   listContainer: { paddingBottom: 20 },
   memberRow: {
     flexDirection: 'row',
