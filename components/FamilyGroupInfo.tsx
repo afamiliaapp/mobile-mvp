@@ -11,11 +11,17 @@ import {
   StatusBar,
   Modal,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Feather'; // Switched to Feather to match ChatRoom
+import Icon from 'react-native-vector-icons/Feather';
 import AddGroupMembers from '../components/AddGroupMembers';
 import EditGroup from '../components/EditGroup';
 
-const FamilyGroupInfo = ({ groupName, setGroupName, onClose }) => {
+const FamilyGroupInfo = ({
+  groupName,
+  setGroupName,
+  groupImage,
+  setGroupImage,
+  onClose,
+}) => {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 
@@ -48,12 +54,17 @@ const FamilyGroupInfo = ({ groupName, setGroupName, onClose }) => {
 
       <View style={styles.header}>
         <View style={styles.groupHeader}>
+          {/* UPDATED AVATAR — empty until image is set */}
           <View style={styles.groupAvatarContainer}>
-            <Image
-              source={require('../assets/avata.png')} // Using your local asset
-              style={styles.groupAvatar}
-            />
+            {groupImage ? (
+              <Image source={{ uri: groupImage }} style={styles.groupAvatar} />
+            ) : (
+              <View style={styles.groupAvatarPlaceholder}>
+                <Icon name="users" size={30} color="#ccc" />
+              </View>
+            )}
           </View>
+
           <Text style={styles.groupTitle}>{groupName}</Text>
           <Text style={styles.memberCount}>(25 Members)</Text>
         </View>
@@ -78,6 +89,7 @@ const FamilyGroupInfo = ({ groupName, setGroupName, onClose }) => {
             </View>
             <Text style={styles.iconLabel}>Edit</Text>
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.iconButton}>
             <View style={[styles.iconCircle, { backgroundColor: '#FFE5E5' }]}>
               <Icon name="log-out" size={20} color="#FF3B30" />
@@ -107,21 +119,19 @@ const FamilyGroupInfo = ({ groupName, setGroupName, onClose }) => {
         visible={isAddModalVisible}
         animationType="slide"
         transparent={true}
-        presentationStyle="pageSheet" // Nice look for iOS
         onRequestClose={() => setIsAddModalVisible(false)}
       >
         <AddGroupMembers onSave={() => setIsAddModalVisible(false)} />
       </Modal>
 
-      {/* 3. EDIT GROUP MODAL */}
+      {/* EDIT GROUP MODAL */}
       <Modal visible={isEditModalVisible} animationType="slide">
         <EditGroup
           currentName={groupName}
-          onSave={newName => {
-            if (typeof setGroupName === 'function') {
-              // Safety check
-              setGroupName(newName);
-            }
+          currentImage={groupImage}
+          onSave={({ name, image }) => {
+            if (typeof setGroupName === 'function') setGroupName(name);
+            if (typeof setGroupImage === 'function') setGroupImage(image);
             setIsEditModalVisible(false);
           }}
           onClose={() => setIsEditModalVisible(false)}
@@ -150,6 +160,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   groupAvatar: { width: '100%', height: '100%' },
+  groupAvatarPlaceholder: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   groupTitle: { fontSize: 22, fontWeight: '700', color: '#2C247A' },
   memberCount: { fontSize: 14, color: '#8E8E93', marginTop: 4 },
   actionButtons: {
