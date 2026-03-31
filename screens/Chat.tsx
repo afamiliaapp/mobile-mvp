@@ -136,10 +136,27 @@ export default function Chat() {
                   <View style={styles.messagesbox}>
                     <View style={styles.messagesbox2}>
                       <View style={styles.avatarWrapper}>
-                        <Image
-                          source={require('../assets/avata.png')}
-                          style={styles.avatar}
-                        />
+                        {chat.image ? (
+                          <Image
+                            source={{ uri: chat.image }}
+                            style={styles.avatar}
+                          />
+                        ) : chat.group ? (
+                          // Empty placeholder for groups with no image
+                          <View
+                            style={[
+                              styles.avatar,
+                              styles.groupAvatarPlaceholder,
+                            ]}
+                          >
+                            <Icon name="users" size={20} color="#ccc" />
+                          </View>
+                        ) : (
+                          <Image
+                            source={require('../assets/avata.png')}
+                            style={styles.avatar}
+                          />
+                        )}
                       </View>
                       <View style={styles.messagesbox3}>
                         <ThemedText variant="title" style={styles.titletext}>
@@ -286,6 +303,12 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     backgroundColor: '#f0f0f0',
     overflow: 'hidden',
+  },
+
+  groupAvatarPlaceholder: {
+    backgroundColor: '#f0f0f0',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   avatar: { width: '100%', height: '100%' },
   titletext: { fontSize: 15, fontWeight: '600' },

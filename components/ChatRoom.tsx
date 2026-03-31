@@ -169,10 +169,19 @@ export default function ChatRoom({ member, onBack }) {
           <Icon name="chevron-left" size={28} color="#2C247A" />
         </Pressable>
         <View style={styles.profileContainer}>
-          <Image
-            source={require('../assets/avata.png')}
-            style={styles.largeAvatar}
-          />
+          {member?.image ? (
+            <Image source={{ uri: member.image }} style={styles.largeAvatar} />
+          ) : member?.group ? (
+            // Empty placeholder for groups with no image
+            <View style={[styles.largeAvatar, styles.groupAvatarPlaceholder]}>
+              <Icon name="users" size={22} color="#ccc" />
+            </View>
+          ) : (
+            <Image
+              source={require('../assets/avata.png')}
+              style={styles.largeAvatar}
+            />
+          )}
           <ThemedText style={styles.userName}>{currentGroupName}</ThemedText>
           <ThemedText
             style={[styles.lastSeen, isTyping && styles.typingHeaderLabel]}
@@ -324,6 +333,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#2C247A',
     borderBottomRightRadius: 2,
   },
+
+  groupAvatarPlaceholder: {
+    backgroundColor: '#f0f0f0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   theirBubble: {
     alignSelf: 'flex-start',
     backgroundColor: '#F1F7FF',
