@@ -10,14 +10,25 @@ import {
   StatusBar,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import { launchImageLibrary } from 'react-native-image-picker';
 
-const EditGroup = ({ currentName, onSave, onClose }) => {
+const EditGroup = ({ currentName, currentImage, onSave, onClose }) => {
   const [groupName, setGroupName] = useState(currentName || 'Family Group');
+  const [groupImage, setGroupImage] = useState(currentImage || null);
+
+  const handlePickImage = () => {
+    launchImageLibrary({ mediaType: 'photo', quality: 1 }, response => {
+      if (response.didCancel || response.errorMessage) return;
+      const uri = response.assets[0].uri;
+      setGroupImage(uri);
+    });
+  };
 
   const handleSave = () => {
-    onSave(groupName); // Pass the updated name back
+    onSave({ name: groupName, image: groupImage }); // Pass both name & image back
   };
 
   return (
@@ -37,6 +48,31 @@ const EditGroup = ({ currentName, onSave, onClose }) => {
       >
         <View style={styles.content}>
           <Text style={styles.title}>Edit group</Text>
+
+          {/* GROUP IMAGE PICKER */}
+          <View style={styles.imagePicker}>
+            <TouchableOpacity
+              style={styles.avatarWrapper}
+              onPress={handlePickImage}
+            >
+              {groupImage ? (
+                <Image
+                  source={{ uri: groupImage }}
+                  style={styles.avatarImage}
+                />
+              ) : (
+                <View style={styles.avatarPlaceholder}>
+                  <Icon name="users" size={30} color="#ccc" />
+                </View>
+              )}
+
+              {/* Camera badge */}
+              <View style={styles.cameraBadge}>
+                <Icon name="camera" size={12} color="#fff" />
+              </View>
+            </TouchableOpacity>
+            <Text style={styles.imageLabel}>Tap to change group photo</Text>
+          </View>
 
           <Text style={styles.label}>Group Name</Text>
 
@@ -71,6 +107,34 @@ const styles = StyleSheet.create({
     color: '#1C1C1E',
     marginBottom: 30,
   },
+
+  // Image picker
+  imagePicker: { alignItems: 'center', marginBottom: 30 },
+  avatarWrapper: { position: 'relative' },
+  avatarImage: { width: 90, height: 90, borderRadius: 45 },
+  avatarPlaceholder: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: '#f0f0f0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cameraBadge: {
+    position: 'absolute',
+    bottom: 2,
+    right: 2,
+    backgroundColor: '#2C247A',
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  imageLabel: { marginTop: 8, fontSize: 13, color: '#8E8E93' },
+
   label: { fontSize: 14, color: '#8E8E93', marginBottom: 8, fontWeight: '500' },
   input: {
     backgroundColor: '#F8F9FA',
@@ -83,7 +147,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   saveButton: {
-    backgroundColor: '#2C247A', // Using your signature purple
+    backgroundColor: '#2C247A',
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
