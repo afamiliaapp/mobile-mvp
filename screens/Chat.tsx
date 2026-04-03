@@ -210,6 +210,20 @@ export default function Chat() {
               </View>
             )}
           </ScrollView>
+
+          {/* FLOATING ACTION BUTTON */}
+          {filteredMessages.length > 0 && (
+            <Pressable
+              onPress={() => setChatModalVisible(true)}
+              style={({ pressed }) => [
+                styles.fab,
+                pressed && { opacity: 0.75, transform: [{ scale: 0.96 }] },
+              ]}
+            >
+              <Icon name="plus" size={12} color="#000" />
+              <Text style={styles.fabText}>New event</Text>
+            </Pressable>
+          )}
         </View>
       </AppContainer>
 
@@ -350,5 +364,29 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 10,
+  },
+
+  fab: {
+    position: 'absolute',
+    bottom: 18,
+    right: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#fff',
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    borderRadius: 10,
+    shadowColor: '#4d4d4e',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  fabText: {
+    color: '#000',
+    fontSize: 14,
+    fontWeight: '600',
+    letterSpacing: 0.3,
   },
 });
