@@ -5,16 +5,15 @@ import AppContainer from './AppContainer';
 import ThemedText from './ThemedText';
 import { ThemeContext } from '../context/ThemeContext';
 
-export default function CalendarBar() {
+const ChoresBar = () => {
   const navigation = useNavigation();
   const { theme } = useContext(ThemeContext); // access current theme
-
   return (
     <AppContainer>
       <View style={styles.container}>
         {/* Title */}
         <ThemedText variant="title" style={styles.title}>
-          Calendar
+          Chores
         </ThemedText>
 
         {/* Bell Icon */}
@@ -31,7 +30,9 @@ export default function CalendarBar() {
       </View>
     </AppContainer>
   );
-}
+};
+
+export default ChoresBar;
 
 const styles = StyleSheet.create({
   container: {
@@ -39,7 +40,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'blue',
+    paddingHorizontal: 20,
   },
 
   title: {
