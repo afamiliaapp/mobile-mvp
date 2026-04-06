@@ -18,6 +18,7 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useChores, Chore } from '../context/ChoreContext';
+import ThemedText from '../components/ThemedText';
 
 type Tab = 'all' | 'open' | 'closed';
 type MemberTag = { id: string; label: string };
@@ -207,14 +208,14 @@ const Chores = ({ route, navigation }: any) => {
                 style={[styles.tab, activeTab === tab && styles.activeTab]}
                 onPress={() => setActiveTab(tab)}
               >
-                <Text
+                <ThemedText
                   style={[
                     styles.tabText,
                     activeTab === tab && styles.activeTabText,
                   ]}
                 >
                   {tabLabel(tab)}
-                </Text>
+                </ThemedText>
               </TouchableOpacity>
             ))}
           </View>
@@ -253,10 +254,12 @@ const Chores = ({ route, navigation }: any) => {
           ) : (
             <View style={styles.emptyState}>
               <Icon name="clipboard" size={48} color="#E0E0E0" />
-              <Text style={styles.emptyTitle}>No chores assigned yet.</Text>
-              <Text style={styles.emptySubtitle}>
+              <ThemedText style={styles.emptyTitle}>
+                No chores assigned yet.
+              </ThemedText>
+              <ThemedText style={styles.emptySubtitle}>
                 Add your first family task to get started
-              </Text>
+              </ThemedText>
               <TouchableOpacity
                 style={styles.newChoreBtn}
                 onPress={() => setIsModalVisible(true)}
@@ -289,9 +292,9 @@ const Chores = ({ route, navigation }: any) => {
                 <ScrollView showsVerticalScrollIndicator={false}>
                   {/* Header */}
                   <View style={styles.modalHeader}>
-                    <Text style={styles.modalTitle}>
+                    <ThemedText variant="title" style={styles.modalTitle}>
                       {editingId ? 'Edit Chore' : 'New Chore'}
-                    </Text>
+                    </ThemedText>
                     <TouchableOpacity onPress={closeModal}>
                       <Icon name="x" size={22} color="#1C1C1E" />
                     </TouchableOpacity>
@@ -299,7 +302,9 @@ const Chores = ({ route, navigation }: any) => {
 
                   {/* Chore Name */}
                   <View style={styles.field}>
-                    <Text style={styles.fieldLabel}>CHORE NAME</Text>
+                    <ThemedText style={styles.fieldLabel}>
+                      CHORE NAME
+                    </ThemedText>
                     <TextInput
                       style={styles.input}
                       placeholder="e.g. Wash the dishes"
@@ -311,7 +316,9 @@ const Chores = ({ route, navigation }: any) => {
 
                   {/* Description */}
                   <View style={styles.field}>
-                    <Text style={styles.fieldLabel}>DESCRIPTION</Text>
+                    <ThemedText style={styles.fieldLabel}>
+                      DESCRIPTION
+                    </ThemedText>
                     <TextInput
                       style={[
                         styles.input,
@@ -327,18 +334,18 @@ const Chores = ({ route, navigation }: any) => {
 
                   {/* Due Time */}
                   <View style={styles.field}>
-                    <Text style={styles.fieldLabel}>DUE TIME</Text>
+                    <ThemedText style={styles.fieldLabel}>DUE TIME</ThemedText>
                     <TouchableOpacity
                       style={styles.inputRow}
                       onPress={() => setShowTimePicker(true)}
                     >
-                      <Text
+                      <ThemedText
                         style={
                           dueTime ? styles.inputText : styles.inputPlaceholder
                         }
                       >
                         {dueTime ? formatTime(dueTime) : 'Select time'}
-                      </Text>
+                      </ThemedText>
                       <Icon name="clock" size={16} color="#9b9b9b" />
                     </TouchableOpacity>
                     {showTimePicker && (
@@ -356,18 +363,18 @@ const Chores = ({ route, navigation }: any) => {
 
                   {/* Due Date */}
                   <View style={styles.field}>
-                    <Text style={styles.fieldLabel}>DUE DATE</Text>
+                    <ThemedText style={styles.fieldLabel}>DUE DATE</ThemedText>
                     <TouchableOpacity
                       style={styles.inputRow}
                       onPress={() => setShowDatePicker(true)}
                     >
-                      <Text
+                      <ThemedText
                         style={
                           dueDate ? styles.inputText : styles.inputPlaceholder
                         }
                       >
                         {dueDate ? formatDate(dueDate) : 'Select date'}
-                      </Text>
+                      </ThemedText>
                       <Icon name="calendar" size={16} color="#9b9b9b" />
                     </TouchableOpacity>
                     {showDatePicker && (
@@ -385,7 +392,9 @@ const Chores = ({ route, navigation }: any) => {
 
                   {/* Members */}
                   <View style={styles.field}>
-                    <Text style={styles.fieldLabel}>ASSIGN MEMBERS</Text>
+                    <ThemedText style={styles.fieldLabel}>
+                      ASSIGN MEMBERS
+                    </ThemedText>
                     <View style={styles.memberWrap}>
                       {members.map(m => (
                         <View key={m.id} style={styles.tag}>
@@ -411,7 +420,9 @@ const Chores = ({ route, navigation }: any) => {
 
                   {/* Reminder */}
                   <View style={styles.reminderRow}>
-                    <Text style={styles.reminderLabel}>Set Reminder</Text>
+                    <ThemedText style={styles.reminderLabel}>
+                      Set Reminder
+                    </ThemedText>
                     <Switch
                       value={reminder}
                       onValueChange={setReminder}
@@ -577,7 +588,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     padding: 28,
-
     maxHeight: '90%',
   },
   modalHeader: {
