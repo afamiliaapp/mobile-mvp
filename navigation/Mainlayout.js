@@ -25,6 +25,7 @@ import Child from '../screens/Child';
 import Photos from '../screens/Photos';
 import Expenses from '../screens/Expenses';
 import Chores from '../screens/Chores';
+import ChoreDetails from '../screens/ChoreDetails';
 
 const Stack = createNativeStackNavigator();
 
@@ -62,6 +63,7 @@ export default function MainLayout() {
       <Stack.Screen name="Calendar" component={withNav(Calendar)} />
       <Stack.Screen name="Chat" component={withNav(Chat)} />
       <Stack.Screen name="Chores" component={withNav(Chores)} />
+      <Stack.Screen name="ChoreDetails" component={withNav(ChoreDetails)} />
       <Stack.Screen name="Profile" component={withNav(Profile)} />
       <Stack.Screen
         name="Notificationpage"
@@ -78,7 +80,6 @@ export default function MainLayout() {
       <Stack.Screen name="Legal" component={withNav(Legal)} />
       <Stack.Screen name="Help" component={withNav(Help)} />
       <Stack.Screen name="Info" component={withNav(Info)} />
-
       <Stack.Screen name="Expenses" component={withNav(Expenses)} />
       <Stack.Screen name="Photos" component={withNav(Photos)} />
       <Stack.Screen name="Child control" component={withNav(Child)} />

@@ -1,7 +1,7 @@
 'use client';
 import AppContainer from '../components/AppContainer';
 import ChoresBar from '../components/ChoresBar';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,25 +17,11 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useChores, Chore } from '../context/ChoreContext';
 
 type Tab = 'all' | 'open' | 'closed';
-
-type Chore = {
-  id: string;
-  title: string;
-  description: string;
-  assigneeCount: number;
-  dueDate: string;
-  dueTime: string;
-  status: 'open' | 'closed';
-  overdue: boolean;
-};
-
 type MemberTag = { id: string; label: string };
 
-const DUMMY_CHORES: Chore[] = [];
-
-// ── Chore Card Component ──────────────────────────────────────────────────────
 const ChoreCard = ({
   item,
   onToggle,
@@ -46,7 +32,6 @@ const ChoreCard = ({
   onView: () => void;
 }) => (
   <View style={cardStyles.card}>
-    {/* Top row: title + check */}
     <View style={cardStyles.topRow}>
       <Text style={cardStyles.title} numberOfLines={1}>
         {item.title}
@@ -64,14 +49,12 @@ const ChoreCard = ({
       </TouchableOpacity>
     </View>
 
-    {/* Description */}
     {item.description ? (
       <Text style={cardStyles.description} numberOfLines={1}>
         {item.description}
       </Text>
     ) : null}
 
-    {/* Bottom row: meta + view button */}
     <View style={cardStyles.bottomRow}>
       <View style={cardStyles.meta}>
         <Text style={cardStyles.metaText}>
@@ -91,96 +74,14 @@ const ChoreCard = ({
   </View>
 );
 
-const cardStyles = StyleSheet.create({
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  topRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 6,
-  },
-  title: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#1C1C1E',
-    flex: 1,
-    marginRight: 12,
-  },
-  check: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: '#D0D0D0',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkDone: {
-    backgroundColor: '#2C247A',
-    borderColor: '#2C247A',
-  },
-  description: {
-    fontSize: 13,
-    color: '#8E8E93',
-    marginBottom: 12,
-  },
-  bottomRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 4,
-  },
-  meta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    flexWrap: 'wrap',
-    marginRight: 8,
-  },
-  metaText: {
-    fontSize: 11,
-    color: '#8E8E93',
-  },
-  overdue: {
-    fontSize: 11,
-    color: '#FF3B30',
-    fontWeight: '600',
-  },
-  viewBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-    borderWidth: 1,
-    borderColor: '#E5E5EA',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
-  viewBtnText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#2C247A',
-  },
-});
-
-// ── Main Chores Screen ────────────────────────────────────────────────────────
-const Chores = () => {
+const Chores = ({ route, navigation }: any) => {
   const [activeTab, setActiveTab] = useState<Tab>('open');
   const [searchQuery, setSearchQuery] = useState('');
-  const [chores, setChores] = useState<Chore[]>(DUMMY_CHORES);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const { chores, toggleStatus, addChore, updateChore } = useChores();
 
-  // Form state
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
   const [choreName, setChoreName] = useState('');
   const [choreDesc, setChoreDesc] = useState('');
   const [dueTime, setDueTime] = useState<Date | null>(null);
@@ -191,8 +92,20 @@ const Chores = () => {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
+  useEffect(() => {
+    if (route.params?.editItem) {
+      const item = route.params.editItem;
+      setChoreName(item.title);
+      setChoreDesc(item.description);
+      setEditingId(item.id);
+      setIsModalVisible(true);
+      navigation.setParams({ editItem: undefined });
+    }
+  }, [route.params?.editItem]);
+
   const formatTime = (d: Date) =>
     d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
   const formatDate = (d: Date) =>
     d.toLocaleDateString([], {
       day: '2-digit',
@@ -218,6 +131,7 @@ const Chores = () => {
     setMembers([]);
     setMemberInput('');
     setReminder(false);
+    setEditingId(null);
   };
 
   const closeModal = () => {
@@ -228,11 +142,10 @@ const Chores = () => {
   const handleSave = () => {
     if (!choreName.trim()) return;
     const now = new Date();
-    const selectedDate = dueDate ?? now;
-    const isOverdue = !!dueDate && selectedDate < now;
+    const isOverdue = !!dueDate && dueDate < now;
 
-    const newChore: Chore = {
-      id: Date.now().toString(),
+    const chore: Chore = {
+      id: editingId || Date.now().toString(),
       title: choreName.trim(),
       description: choreDesc.trim(),
       assigneeCount: members.length || 1,
@@ -241,7 +154,14 @@ const Chores = () => {
       status: 'open',
       overdue: isOverdue,
     };
-    setChores(prev => [newChore, ...prev]);
+
+    // ✅ Fix: update if editing, add if new
+    if (editingId) {
+      updateChore(chore);
+    } else {
+      addChore(chore);
+    }
+
     closeModal();
   };
 
@@ -259,27 +179,15 @@ const Chores = () => {
 
   const tabLabel = (tab: Tab) => {
     if (tab === 'all') return `All (${allCount})`;
-    if (tab === 'open') return `Open(${openCount})`;
-    return `Closed(${closedCount})`;
-  };
-
-  const toggleStatus = (id: string) => {
-    setChores(prev =>
-      prev.map(c =>
-        c.id === id
-          ? { ...c, status: c.status === 'open' ? 'closed' : 'open' }
-          : c,
-      ),
-    );
+    if (tab === 'open') return `Open (${openCount})`;
+    return `Closed (${closedCount})`;
   };
 
   const renderChore = ({ item }: { item: Chore }) => (
     <ChoreCard
       item={item}
       onToggle={() => toggleStatus(item.id)}
-      onView={() => {
-        // Wire to your navigator: navigation.navigate('ChoreDetail', { id: item.id })
-      }}
+      onView={() => navigation.navigate('ChoreDetails', { item })}
     />
   );
 
@@ -333,7 +241,7 @@ const Chores = () => {
             )}
           </View>
 
-          {/* LIST or EMPTY STATE */}
+          {/* LIST */}
           {filtered.length > 0 ? (
             <FlatList
               data={filtered}
@@ -374,57 +282,55 @@ const Chores = () => {
             </TouchableOpacity>
           )}
 
-          {/* ADD CHORES MODAL */}
+          {/* ✅ FIXED MODAL */}
           <Modal visible={isModalVisible} animationType="slide" transparent>
-            <TouchableOpacity
-              style={styles.overlay}
-              activeOpacity={1}
-              onPress={closeModal}
-            >
-              <TouchableOpacity
-                style={styles.modalContent}
-                activeOpacity={1}
-                onPress={e => e.stopPropagation()}
-              >
-                <View style={styles.modalHeader}>
-                  <Text style={styles.modalTitle}>Add chores</Text>
-                  <TouchableOpacity onPress={closeModal}>
-                    <Icon name="x" size={20} color="#333" />
-                  </TouchableOpacity>
-                </View>
+            <View style={styles.overlay}>
+              <View style={styles.modalContent}>
+                <ScrollView showsVerticalScrollIndicator={false}>
+                  {/* Header */}
+                  <View style={styles.modalHeader}>
+                    <Text style={styles.modalTitle}>
+                      {editingId ? 'Edit Chore' : 'New Chore'}
+                    </Text>
+                    <TouchableOpacity onPress={closeModal}>
+                      <Icon name="x" size={22} color="#1C1C1E" />
+                    </TouchableOpacity>
+                  </View>
 
-                <ScrollView
-                  showsVerticalScrollIndicator={false}
-                  keyboardShouldPersistTaps="handled"
-                >
+                  {/* Chore Name */}
                   <View style={styles.field}>
-                    <Text style={styles.fieldLabel}>Name</Text>
+                    <Text style={styles.fieldLabel}>CHORE NAME</Text>
                     <TextInput
                       style={styles.input}
-                      placeholder="Enter name"
+                      placeholder="e.g. Wash the dishes"
                       placeholderTextColor="#b8b8b8"
                       value={choreName}
                       onChangeText={setChoreName}
                     />
                   </View>
 
+                  {/* Description */}
                   <View style={styles.field}>
-                    <Text style={styles.fieldLabel}>Description</Text>
+                    <Text style={styles.fieldLabel}>DESCRIPTION</Text>
                     <TextInput
-                      style={styles.input}
-                      placeholder="Enter description"
+                      style={[
+                        styles.input,
+                        { height: 80, textAlignVertical: 'top' },
+                      ]}
+                      placeholder="Optional details..."
                       placeholderTextColor="#b8b8b8"
                       value={choreDesc}
                       onChangeText={setChoreDesc}
+                      multiline
                     />
                   </View>
 
+                  {/* Due Time */}
                   <View style={styles.field}>
-                    <Text style={styles.fieldLabel}>Due time</Text>
+                    <Text style={styles.fieldLabel}>DUE TIME</Text>
                     <TouchableOpacity
                       style={styles.inputRow}
                       onPress={() => setShowTimePicker(true)}
-                      activeOpacity={0.7}
                     >
                       <Text
                         style={
@@ -433,28 +339,27 @@ const Chores = () => {
                       >
                         {dueTime ? formatTime(dueTime) : 'Select time'}
                       </Text>
-                      <Icon name="clock" size={16} color="#c5c5c5" />
+                      <Icon name="clock" size={16} color="#9b9b9b" />
                     </TouchableOpacity>
+                    {showTimePicker && (
+                      <DateTimePicker
+                        value={dueTime ?? new Date()}
+                        mode="time"
+                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                        onChange={(_, date) => {
+                          setShowTimePicker(false);
+                          if (date) setDueTime(date);
+                        }}
+                      />
+                    )}
                   </View>
 
-                  {showTimePicker && (
-                    <DateTimePicker
-                      value={dueTime ?? new Date()}
-                      mode="time"
-                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                      onChange={(_, date) => {
-                        setShowTimePicker(Platform.OS === 'ios');
-                        if (date) setDueTime(date);
-                      }}
-                    />
-                  )}
-
+                  {/* Due Date */}
                   <View style={styles.field}>
-                    <Text style={styles.fieldLabel}>Due date</Text>
+                    <Text style={styles.fieldLabel}>DUE DATE</Text>
                     <TouchableOpacity
                       style={styles.inputRow}
                       onPress={() => setShowDatePicker(true)}
-                      activeOpacity={0.7}
                     >
                       <Text
                         style={
@@ -463,31 +368,30 @@ const Chores = () => {
                       >
                         {dueDate ? formatDate(dueDate) : 'Select date'}
                       </Text>
-                      <Icon name="calendar" size={16} color="#c5c5c5" />
+                      <Icon name="calendar" size={16} color="#9b9b9b" />
                     </TouchableOpacity>
+                    {showDatePicker && (
+                      <DateTimePicker
+                        value={dueDate ?? new Date()}
+                        mode="date"
+                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                        onChange={(_, date) => {
+                          setShowDatePicker(false);
+                          if (date) setDueDate(date);
+                        }}
+                      />
+                    )}
                   </View>
 
-                  {showDatePicker && (
-                    <DateTimePicker
-                      value={dueDate ?? new Date()}
-                      mode="date"
-                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                      onChange={(_, date) => {
-                        setShowDatePicker(Platform.OS === 'ios');
-                        if (date) setDueDate(date);
-                      }}
-                    />
-                  )}
-
+                  {/* Members */}
                   <View style={styles.field}>
-                    <Text style={styles.fieldLabel}>Member</Text>
+                    <Text style={styles.fieldLabel}>ASSIGN MEMBERS</Text>
                     <View style={styles.memberWrap}>
                       {members.map(m => (
                         <View key={m.id} style={styles.tag}>
                           <Text style={styles.tagText}>{m.label}</Text>
                           <TouchableOpacity
                             onPress={() => removeMemberTag(m.id)}
-                            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
                           >
                             <Text style={styles.tagClose}>×</Text>
                           </TouchableOpacity>
@@ -495,7 +399,7 @@ const Chores = () => {
                       ))}
                       <TextInput
                         style={styles.memberInput}
-                        placeholder="Select member"
+                        placeholder="Add member..."
                         placeholderTextColor="#b8b8b8"
                         value={memberInput}
                         onChangeText={setMemberInput}
@@ -505,17 +409,18 @@ const Chores = () => {
                     </View>
                   </View>
 
+                  {/* Reminder */}
                   <View style={styles.reminderRow}>
-                    <Text style={styles.reminderLabel}>Reminder</Text>
+                    <Text style={styles.reminderLabel}>Set Reminder</Text>
                     <Switch
                       value={reminder}
                       onValueChange={setReminder}
-                      trackColor={{ false: '#e0e0e0', true: '#2C247A' }}
-                      thumbColor="#ffffff"
-                      ios_backgroundColor="#e0e0e0"
+                      trackColor={{ false: '#E5E5EA', true: '#2C247A' }}
+                      thumbColor="#fff"
                     />
                   </View>
 
+                  {/* Save Button */}
                   <TouchableOpacity
                     style={[
                       styles.saveBtn,
@@ -524,11 +429,13 @@ const Chores = () => {
                     onPress={handleSave}
                     disabled={!choreName.trim()}
                   >
-                    <Text style={styles.saveBtnText}>Save</Text>
+                    <Text style={styles.saveBtnText}>
+                      {editingId ? 'Update Chore' : 'Save'}
+                    </Text>
                   </TouchableOpacity>
                 </ScrollView>
-              </TouchableOpacity>
-            </TouchableOpacity>
+              </View>
+            </View>
           </Modal>
         </SafeAreaView>
       </AppContainer>
@@ -538,9 +445,58 @@ const Chores = () => {
 
 export default Chores;
 
+const cardStyles = StyleSheet.create({
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#F2F2F7',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  title: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1C1C1E',
+    flex: 1,
+    marginRight: 8,
+  },
+  check: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#C7C7CC',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkDone: { backgroundColor: '#2C247A', borderColor: '#2C247A' },
+  description: { fontSize: 13, color: '#8E8E93', marginBottom: 10 },
+  bottomRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  meta: { flexDirection: 'row', alignItems: 'center', flex: 1 },
+  metaText: { fontSize: 11, color: '#8E8E93' },
+  overdue: { fontSize: 11, color: '#FF3B30', fontWeight: '600' },
+  viewBtn: { flexDirection: 'row', alignItems: 'center' },
+  viewBtnText: { fontSize: 12, color: '#2C247A', fontWeight: '600' },
+});
+
 const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 10 },
-
   tabContainer: {
     flexDirection: 'row',
     borderWidth: 1,
@@ -554,7 +510,6 @@ const styles = StyleSheet.create({
   activeTab: { backgroundColor: '#2C247A' },
   tabText: { fontSize: 13, fontWeight: '500', color: '#8E8E93' },
   activeTabText: { color: '#fff', fontWeight: '700' },
-
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -567,7 +522,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   searchInput: { flex: 1, fontSize: 14, color: '#1C1C1E' },
-
   emptyState: {
     flex: 1,
     alignItems: 'center',
@@ -596,9 +550,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   newChoreBtnText: { color: '#fff', fontSize: 14, fontWeight: '600' },
-
   listContainer: { paddingHorizontal: 16, paddingBottom: 100 },
-
   fab: {
     position: 'absolute',
     bottom: 25,
@@ -615,7 +567,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 8,
   },
-
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
@@ -626,7 +577,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     padding: 28,
-    paddingBottom: 40,
+
     maxHeight: '90%',
   },
   modalHeader: {
@@ -641,7 +592,6 @@ const styles = StyleSheet.create({
     color: '#0f0e17',
     letterSpacing: -0.5,
   },
-
   field: { marginBottom: 18 },
   fieldLabel: {
     fontSize: 12,
@@ -672,7 +622,6 @@ const styles = StyleSheet.create({
   },
   inputText: { fontSize: 14, color: '#0f0e17', flex: 1 },
   inputPlaceholder: { fontSize: 14, color: '#b8b8b8', flex: 1 },
-
   memberWrap: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -703,7 +652,6 @@ const styles = StyleSheet.create({
     color: '#0f0e17',
     paddingVertical: 4,
   },
-
   reminderRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -712,11 +660,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   reminderLabel: { fontSize: 14, fontWeight: '500', color: '#0f0e17' },
-
   saveBtn: {
     backgroundColor: '#2C247A',
     borderRadius: 16,
-    paddingVertical: 18,
+    paddingVertical: 10,
     alignItems: 'center',
     shadowColor: '#2C247A',
     shadowOffset: { width: 0, height: 4 },
