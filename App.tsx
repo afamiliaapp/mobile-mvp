@@ -12,6 +12,7 @@ import MainLayout from '../mobile-mvp/navigation/Mainlayout';
 import { ThemeProvider, ThemeContext } from './context/ThemeContext';
 import { EventsProvider } from './context/Eventscontext';
 import { MenuProvider } from './context/Menucontex';
+import { ChoreProvider } from './context/ChoreContext';
 
 const RootStack = createNativeStackNavigator();
 
@@ -64,7 +65,9 @@ const App: React.FC = () => {
     <ThemeProvider>
       <EventsProvider>
         <MenuProvider>
-          <AppNavigator />
+          <ChoreProvider>
+            <AppNavigator />
+          </ChoreProvider>
         </MenuProvider>
       </EventsProvider>
     </ThemeProvider>
