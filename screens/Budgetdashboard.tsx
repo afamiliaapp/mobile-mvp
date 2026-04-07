@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import Icon from 'react-native-vector-icons/Feather';
+import AddBudgetModal from '../components/AddBudgetModal';
 
 const { width } = Dimensions.get('window');
 
@@ -25,7 +26,8 @@ type BudgetItem = {
 
 type Props = {
   budgets?: BudgetItem[];
-  onNewBudget?: () => void;
+  onNewBudget?: (name: string, amount: number) => void;
+  onUpdateBudget?: (updatedItem: BudgetItem) => void;
   onViewBudget?: (id: string) => void;
   onSearch?: () => void;
 };
@@ -42,17 +44,13 @@ const DonutChart = ({
   const strokeWidth = 22;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-
-  // Colors for different budget categories
   const colors = ['#2C247A', '#4F46E5', '#94A3B8', '#C5CAE9', '#6366F1'];
 
-  // Track the rotation offset for each slice
   let currentOffset = 0;
 
   return (
     <View style={donutStyles.wrapper}>
       <Svg width={size} height={size}>
-        {/* Background Track (Visible if no budgets exist) */}
         <Circle
           cx={size / 2}
           cy={size / 2}
@@ -61,13 +59,10 @@ const DonutChart = ({
           strokeWidth={strokeWidth}
           fill="none"
         />
-
         {budgets.map((item, index) => {
           const slicePercentage = total > 0 ? item.total / total : 0;
           const strokeDash = circumference * slicePercentage;
           const offset = circumference * currentOffset;
-
-          // Add to offset for the next slice in the loop
           currentOffset += slicePercentage;
 
           return (
@@ -88,7 +83,7 @@ const DonutChart = ({
           );
         })}
       </Svg>
-      <View style={donutStyles.center}>
+      <View style={donutStyles.center as any}>
         <Text style={donutStyles.label}>Total budget</Text>
         <Text style={donutStyles.amount}>₦{total.toLocaleString()}</Text>
       </View>
@@ -97,15 +92,7 @@ const DonutChart = ({
 };
 
 // ── Stat Item ─────────────────────────────────────────────────────────────────
-const StatItem = ({
-  label,
-  percent,
-  borderLeft,
-}: {
-  label: string;
-  percent: number;
-  borderLeft?: boolean;
-}) => (
+const StatItem = ({ label, percent, borderLeft }: any) => (
   <View style={[statStyles.item, borderLeft && statStyles.borderLeft]}>
     <Text style={statStyles.label} numberOfLines={1}>
       {label}
@@ -118,22 +105,21 @@ const StatItem = ({
 );
 
 // ── Budget Card ───────────────────────────────────────────────────────────────
-const BudgetCard = ({
-  item,
-  onView,
-}: {
-  item: BudgetItem;
-  onView: () => void;
-}) => (
+const BudgetCard = ({ item, onView, onEdit }: any) => (
   <View style={cardStyles.card}>
-    <Text style={cardStyles.name}>{item.name}</Text>
+    <View style={cardStyles.headerRow}>
+      <Text style={cardStyles.name}>{item.name}</Text>
+      <TouchableOpacity onPress={onEdit} style={cardStyles.editBtn}>
+        <Icon name="edit-2" size={14} color="#8E8E93" />
+      </TouchableOpacity>
+    </View>
     <View style={cardStyles.row}>
       <Text style={cardStyles.metaText}>
         Spend: ₦{item.spend.toLocaleString()}
       </Text>
       <View style={cardStyles.rightRow}>
         <Text style={cardStyles.metaText}>
-          Remaining: ₦{item.remaining.toLocaleString()}
+          Rem: ₦{item.remaining.toLocaleString()}
         </Text>
         <TouchableOpacity style={cardStyles.viewBtn} onPress={onView}>
           <Text style={cardStyles.viewBtnText}>View</Text>
@@ -159,12 +145,14 @@ const BudgetCard = ({
 const BudgetDashboard = ({
   budgets = [],
   onNewBudget,
+  onUpdateBudget,
   onViewBudget,
   onSearch,
 }: Props) => {
-  const totalBudget = budgets.reduce((sum, item) => sum + item.total, 0);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedBudget, setSelectedBudget] = useState<BudgetItem | null>(null);
 
-  // Get Top 2 budgets by total amount for the Stats Row
+  const totalBudget = budgets.reduce((sum, item) => sum + item.total, 0);
   const sortedBudgets = [...budgets].sort((a, b) => b.total - a.total);
   const topBudget = sortedBudgets[0];
   const secondBudget = sortedBudgets[1];
@@ -172,43 +160,65 @@ const BudgetDashboard = ({
   const getShare = (amount: number) =>
     totalBudget > 0 ? Math.round((amount / totalBudget) * 100) : 0;
 
+  const handleEditPress = (item: BudgetItem) => {
+    setSelectedBudget(item);
+    setModalVisible(true);
+  };
+
+  const handleNewPress = () => {
+    setSelectedBudget(null);
+    setModalVisible(true);
+  };
+
+  const handleSaveBudget = (name: string, amount: number) => {
+    if (selectedBudget) {
+      // Pass the update to parent (who will save to AsyncStorage)
+      onUpdateBudget?.({
+        ...selectedBudget,
+        name,
+        total: amount,
+        remaining: amount - selectedBudget.spend,
+        usedPercent: Math.round((selectedBudget.spend / amount) * 100),
+      });
+    } else {
+      // Pass new budget to parent
+      onNewBudget?.(name, amount);
+    }
+    setModalVisible(false);
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Multi-Slice Composition Chart */}
         <DonutChart budgets={budgets} total={totalBudget} />
-
-        {/* Stats Row: Dynamic Labels & Percentages */}
         <View style={styles.statsRow}>
           <StatItem
             label={topBudget ? topBudget.name : 'Primary Budget'}
-            percent={topBudget ? getShare(topBudget.total) : 0}
+            percent={getShare(topBudget?.total || 0)}
           />
           <StatItem
             label={secondBudget ? secondBudget.name : 'Other Budgets'}
-            percent={secondBudget ? getShare(secondBudget.total) : 0}
+            percent={getShare(secondBudget?.total || 0)}
             borderLeft
           />
         </View>
-
         <View style={styles.divider} />
-
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Budgets</Text>
           <TouchableOpacity onPress={onSearch}>
             <Icon name="search" size={18} color="#8E8E93" />
           </TouchableOpacity>
         </View>
-
         <View style={styles.cardList}>
           {budgets.map(item => (
             <BudgetCard
               key={item.id}
               item={item}
               onView={() => onViewBudget?.(item.id)}
+              onEdit={() => handleEditPress(item)}
             />
           ))}
         </View>
@@ -217,17 +227,22 @@ const BudgetDashboard = ({
 
       <TouchableOpacity
         style={styles.fab}
-        onPress={onNewBudget}
+        onPress={handleNewPress}
         activeOpacity={0.85}
       >
         <Icon name="plus" size={16} color="#fff" style={{ marginRight: 6 }} />
         <Text style={styles.fabText}>New budget</Text>
       </TouchableOpacity>
+
+      <AddBudgetModal
+        isVisible={modalVisible}
+        initialData={selectedBudget}
+        onClose={() => setModalVisible(false)}
+        onSave={handleSaveBudget}
+      />
     </View>
   );
 };
-
-export default BudgetDashboard;
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 const donutStyles = StyleSheet.create({
@@ -257,7 +272,14 @@ const cardStyles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#F2F2F7',
   },
-  name: { fontSize: 16, fontWeight: '700', color: '#1C1C1E', marginBottom: 10 },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  name: { fontSize: 16, fontWeight: '700', color: '#1C1C1E' },
+  editBtn: { padding: 4 },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -320,3 +342,5 @@ const styles = StyleSheet.create({
   },
   fabText: { color: '#fff', fontSize: 15, fontWeight: '600' },
 });
+
+export default BudgetDashboard;
