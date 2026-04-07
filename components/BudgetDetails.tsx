@@ -11,6 +11,7 @@ import Svg, { Circle } from 'react-native-svg';
 import Icon from 'react-native-vector-icons/Feather';
 import AddExpenseModal from './AddExpenseModal';
 import ExpenseItem from './ExpenseItem';
+import AddBudgetModal from './AddBudgetModal';
 
 const BudgetDonut = ({ total, spent }: { total: number; spent: number }) => {
   const size = 160;
@@ -54,10 +55,18 @@ const BudgetDonut = ({ total, spent }: { total: number; spent: number }) => {
   );
 };
 
-const BudgetDetails = ({ budget, onAddExpense, onDelete, onEdit }: any) => {
+const BudgetDetails = ({
+  budget,
+  onAddExpense,
+  onDelete,
+  onEdit,
+  onUpdateBudget,
+}: any) => {
   const [activeTab, setActiveTab] = useState('Overview');
   const [isExpenseModalVisible, setExpenseModalVisible] = useState(false);
   const [expenses, setExpenses] = useState<any[]>([]);
+  const [selectedExpense, setSelectedExpense] = useState<any>(null); // Track item to edit
+  const [isEditBudgetModalVisible, setEditBudgetModalVisible] = useState(false);
 
   // Calculate Top Categories and Members
   const analytics = useMemo(() => {
@@ -81,10 +90,49 @@ const BudgetDetails = ({ budget, onAddExpense, onDelete, onEdit }: any) => {
     };
   }, [expenses]);
 
-  const handleSaveNewExpense = (expenseData: any) => {
-    setExpenses([expenseData, ...expenses]);
-    onAddExpense(expenseData.amount);
+  const handleSaveExpense = (expenseData: any) => {
+    const exists = expenses.find(e => e.id === expenseData.id);
+
+    if (exists) {
+      // EDIT LOGIC: Replace existing item
+      const updatedExpenses = expenses.map(e =>
+        e.id === expenseData.id ? expenseData : e,
+      );
+      setExpenses(updatedExpenses);
+
+      // Calculate difference for budget adjustment
+      const diff = expenseData.amount - exists.amount;
+      onAddExpense(diff);
+    } else {
+      // CREATE LOGIC: Add new item
+      setExpenses([expenseData, ...expenses]);
+      onAddExpense(expenseData.amount);
+    }
+
     setExpenseModalVisible(false);
+    setSelectedExpense(null);
+  };
+
+  const openEditModal = (expense: any) => {
+    setSelectedExpense(expense);
+    setExpenseModalVisible(true);
+  };
+
+  const openCreateModal = () => {
+    setSelectedExpense(null);
+    setExpenseModalVisible(true);
+  };
+
+  // Logic to handle saving the edited budget
+  const handleUpdateBudget = (name: string, amount: number) => {
+    // Pass the data back up to your main state handler
+    onUpdateBudget({
+      ...budget,
+      name: name,
+      total: amount,
+      remaining: amount - budget.spend, // recalculate remaining
+    });
+    setEditBudgetModalVisible(false);
   };
 
   return (
@@ -92,7 +140,8 @@ const BudgetDetails = ({ budget, onAddExpense, onDelete, onEdit }: any) => {
       <View style={detailsStyles.header}>
         <Text style={detailsStyles.title}>{budget.name}</Text>
         <View style={detailsStyles.headerIcons}>
-          <TouchableOpacity onPress={onEdit}>
+          {/* TRIGGER FOR EDIT BUDGET */}
+          <TouchableOpacity onPress={() => setEditBudgetModalVisible(true)}>
             <Icon name="edit-2" size={18} color="#8E8E93" />
           </TouchableOpacity>
           <TouchableOpacity onPress={onDelete} style={{ marginLeft: 15 }}>
@@ -193,33 +242,35 @@ const BudgetDetails = ({ budget, onAddExpense, onDelete, onEdit }: any) => {
         ) : (
           <View style={detailsStyles.expenseListContainer}>
             {expenses.map((item, index) => (
-              <ExpenseItem
-                key={index}
-                title={item.name}
-                amount={item.amount}
-                paidBy={item.paidBy}
-                time={item.time}
-                date={item.date}
-                category={item.category}
-              />
+              <View key={item.id || index} style={{ position: 'relative' }}>
+                <ExpenseItem {...item} title={item.name} />
+              </View>
             ))}
           </View>
         )}
         <View style={{ height: 100 }} />
       </ScrollView>
 
-      <TouchableOpacity
-        style={detailsStyles.fab}
-        onPress={() => setExpenseModalVisible(true)}
-      >
+      <TouchableOpacity style={detailsStyles.fab} onPress={openCreateModal}>
         <Icon name="plus" size={18} color="#1C1C1E" />
         <Text style={detailsStyles.fabText}>New expense</Text>
       </TouchableOpacity>
 
       <AddExpenseModal
         isVisible={isExpenseModalVisible}
-        onClose={() => setExpenseModalVisible(false)}
-        onSave={handleSaveNewExpense}
+        initialData={selectedExpense} // Pass the data here
+        onClose={() => {
+          setExpenseModalVisible(false);
+          setSelectedExpense(null);
+        }}
+        onSave={handleSaveExpense}
+      />
+
+      <AddBudgetModal
+        isVisible={isEditBudgetModalVisible}
+        initialData={budget} // Pass current budget to pre-fill inputs
+        onClose={() => setEditBudgetModalVisible(false)}
+        onSave={handleUpdateBudget}
       />
     </View>
   );
@@ -318,6 +369,12 @@ const detailsStyles = StyleSheet.create({
     alignItems: 'center',
   },
   fabText: { marginLeft: 8, fontWeight: '600', fontSize: 16 },
+  itemEditIcon: {
+    position: 'absolute',
+    right: 15,
+    top: 20,
+    padding: 10,
+  },
 });
 
 export default BudgetDetails;

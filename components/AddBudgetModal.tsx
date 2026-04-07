@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+'use client';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,18 +15,30 @@ import {
 type Props = {
   isVisible: boolean;
   onClose: () => void;
-  onSave: (name: string, amount: number) => void; // Add this prop
+  onSave: (name: string, amount: number) => void;
+  initialData?: { name: string; total: number } | null; // Added this prop
 };
 
-const AddBudgetModal = ({ isVisible, onClose, onSave }: Props) => {
+const AddBudgetModal = ({ isVisible, onClose, onSave, initialData }: Props) => {
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
+
+  // Pre-fill fields if initialData is provided (Edit Mode)
+  useEffect(() => {
+    if (isVisible) {
+      if (initialData) {
+        setName(initialData.name);
+        setAmount(initialData.total.toString());
+      } else {
+        setName('');
+        setAmount('');
+      }
+    }
+  }, [isVisible, initialData]);
 
   const handleSave = () => {
     if (!name || !amount) return;
     onSave(name, parseFloat(amount));
-    setName(''); // Clear inputs
-    setAmount('');
     onClose();
   };
 
@@ -41,15 +54,15 @@ const AddBudgetModal = ({ isVisible, onClose, onSave }: Props) => {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.modalContainer}
         >
-          {/* Prevent taps inside the modal from closing it */}
           <Pressable
             style={styles.modalContent}
             onPress={e => e.stopPropagation()}
           >
-            {/* Handle bar for visual cue */}
             <View style={styles.handle} />
 
-            <Text style={styles.header}>Add budget</Text>
+            <Text style={styles.header}>
+              {initialData ? 'Edit budget' : 'Add budget'}
+            </Text>
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Name</Text>
@@ -75,7 +88,9 @@ const AddBudgetModal = ({ isVisible, onClose, onSave }: Props) => {
             </View>
 
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <Text style={styles.saveButtonText}>Save</Text>
+              <Text style={styles.saveButtonText}>
+                {initialData ? 'Update Budget' : 'Save'}
+              </Text>
             </TouchableOpacity>
           </Pressable>
         </KeyboardAvoidingView>
@@ -83,6 +98,8 @@ const AddBudgetModal = ({ isVisible, onClose, onSave }: Props) => {
     </Modal>
   );
 };
+
+// ... styles remain exactly as you have them ...
 
 const styles = StyleSheet.create({
   overlay: {

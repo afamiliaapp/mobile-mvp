@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -20,6 +20,7 @@ interface Props {
   isVisible: boolean;
   onClose: () => void;
   onSave: (expenseData: any) => void;
+  initialData?: any; // New prop for editing
 }
 
 const BUDGET_CATEGORIES = [
@@ -37,25 +38,49 @@ const BUDGET_CATEGORIES = [
 
 const MEMBERS = ['Dad', 'Mom', 'Brother', 'Sister'];
 
-const AddExpenseModal = ({ isVisible, onClose, onSave }: Props) => {
+const initialState = {
+  name: '',
+  description: '',
+  category: '',
+  amount: '',
+  paidBy: '',
+  time: '',
+  date: '',
+  receipt: null as any,
+};
+
+const AddExpenseModal = ({
+  isVisible,
+  onClose,
+  onSave,
+  initialData,
+}: Props) => {
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
   const [showMemberPicker, setShowMemberPicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [formData, setFormData] = useState(initialState);
 
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    category: '',
-    amount: '',
-    paidBy: '',
-    time: new Date().toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-    }),
-    date: new Date().toLocaleDateString(),
-    receipt: null as any,
-  });
+  // Sync form state when modal visibility or initialData changes
+  useEffect(() => {
+    if (isVisible) {
+      if (initialData) {
+        setFormData({
+          ...initialData,
+          amount: initialData.amount.toString(), // Convert number to string for input
+        });
+      } else {
+        setFormData({
+          ...initialState,
+          time: new Date().toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          }),
+          date: new Date().toLocaleDateString(),
+        });
+      }
+    }
+  }, [isVisible, initialData]);
 
   const handleSave = () => {
     if (!formData.name || !formData.amount) {
@@ -64,6 +89,7 @@ const AddExpenseModal = ({ isVisible, onClose, onSave }: Props) => {
     }
     onSave({
       ...formData,
+      id: initialData?.id || Date.now(), // Keep existing ID or create new one
       amount: parseFloat(formData.amount) || 0,
     });
     onClose();
@@ -78,9 +104,8 @@ const AddExpenseModal = ({ isVisible, onClose, onSave }: Props) => {
 
   const onDateChange = (event: any, selectedDate?: Date) => {
     setShowDatePicker(false);
-    if (selectedDate) {
+    if (selectedDate)
       setFormData({ ...formData, date: selectedDate.toLocaleDateString() });
-    }
   };
 
   const onTimeChange = (event: any, selectedTime?: Date) => {
@@ -104,7 +129,9 @@ const AddExpenseModal = ({ isVisible, onClose, onSave }: Props) => {
           style={styles.modalContainer}
         >
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>Add expenses</Text>
+            <Text style={styles.headerTitle}>
+              {initialData ? 'Edit expense' : 'Add expenses'}
+            </Text>
             <TouchableOpacity onPress={onClose}>
               <Icon name="x" size={24} color="#1C1C1E" />
             </TouchableOpacity>
@@ -130,7 +157,6 @@ const AddExpenseModal = ({ isVisible, onClose, onSave }: Props) => {
               onChangeText={t => setFormData({ ...formData, description: t })}
             />
 
-            {/* Category Dropdown */}
             <Label text="Category" />
             <TouchableOpacity
               style={styles.pickerInput}
@@ -179,7 +205,6 @@ const AddExpenseModal = ({ isVisible, onClose, onSave }: Props) => {
               onChangeText={t => setFormData({ ...formData, amount: t })}
             />
 
-            {/* Paid By Dropdown */}
             <Label text="Paid by" />
             <TouchableOpacity
               style={styles.pickerInput}
@@ -219,7 +244,6 @@ const AddExpenseModal = ({ isVisible, onClose, onSave }: Props) => {
               </View>
             )}
 
-            {/* Time Picker */}
             <Label text="Time" />
             <TouchableOpacity
               style={styles.pickerInput}
@@ -237,7 +261,6 @@ const AddExpenseModal = ({ isVisible, onClose, onSave }: Props) => {
               />
             )}
 
-            {/* Date Picker */}
             <Label text="Date" />
             <TouchableOpacity
               style={styles.pickerInput}
@@ -255,7 +278,6 @@ const AddExpenseModal = ({ isVisible, onClose, onSave }: Props) => {
               />
             )}
 
-            {/* Receipt Upload */}
             <Label text="Receipt" />
             <View style={styles.uploadContainer}>
               <View style={styles.filePreview}>
