@@ -73,6 +73,7 @@ const Expenses = () => {
       spend: 0,
       remaining: amount,
       usedPercent: 0,
+      expenses: [], // <--- Add this!
     };
     setBudgets(prev => [...prev, newBudget]);
     setModalVisible(false);
@@ -84,13 +85,33 @@ const Expenses = () => {
     );
   };
 
-  const handleAddNewExpense = (budgetId: string, expenseAmount: number) => {
+  const handleAddNewExpense = (budgetId: string, expenseData: any) => {
     setBudgets(prevBudgets =>
       prevBudgets.map(budget => {
         if (budget.id === budgetId) {
-          const newSpend = budget.spend + expenseAmount;
+          // Handle both New and Edit logic for the expense itself
+          const existingExpenses = budget.expenses || [];
+          const exists = existingExpenses.find(
+            (e: any) => e.id === expenseData.id,
+          );
+
+          let updatedExpenses;
+          if (exists) {
+            updatedExpenses = existingExpenses.map((e: any) =>
+              e.id === expenseData.id ? expenseData : e,
+            );
+          } else {
+            updatedExpenses = [expenseData, ...existingExpenses];
+          }
+
+          const newSpend = updatedExpenses.reduce(
+            (sum: number, exp: any) => sum + exp.amount,
+            0,
+          );
+
           return {
             ...budget,
+            expenses: updatedExpenses, // <--- Save the list!
             spend: newSpend,
             remaining: budget.total - newSpend,
             usedPercent: Math.round((newSpend / budget.total) * 100),

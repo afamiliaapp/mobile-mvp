@@ -9,9 +9,12 @@ import {
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import Icon from 'react-native-vector-icons/Feather';
-import AddExpenseModal from './AddExpenseModal';
 import ExpenseItem from './ExpenseItem';
+import AddExpenseModal from './AddExpenseModal';
 import AddBudgetModal from './AddBudgetModal';
+import DeleteBudgetModal from './DeleteBudgetModal';
+import BackButtonTwo from './BackButtonTwo';
+import ExpensesBar from './ExpensesBar';
 
 const BudgetDonut = ({ total, spent }: { total: number; spent: number }) => {
   const size = 160;
@@ -59,14 +62,17 @@ const BudgetDetails = ({
   budget,
   onAddExpense,
   onDelete,
-  onEdit,
+  onBack,
+
   onUpdateBudget,
 }: any) => {
   const [activeTab, setActiveTab] = useState('Overview');
   const [isExpenseModalVisible, setExpenseModalVisible] = useState(false);
-  const [expenses, setExpenses] = useState<any[]>([]);
+  const expenses = budget.expenses || [];
   const [selectedExpense, setSelectedExpense] = useState<any>(null); // Track item to edit
   const [isEditBudgetModalVisible, setEditBudgetModalVisible] = useState(false);
+  // NEW: State for Delete Modal
+  const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
 
   // Calculate Top Categories and Members
   const analytics = useMemo(() => {
@@ -91,31 +97,50 @@ const BudgetDetails = ({
   }, [expenses]);
 
   const handleSaveExpense = (expenseData: any) => {
-    const exists = expenses.find(e => e.id === expenseData.id);
+    // 1. Get the current list (ensure it's an array)
+    const currentExpenses = budget.expenses || [];
 
+    // 2. Determine if we are editing or creating
+    const exists = currentExpenses.find((e: any) => e.id === expenseData.id);
+
+    let updatedExpenses;
     if (exists) {
-      // EDIT LOGIC: Replace existing item
-      const updatedExpenses = expenses.map(e =>
+      // EDIT: Update specific expense
+      updatedExpenses = currentExpenses.map((e: any) =>
         e.id === expenseData.id ? expenseData : e,
       );
-      setExpenses(updatedExpenses);
-
-      // Calculate difference for budget adjustment
-      const diff = expenseData.amount - exists.amount;
-      onAddExpense(diff);
     } else {
-      // CREATE LOGIC: Add new item
-      setExpenses([expenseData, ...expenses]);
-      onAddExpense(expenseData.amount);
+      // CREATE: Add new expense with unique ID and current timestamps
+      const newExpense = {
+        ...expenseData,
+        id: Date.now().toString(),
+        date: expenseData.date || new Date().toLocaleDateString('en-GB'),
+        time:
+          expenseData.time ||
+          new Date().toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          }),
+      };
+      updatedExpenses = [newExpense, ...currentExpenses];
     }
+
+    // 3. Calculate new spend totals
+    const totalSpent = updatedExpenses.reduce(
+      (sum: number, exp: any) => sum + exp.amount,
+      0,
+    );
+
+    // 4. Update the Parent State (This triggers AsyncStorage save)
+    onUpdateBudget({
+      ...budget,
+      expenses: updatedExpenses,
+      spend: totalSpent,
+      remaining: budget.total - totalSpent,
+    });
 
     setExpenseModalVisible(false);
     setSelectedExpense(null);
-  };
-
-  const openEditModal = (expense: any) => {
-    setSelectedExpense(expense);
-    setExpenseModalVisible(true);
   };
 
   const openCreateModal = () => {
@@ -135,8 +160,20 @@ const BudgetDetails = ({
     setEditBudgetModalVisible(false);
   };
 
+  // NEW: Function to handle the actual deletion
+  const confirmDelete = () => {
+    setDeleteModalVisible(false);
+    onDelete(); // Triggers the deletion logic in the parent (Expenses.tsx)
+  };
+
   return (
     <View style={detailsStyles.container}>
+      <View>
+        <ExpensesBar />
+      </View>
+
+      <BackButtonTwo onPress={onBack} />
+
       <View style={detailsStyles.header}>
         <Text style={detailsStyles.title}>{budget.name}</Text>
         <View style={detailsStyles.headerIcons}>
@@ -144,7 +181,11 @@ const BudgetDetails = ({
           <TouchableOpacity onPress={() => setEditBudgetModalVisible(true)}>
             <Icon name="edit-2" size={18} color="#8E8E93" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={onDelete} style={{ marginLeft: 15 }}>
+          {/* Trigger the Delete Confirmation Modal */}
+          <TouchableOpacity
+            onPress={() => setDeleteModalVisible(true)}
+            style={{ marginLeft: 15 }}
+          >
             <Icon name="trash-2" size={18} color="#FF3B30" />
           </TouchableOpacity>
         </View>
@@ -241,9 +282,16 @@ const BudgetDetails = ({
           </View>
         ) : (
           <View style={detailsStyles.expenseListContainer}>
-            {expenses.map((item, index) => (
-              <View key={item.id || index} style={{ position: 'relative' }}>
-                <ExpenseItem {...item} title={item.name} />
+            {expenses.map((item: any, index: number) => (
+              <View key={item.id || index}>
+                <ExpenseItem
+                  {...item}
+                  title={item.name}
+                  onViewDetails={() => {
+                    setSelectedExpense(item);
+                    setExpenseModalVisible(true);
+                  }}
+                />
               </View>
             ))}
           </View>
@@ -272,6 +320,13 @@ const BudgetDetails = ({
         onClose={() => setEditBudgetModalVisible(false)}
         onSave={handleUpdateBudget}
       />
+
+      {/* NEW: Implementation of the Delete Budget Modal */}
+      <DeleteBudgetModal
+        isVisible={isDeleteModalVisible}
+        onClose={() => setDeleteModalVisible(false)}
+        onDelete={confirmDelete}
+      />
     </View>
   );
 };
@@ -290,12 +345,12 @@ const TabButton = ({ label, active, onPress }: any) => (
 );
 
 const detailsStyles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', paddingHorizontal: 20 },
+  container: { flex: 1, backgroundColor: '#fff', paddingHorizontal: 10 },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 50,
+    marginTop: 20,
   },
   title: { fontSize: 22, fontWeight: '700', color: '#1C1C1E' },
   headerIcons: { flexDirection: 'row' },
