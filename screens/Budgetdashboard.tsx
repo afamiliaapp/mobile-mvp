@@ -289,7 +289,7 @@ const cardStyles = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', marginTop: '10%' },
+  container: { flex: 1, marginTop: '10%' },
   scrollContent: { paddingBottom: 20 },
   statsRow: { flexDirection: 'row', paddingHorizontal: 16, marginBottom: 16 },
   divider: { height: 8, backgroundColor: '#F2F2F7', marginBottom: 16 },

@@ -12,18 +12,16 @@ import ExpensesBar from '../components/ExpensesBar';
 import AddBudgetModal from '../components/AddBudgetModal';
 import ThemedText from '../components/ThemedText';
 import BudgetDashboard from './Budgetdashboard';
+import BudgetDetails from '../components/BudgetDetails';
 
 const Expenses = () => {
   const [isModalVisible, setModalVisible] = useState(false);
-
-  // 1. ADD THIS: State to store your budgets
   const [budgets, setBudgets] = useState<any[]>([]);
+  // Tracks which budget to show details for. If null, show the main dashboard.
+  const [selectedBudgetId, setSelectedBudgetId] = useState<string | null>(null);
 
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
+  const toggleModal = () => setModalVisible(!isModalVisible);
 
-  // 2. ADD THIS: The function that was missing
   const handleSaveBudget = (name: string, amount: number) => {
     const newBudget = {
       id: Date.now().toString(),
@@ -33,21 +31,52 @@ const Expenses = () => {
       remaining: amount,
       usedPercent: 0,
     };
-
-    setBudgets([...budgets, newBudget]); // Add new budget to list
-    setModalVisible(false); // Close the modal
+    setBudgets([...budgets, newBudget]);
+    setModalVisible(false);
   };
+
+  const handleAddNewExpense = (budgetId: string, expenseAmount: number) => {
+    setBudgets(prevBudgets =>
+      prevBudgets.map(budget => {
+        if (budget.id === budgetId) {
+          const newSpend = budget.spend + expenseAmount;
+          return {
+            ...budget,
+            spend: newSpend,
+            remaining: budget.total - newSpend,
+            usedPercent: Math.round((newSpend / budget.total) * 100),
+          };
+        }
+        return budget;
+      }),
+    );
+  };
+
+  // Find the currently selected budget object
+  const currentBudget = budgets.find(b => b.id === selectedBudgetId);
 
   return (
     <>
       <AppContainer>
         <View style={styles.container1}>
-          <View>
-            <ExpensesBar />
-          </View>
-
-          {/* 3. Logic to switch views */}
-          {budgets.length === 0 ? (
+          {' '}
+          {/* Header Bar - Hide if viewing details for a cleaner look */}
+          {!selectedBudgetId && (
+            <View>
+              {' '}
+              <ExpensesBar />
+            </View>
+          )}
+          {/* Conditional Rendering Logic */}
+          {selectedBudgetId && currentBudget ? (
+            <BudgetDetails
+              budget={currentBudget}
+              onBack={() => setSelectedBudgetId(null)}
+              onAddExpense={(amount: number) =>
+                handleAddNewExpense(currentBudget.id, amount)
+              }
+            />
+          ) : budgets.length === 0 ? (
             <SafeAreaView style={styles.container2}>
               <View style={styles.centered}>
                 <ThemedText variant="title" style={styles.title}>
@@ -66,7 +95,11 @@ const Expenses = () => {
               </View>
             </SafeAreaView>
           ) : (
-            <BudgetDashboard budgets={budgets} onNewBudget={toggleModal} />
+            <BudgetDashboard
+              budgets={budgets}
+              onNewBudget={toggleModal}
+              onViewBudget={id => setSelectedBudgetId(id)} // Clicking "View" sets the ID
+            />
           )}
         </View>
       </AppContainer>
