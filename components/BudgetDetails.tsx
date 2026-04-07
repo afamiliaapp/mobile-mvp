@@ -15,6 +15,8 @@ import AddBudgetModal from './AddBudgetModal';
 import DeleteBudgetModal from './DeleteBudgetModal';
 import BackButtonTwo from './BackButtonTwo';
 import ExpensesBar from './ExpensesBar';
+import ExpenseDetails from './ExpenseDetails';
+import DeleteExpenseModal from './DeleteExpenseModal';
 
 const BudgetDonut = ({ total, spent }: { total: number; spent: number }) => {
   const size = 160;
@@ -58,22 +60,17 @@ const BudgetDonut = ({ total, spent }: { total: number; spent: number }) => {
   );
 };
 
-const BudgetDetails = ({
-  budget,
-  onAddExpense,
-  onDelete,
-  onBack,
-
-  onUpdateBudget,
-}: any) => {
+const BudgetDetails = ({ budget, onDelete, onBack, onUpdateBudget }: any) => {
   const [activeTab, setActiveTab] = useState('Overview');
   const [isExpenseModalVisible, setExpenseModalVisible] = useState(false);
-  const expenses = budget.expenses || [];
-  const [selectedExpense, setSelectedExpense] = useState<any>(null); // Track item to edit
   const [isEditBudgetModalVisible, setEditBudgetModalVisible] = useState(false);
-  // NEW: State for Delete Modal
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
-
+  const [selectedExpenseForDetails, setSelectedExpenseForDetails] =
+    useState<any>(null);
+  const [expenseToEdit, setExpenseToEdit] = useState<any>(null);
+  const [isDeleteExpenseModalVisible, setDeleteExpenseModalVisible] =
+    useState(false);
+  const expenses = budget.expenses || [];
   // Calculate Top Categories and Members
   const analytics = useMemo(() => {
     const categoryMap: any = {};
@@ -97,20 +94,19 @@ const BudgetDetails = ({
   }, [expenses]);
 
   const handleSaveExpense = (expenseData: any) => {
-    // 1. Get the current list (ensure it's an array)
     const currentExpenses = budget.expenses || [];
-
-    // 2. Determine if we are editing or creating
     const exists = currentExpenses.find((e: any) => e.id === expenseData.id);
 
     let updatedExpenses;
     if (exists) {
-      // EDIT: Update specific expense
       updatedExpenses = currentExpenses.map((e: any) =>
         e.id === expenseData.id ? expenseData : e,
       );
+      // Sync the details view if it's currently open
+      if (selectedExpenseForDetails?.id === expenseData.id) {
+        setSelectedExpenseForDetails(expenseData);
+      }
     } else {
-      // CREATE: Add new expense with unique ID and current timestamps
       const newExpense = {
         ...expenseData,
         id: Date.now().toString(),
@@ -125,46 +121,78 @@ const BudgetDetails = ({
       updatedExpenses = [newExpense, ...currentExpenses];
     }
 
-    // 3. Calculate new spend totals
-    const totalSpent = updatedExpenses.reduce(
-      (sum: number, exp: any) => sum + exp.amount,
-      0,
-    );
-
-    // 4. Update the Parent State (This triggers AsyncStorage save)
     onUpdateBudget({
       ...budget,
       expenses: updatedExpenses,
-      spend: totalSpent,
-      remaining: budget.total - totalSpent,
+      spend: updatedExpenses.reduce(
+        (sum: number, exp: any) => sum + exp.amount,
+        0,
+      ),
+      remaining:
+        budget.total -
+        updatedExpenses.reduce((sum: number, exp: any) => sum + exp.amount, 0),
     });
 
     setExpenseModalVisible(false);
-    setSelectedExpense(null);
+    setExpenseToEdit(null); // Reset after saving
   };
 
-  const openCreateModal = () => {
-    setSelectedExpense(null);
-    setExpenseModalVisible(true);
-  };
+  // If an expense is selected, show the Details view instead of the list/overview
+  if (selectedExpenseForDetails) {
+    return (
+      <>
+        <ExpenseDetails
+          expense={selectedExpenseForDetails}
+          onBack={() => setSelectedExpenseForDetails(null)}
+          onEdit={() => {
+            setExpenseToEdit(selectedExpenseForDetails);
+            setExpenseModalVisible(true);
+          }}
+          // CHANGE THIS: Don't delete, just show the modal
+          onDelete={() => setDeleteExpenseModalVisible(true)}
+        />
 
-  // Logic to handle saving the edited budget
-  const handleUpdateBudget = (name: string, amount: number) => {
-    // Pass the data back up to your main state handler
-    onUpdateBudget({
-      ...budget,
-      name: name,
-      total: amount,
-      remaining: amount - budget.spend, // recalculate remaining
-    });
-    setEditBudgetModalVisible(false);
-  };
+        {/* This is the modal we created earlier */}
+        <DeleteExpenseModal
+          isVisible={isDeleteExpenseModalVisible}
+          onClose={() => setDeleteExpenseModalVisible(false)}
+          onDelete={() => {
+            // 1. Perform the actual data filtering
+            const updated = expenses.filter(
+              (e: any) => e.id !== selectedExpenseForDetails.id,
+            );
 
-  // NEW: Function to handle the actual deletion
-  const confirmDelete = () => {
-    setDeleteModalVisible(false);
-    onDelete(); // Triggers the deletion logic in the parent (Expenses.tsx)
-  };
+            // 2. Update the parent state/database
+            onUpdateBudget({
+              ...budget,
+              expenses: updated,
+              spend: updated.reduce(
+                (sum: number, exp: any) => sum + exp.amount,
+                0,
+              ),
+            });
+
+            // 3. Close the modal
+            setDeleteExpenseModalVisible(false);
+
+            // 4. Exit the details view and go back to the budget list
+            setSelectedExpenseForDetails(null);
+          }}
+        />
+
+        {/* Keep your Add/Edit Modal here too */}
+        <AddExpenseModal
+          isVisible={isExpenseModalVisible}
+          initialData={expenseToEdit}
+          onClose={() => {
+            setExpenseModalVisible(false);
+            setExpenseToEdit(null);
+          }}
+          onSave={handleSaveExpense}
+        />
+      </>
+    );
+  }
 
   return (
     <View style={detailsStyles.container}>
@@ -282,50 +310,68 @@ const BudgetDetails = ({
           </View>
         ) : (
           <View style={detailsStyles.expenseListContainer}>
-            {expenses.map((item: any, index: number) => (
-              <View key={item.id || index}>
-                <ExpenseItem
-                  {...item}
-                  title={item.name}
-                  onViewDetails={() => {
-                    setSelectedExpense(item);
-                    setExpenseModalVisible(true);
-                  }}
-                />
+            {activeTab === 'Expenses' && (
+              <View style={detailsStyles.expenseListContainer}>
+                {expenses.map((item: any, index: number) => (
+                  <ExpenseItem
+                    key={item.id || index}
+                    {...item}
+                    title={item.name}
+                    // Only sets the details state - does NOT open modal
+                    onViewDetails={() => setSelectedExpenseForDetails(item)}
+                  />
+                ))}
               </View>
-            ))}
+            )}
           </View>
         )}
         <View style={{ height: 100 }} />
       </ScrollView>
 
-      <TouchableOpacity style={detailsStyles.fab} onPress={openCreateModal}>
+      <TouchableOpacity
+        style={detailsStyles.fab}
+        onPress={() => {
+          setExpenseToEdit(null); // Ensure it's empty for a "New" expense
+          setExpenseModalVisible(true);
+        }}
+      >
         <Icon name="plus" size={18} color="#1C1C1E" />
         <Text style={detailsStyles.fabText}>New expense</Text>
       </TouchableOpacity>
 
       <AddExpenseModal
         isVisible={isExpenseModalVisible}
-        initialData={selectedExpense} // Pass the data here
+        initialData={expenseToEdit}
         onClose={() => {
           setExpenseModalVisible(false);
-          setSelectedExpense(null);
+          setExpenseToEdit(null);
         }}
         onSave={handleSaveExpense}
       />
 
       <AddBudgetModal
         isVisible={isEditBudgetModalVisible}
-        initialData={budget} // Pass current budget to pre-fill inputs
+        initialData={budget}
         onClose={() => setEditBudgetModalVisible(false)}
-        onSave={handleUpdateBudget}
+        onSave={(name: string, amount: number) => {
+          onUpdateBudget({
+            ...budget,
+            name,
+            total: amount,
+            remaining: amount - budget.spend,
+          });
+          setEditBudgetModalVisible(false);
+        }}
       />
 
       {/* NEW: Implementation of the Delete Budget Modal */}
       <DeleteBudgetModal
         isVisible={isDeleteModalVisible}
         onClose={() => setDeleteModalVisible(false)}
-        onDelete={confirmDelete}
+        onDelete={() => {
+          setDeleteModalVisible(false);
+          onDelete();
+        }}
       />
     </View>
   );
