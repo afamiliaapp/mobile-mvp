@@ -13,7 +13,7 @@ import Icon from 'react-native-vector-icons/Feather';
 interface DeleteExpenseModalProps {
   isVisible: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+
   onDelete: () => void;
 }
 
