@@ -102,7 +102,6 @@ const BudgetDetails = ({ budget, onDelete, onBack, onUpdateBudget }: any) => {
       updatedExpenses = currentExpenses.map((e: any) =>
         e.id === expenseData.id ? expenseData : e,
       );
-      // Sync the details view if it's currently open
       if (selectedExpenseForDetails?.id === expenseData.id) {
         setSelectedExpenseForDetails(expenseData);
       }
@@ -121,20 +120,25 @@ const BudgetDetails = ({ budget, onDelete, onBack, onUpdateBudget }: any) => {
       updatedExpenses = [newExpense, ...currentExpenses];
     }
 
+    // 1. Calculate the new spend once
+    const newSpend = updatedExpenses.reduce(
+      (sum: number, exp: any) => sum + exp.amount,
+      0,
+    );
+
+    // 2. Pass all recalculated fields to the parent
     onUpdateBudget({
       ...budget,
       expenses: updatedExpenses,
-      spend: updatedExpenses.reduce(
-        (sum: number, exp: any) => sum + exp.amount,
-        0,
-      ),
-      remaining:
-        budget.total -
-        updatedExpenses.reduce((sum: number, exp: any) => sum + exp.amount, 0),
+      spend: newSpend,
+      remaining: budget.total - newSpend,
+      // 3. Update the percentage for the dashboard progress bars
+      usedPercent:
+        budget.total > 0 ? Math.round((newSpend / budget.total) * 100) : 0,
     });
 
     setExpenseModalVisible(false);
-    setExpenseToEdit(null); // Reset after saving
+    setExpenseToEdit(null);
   };
 
   // If an expense is selected, show the Details view instead of the list/overview
@@ -157,25 +161,32 @@ const BudgetDetails = ({ budget, onDelete, onBack, onUpdateBudget }: any) => {
           isVisible={isDeleteExpenseModalVisible}
           onClose={() => setDeleteExpenseModalVisible(false)}
           onDelete={() => {
-            // 1. Perform the actual data filtering
-            const updated = expenses.filter(
+            // 1. Filter out the deleted expense
+            const updatedExpenses = expenses.filter(
               (e: any) => e.id !== selectedExpenseForDetails.id,
             );
 
-            // 2. Update the parent state/database
+            // 2. Calculate the new total spend
+            const newSpend = updatedExpenses.reduce(
+              (sum: number, exp: any) => sum + exp.amount,
+              0,
+            );
+
+            // 3. Update the parent with the new spend, remaining, AND usedPercent
             onUpdateBudget({
               ...budget,
-              expenses: updated,
-              spend: updated.reduce(
-                (sum: number, exp: any) => sum + exp.amount,
-                0,
-              ),
+              expenses: updatedExpenses,
+              spend: newSpend,
+              remaining: budget.total - newSpend,
+              // Recalculate percentage: (Spent / Total) * 100
+              usedPercent:
+                budget.total > 0
+                  ? Math.round((newSpend / budget.total) * 100)
+                  : 0,
             });
 
-            // 3. Close the modal
+            // 4. Close modal and exit details view
             setDeleteExpenseModalVisible(false);
-
-            // 4. Exit the details view and go back to the budget list
             setSelectedExpenseForDetails(null);
           }}
         />
@@ -391,7 +402,7 @@ const TabButton = ({ label, active, onPress }: any) => (
 );
 
 const detailsStyles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', paddingHorizontal: 10 },
+  container: { flex: 1, backgroundColor: '#fff' },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
