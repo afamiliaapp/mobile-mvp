@@ -98,16 +98,24 @@ const BudgetDetails = ({ budget, onDelete, onBack, onUpdateBudget }: any) => {
     const exists = currentExpenses.find((e: any) => e.id === expenseData.id);
 
     let updatedExpenses;
+
     if (exists) {
+      // EDITING EXISTING
       updatedExpenses = currentExpenses.map((e: any) =>
-        e.id === expenseData.id ? expenseData : e,
+        e.id === expenseData.id
+          ? { ...e, ...expenseData } // Merge to preserve existing fields like receipt if not changed
+          : e,
       );
+
+      // Sync the details view if it's open
       if (selectedExpenseForDetails?.id === expenseData.id) {
-        setSelectedExpenseForDetails(expenseData);
+        const updatedDetail = { ...selectedExpenseForDetails, ...expenseData };
+        setSelectedExpenseForDetails(updatedDetail);
       }
     } else {
+      // ADDING NEW
       const newExpense = {
-        ...expenseData,
+        ...expenseData, // This brings in the name, amount, AND receipt
         id: Date.now().toString(),
         date: expenseData.date || new Date().toLocaleDateString('en-GB'),
         time:
@@ -120,19 +128,16 @@ const BudgetDetails = ({ budget, onDelete, onBack, onUpdateBudget }: any) => {
       updatedExpenses = [newExpense, ...currentExpenses];
     }
 
-    // 1. Calculate the new spend once
     const newSpend = updatedExpenses.reduce(
       (sum: number, exp: any) => sum + exp.amount,
       0,
     );
 
-    // 2. Pass all recalculated fields to the parent
     onUpdateBudget({
       ...budget,
       expenses: updatedExpenses,
       spend: newSpend,
       remaining: budget.total - newSpend,
-      // 3. Update the percentage for the dashboard progress bars
       usedPercent:
         budget.total > 0 ? Math.round((newSpend / budget.total) * 100) : 0,
     });

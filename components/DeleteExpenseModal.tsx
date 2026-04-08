@@ -99,11 +99,11 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#fff',
-    borderRadius: 24,
+    borderTopRightRadius: 24,
+    borderTopLeftRadius: 24,
 
     padding: 24,
     width: '100%',
-    maxWidth: 340,
   },
   title: {
     fontSize: 20,

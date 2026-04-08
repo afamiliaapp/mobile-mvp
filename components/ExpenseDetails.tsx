@@ -54,13 +54,24 @@ const ExpenseDetails = ({ expense, onBack, onEdit, onDelete }: any) => {
           ))}
 
           <Text style={styles.label}>Receipt</Text>
-          {expense.receiptUri ? (
+          {expense.receipt && expense.receipt.uri ? (
             <Image
-              source={{ uri: expense.receiptUri }}
+              key={expense.receipt.uri} // Adding a key forces a rerender if the URI changes
+              source={{ uri: expense.receipt.uri }}
               style={styles.receiptImage}
+              onLoad={() => console.log('Image loaded successfully')}
+              onError={e =>
+                console.log('Image load error:', e.nativeEvent.error)
+              }
             />
           ) : (
             <View style={styles.noReceiptBox}>
+              <Icon
+                name="image"
+                size={24}
+                color="#C7C7CC"
+                style={{ marginBottom: 8 }}
+              />
               <ThemedText style={styles.noReceiptText}>
                 No receipt attached
               </ThemedText>
