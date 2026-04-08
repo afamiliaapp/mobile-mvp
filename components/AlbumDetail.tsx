@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import PhotosBar from './PhotosBar';
+import DeleteAlbumModal from './DeleteAlbumModal';
 
 const { width } = Dimensions.get('window');
 const ITEM_SIZE = (width - 48) / 3;
@@ -41,6 +42,7 @@ const AlbumDetail = ({
   onDeleteSelected,
 }: Props) => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const allSelected = selectedIds.length === photos.length && photos.length > 0;
 
@@ -79,6 +81,11 @@ const AlbumDetail = ({
     );
   };
 
+  const handleConfirmDelete = () => {
+    setIsModalVisible(false);
+    onDeleteAlbum?.(); // Trigger the actual deletion logic
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <PhotosBar />
@@ -95,7 +102,10 @@ const AlbumDetail = ({
           <TouchableOpacity onPress={onEdit} style={styles.iconBtn}>
             <Icon name="edit-2" size={18} color="#1C1C1E" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={onDeleteAlbum} style={styles.iconBtn}>
+          <TouchableOpacity
+            onPress={() => setIsModalVisible(true)}
+            style={styles.iconBtn}
+          >
             <Icon name="trash-2" size={18} color="#FF3B30" />
           </TouchableOpacity>
         </View>
@@ -153,6 +163,12 @@ const AlbumDetail = ({
             <Text style={styles.emptyText}>No photos in this album</Text>
           </View>
         }
+      />
+
+      <DeleteAlbumModal
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        onConfirm={handleConfirmDelete}
       />
     </SafeAreaView>
   );
