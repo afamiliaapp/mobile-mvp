@@ -1,4 +1,3 @@
-'use client';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -73,16 +72,19 @@ const Expenses = () => {
       spend: 0,
       remaining: amount,
       usedPercent: 0,
-      expenses: [], // <--- Add this!
+      expenses: [],
     };
-    setBudgets(prev => [...prev, newBudget]);
+    setBudgets(prev => [newBudget, ...prev]); // Add new one to the top
     setModalVisible(false);
   };
 
   const handleUpdateBudget = (updatedBudget: any) => {
     setBudgets(prev =>
-      prev.map(b => (b.id === updatedBudget.id ? updatedBudget : b)),
+      prev.map(b =>
+        b.id === updatedBudget.id ? { ...b, ...updatedBudget } : b,
+      ),
     );
+    setModalVisible(false); // Ensure modal closes after update
   };
 
   const handleAddNewExpense = (budgetId: string, expenseData: any) => {
@@ -153,6 +155,7 @@ const Expenses = () => {
             <BudgetDetails
               budget={currentBudget}
               onBack={() => setSelectedBudgetId(null)}
+              onNewBudget={() => setModalVisible(true)}
               onUpdateBudget={handleUpdateBudget}
               onDelete={() => handleDeleteBudget(currentBudget.id)}
               onAddExpense={(amount: number) =>

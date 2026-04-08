@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react'; // Added useMemo
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   Dimensions,
+  TextInput, // Added TextInput
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import Icon from 'react-native-vector-icons/Feather';
@@ -26,10 +27,10 @@ type BudgetItem = {
 
 type Props = {
   budgets?: BudgetItem[];
-  onNewBudget?: (name: string, amount: number) => void;
+  onNewBudget?: () => void;
+  onEditBudget?: (item: BudgetItem) => void; // ← parent opens modal pre-filled
   onUpdateBudget?: (updatedItem: BudgetItem) => void;
   onViewBudget?: (id: string) => void;
-  onSearch?: () => void;
 };
 
 // ── Multi-Slice Donut Chart ──────────────────────────────────────────────────
@@ -105,13 +106,10 @@ const StatItem = ({ label, percent, borderLeft }: any) => (
 );
 
 // ── Budget Card ───────────────────────────────────────────────────────────────
-const BudgetCard = ({ item, onView, onEdit }: any) => (
+const BudgetCard = ({ item, onView }: any) => (
   <View style={cardStyles.card}>
     <View style={cardStyles.headerRow}>
       <Text style={cardStyles.name}>{item.name}</Text>
-      <TouchableOpacity onPress={onEdit} style={cardStyles.editBtn}>
-        <Icon name="edit-2" size={14} color="#8E8E93" />
-      </TouchableOpacity>
     </View>
     <View style={cardStyles.row}>
       <Text style={cardStyles.metaText}>
@@ -147,44 +145,35 @@ const BudgetDashboard = ({
   onNewBudget,
   onUpdateBudget,
   onViewBudget,
-  onSearch,
 }: Props) => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedBudget, setSelectedBudget] = useState<BudgetItem | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const totalBudget = budgets.reduce((sum, item) => sum + item.total, 0);
   const sortedBudgets = [...budgets].sort((a, b) => b.total - a.total);
   const topBudget = sortedBudgets[0];
   const secondBudget = sortedBudgets[1];
 
+  const filteredBudgets = useMemo(() => {
+    return budgets.filter(budget =>
+      budget.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
+  }, [budgets, searchQuery]);
+
+  const clearSearch = () => {
+    setSearchQuery('');
+    setIsSearching(false);
+  };
+
   const getShare = (amount: number) =>
     totalBudget > 0 ? Math.round((amount / totalBudget) * 100) : 0;
 
   const handleEditPress = (item: BudgetItem) => {
-    setSelectedBudget(item);
-    setModalVisible(true);
+    onUpdateBudget?.(item);
   };
 
   const handleNewPress = () => {
-    setSelectedBudget(null);
-    setModalVisible(true);
-  };
-
-  const handleSaveBudget = (name: string, amount: number) => {
-    if (selectedBudget) {
-      // Pass the update to parent (who will save to AsyncStorage)
-      onUpdateBudget?.({
-        ...selectedBudget,
-        name,
-        total: amount,
-        remaining: amount - selectedBudget.spend,
-        usedPercent: Math.round((selectedBudget.spend / amount) * 100),
-      });
-    } else {
-      // Pass new budget to parent
-      onNewBudget?.(name, amount);
-    }
-    setModalVisible(false);
+    onNewBudget?.();
   };
 
   return (
@@ -207,20 +196,50 @@ const BudgetDashboard = ({
         </View>
         <View style={styles.divider} />
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Budgets</Text>
-          <TouchableOpacity onPress={onSearch}>
-            <Icon name="search" size={18} color="#8E8E93" />
-          </TouchableOpacity>
+          {isSearching ? (
+            <View style={styles.searchContainer}>
+              <Icon name="search" size={16} color="#8E8E93" />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search budgets..."
+                placeholderTextColor="#8E8E93" // Match your icon color
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                autoFocus
+                returnKeyType="search"
+                autoCapitalize="none"
+              />
+              <TouchableOpacity onPress={clearSearch}>
+                <Icon name="x-circle" size={18} color="#8E8E93" />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <>
+              <Text style={styles.sectionTitle}>Budgets</Text>
+              <TouchableOpacity
+                onPress={() => setIsSearching(true)}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} // Easier to tap
+              >
+                <Icon name="search" size={18} color="#8E8E93" />
+              </TouchableOpacity>
+            </>
+          )}
         </View>
         <View style={styles.cardList}>
-          {budgets.map(item => (
-            <BudgetCard
-              key={item.id}
-              item={item}
-              onView={() => onViewBudget?.(item.id)}
-              onEdit={() => handleEditPress(item)}
-            />
-          ))}
+          {filteredBudgets.length > 0 ? (
+            filteredBudgets.map(item => (
+              <BudgetCard
+                key={item.id}
+                item={item}
+                onView={() => onViewBudget?.(item.id)}
+                onEdit={() => handleEditPress(item)}
+              />
+            ))
+          ) : (
+            <Text style={styles.emptySearchText}>
+              No budgets found matching "{searchQuery}"
+            </Text>
+          )}
         </View>
         <View style={{ height: 80 }} />
       </ScrollView>
@@ -230,16 +249,9 @@ const BudgetDashboard = ({
         onPress={handleNewPress}
         activeOpacity={0.85}
       >
-        <Icon name="plus" size={16} color="#fff" style={{ marginRight: 6 }} />
+        <Icon name="plus" size={16} color="#000" style={{ marginRight: 6 }} />
         <Text style={styles.fabText}>New budget</Text>
       </TouchableOpacity>
-
-      <AddBudgetModal
-        isVisible={modalVisible}
-        initialData={selectedBudget}
-        onClose={() => setModalVisible(false)}
-        onSave={handleSaveBudget}
-      />
     </View>
   );
 };
@@ -320,9 +332,32 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    marginBottom: 4,
+    marginBottom: 10,
+    minHeight: 40, // Ensure height doesn't jump when switching to search
   },
   sectionTitle: { fontSize: 20, fontWeight: '700', color: '#1C1C1E' },
+  searchContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F2F2F7',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    height: 40,
+  },
+  searchInput: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: 16,
+    color: '#1C1C1E',
+    paddingVertical: 0, // Fix for Android vertical centering
+  },
+  emptySearchText: {
+    textAlign: 'center',
+    color: '#8E8E93',
+    marginTop: 20,
+    fontSize: 14,
+  },
   cardList: { paddingHorizontal: 16 },
   fab: {
     position: 'absolute',
@@ -330,17 +365,17 @@ const styles = StyleSheet.create({
     right: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#2C247A',
+    backgroundColor: '#fff',
     paddingHorizontal: 20,
     paddingVertical: 14,
     borderRadius: 12,
-    elevation: 6,
-    shadowColor: '#2C247A',
+    elevation: 4,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.35,
     shadowRadius: 8,
   },
-  fabText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  fabText: { color: '#000', fontSize: 15, fontWeight: '600' },
 });
 
 export default BudgetDashboard;

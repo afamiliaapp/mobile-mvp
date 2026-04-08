@@ -66,8 +66,12 @@ const AddExpenseModal = ({
     if (isVisible) {
       if (initialData) {
         setFormData({
+          ...initialState,
           ...initialData,
-          amount: initialData.amount.toString(), // Convert number to string for input
+          // CRITICAL: Ensure the amount is a string for the input field
+          amount: initialData.amount?.toString() || '',
+          // Ensure receipt is carried over from initialData
+          receipt: initialData.receipt || null,
         });
       } else {
         setFormData({
@@ -89,16 +93,29 @@ const AddExpenseModal = ({
     }
     onSave({
       ...formData,
-      id: initialData?.id || Date.now(), // Keep existing ID or create new one
+      // Ensure we are passing a simple string if possible,
+      // or a clean object
+      receipt: formData.receipt ? { uri: formData.receipt.uri } : null,
       amount: parseFloat(formData.amount) || 0,
     });
     onClose();
   };
 
   const pickImage = async () => {
-    const result = await launchImageLibrary({ mediaType: 'photo', quality: 1 });
+    const result = await launchImageLibrary({
+      mediaType: 'photo',
+      quality: 0.7, // Lower quality slightly to keep AsyncStorage size small
+      includeBase64: false,
+    });
+
+    if (result.didCancel) return;
+
     if (result.assets && result.assets.length > 0) {
-      setFormData({ ...formData, receipt: result.assets[0] });
+      const selectedImage = result.assets[0];
+      setFormData(prev => ({
+        ...prev,
+        receipt: selectedImage, // This contains uri, fileName, type, etc.
+      }));
     }
   };
 
