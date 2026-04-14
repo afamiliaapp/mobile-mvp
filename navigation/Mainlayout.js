@@ -26,6 +26,7 @@ import Photos from '../screens/Photos';
 import Expenses from '../screens/Expenses';
 import Chores from '../screens/Chores';
 import ChoreDetails from '../screens/ChoreDetails';
+import MealDetails from '../screens/MealDetails';
 
 const Stack = createNativeStackNavigator();
 
@@ -84,6 +85,7 @@ export default function MainLayout() {
       <Stack.Screen name="Photos" component={withNav(Photos)} />
       <Stack.Screen name="Child control" component={withNav(Child)} />
       <Stack.Screen name="Meal" component={withNav(Meal)} />
+      <Stack.Screen name="MealDetails" component={withNav(MealDetails)} />
       <Stack.Screen name="Logout" component={withNav(Logout)} />
       <Stack.Screen name="SupportChat" component={SupportChat} />
     </Stack.Navigator>
