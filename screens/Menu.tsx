@@ -37,7 +37,7 @@ const ITEMS = [
     id: 'meal-planner',
     label: 'Meal Planner',
     icon: 'coffee',
-    route: 'MealPlanner',
+    route: 'Meal',
   },
 ];
 

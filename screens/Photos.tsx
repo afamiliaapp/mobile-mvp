@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
   // ── Gallery ──
   galleryContainer: {
     flex: 1,
-    paddingTop: 12,
+    paddingTop: 40,
   },
   searchWrapper: {
     flexDirection: 'row',
