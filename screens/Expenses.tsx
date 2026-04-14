@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+'use client';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,8 +8,6 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
-// Make sure to install: npx expo install @react-native-async-storage/async-storage
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import AppContainer from '../components/AppContainer';
 import ExpensesBar from '../components/ExpensesBar';
@@ -17,122 +16,23 @@ import ThemedText from '../components/ThemedText';
 import BudgetDashboard from './Budgetdashboard';
 import BudgetDetails from '../components/BudgetDetails';
 
-const STORAGE_KEY = '@family_budgets_data';
+// Import the hook from your Context file
+import { useBudgets } from '../context/BudgetContext';
 
 const Expenses = () => {
   const [isModalVisible, setModalVisible] = useState(false);
-  const [budgets, setBudgets] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedBudgetId, setSelectedBudgetId] = useState<string | null>(null);
 
-  // --- PERSISTENCE LOGIC ---
-
-  // Load data once when the component starts
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const savedBudgets = await AsyncStorage.getItem(STORAGE_KEY);
-        if (savedBudgets !== null) {
-          setBudgets(JSON.parse(savedBudgets));
-        }
-      } catch (error) {
-        console.error('Error loading budgets:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, []);
-
-  // Save data whenever the budgets array changes
-  useEffect(() => {
-    const saveData = async () => {
-      // Don't save if we are still in the initial loading phase
-      // (prevents overwriting saved data with an empty array)
-      if (!loading) {
-        try {
-          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(budgets));
-        } catch (error) {
-          console.error('Error saving budgets:', error);
-        }
-      }
-    };
-    saveData();
-  }, [budgets, loading]);
-
-  // -------------------------
+  // Pull everything we need from Context
+  const { budgets, loading, addBudget, updateBudget, deleteBudget } =
+    useBudgets();
 
   const toggleModal = () => setModalVisible(!isModalVisible);
 
-  const handleSaveBudget = (name: string, amount: number) => {
-    const newBudget = {
-      id: Date.now().toString(),
-      name: name,
-      total: amount,
-      spend: 0,
-      remaining: amount,
-      usedPercent: 0,
-      expenses: [],
-    };
-    setBudgets(prev => [newBudget, ...prev]); // Add new one to the top
-    setModalVisible(false);
-  };
-
-  const handleUpdateBudget = (updatedBudget: any) => {
-    setBudgets(prev =>
-      prev.map(b =>
-        b.id === updatedBudget.id ? { ...b, ...updatedBudget } : b,
-      ),
-    );
-    setModalVisible(false); // Ensure modal closes after update
-  };
-
-  const handleAddNewExpense = (budgetId: string, expenseData: any) => {
-    setBudgets(prevBudgets =>
-      prevBudgets.map(budget => {
-        if (budget.id === budgetId) {
-          // Handle both New and Edit logic for the expense itself
-          const existingExpenses = budget.expenses || [];
-          const exists = existingExpenses.find(
-            (e: any) => e.id === expenseData.id,
-          );
-
-          let updatedExpenses;
-          if (exists) {
-            updatedExpenses = existingExpenses.map((e: any) =>
-              e.id === expenseData.id ? expenseData : e,
-            );
-          } else {
-            updatedExpenses = [expenseData, ...existingExpenses];
-          }
-
-          const newSpend = updatedExpenses.reduce(
-            (sum: number, exp: any) => sum + exp.amount,
-            0,
-          );
-
-          return {
-            ...budget,
-            expenses: updatedExpenses, // <--- Save the list!
-            spend: newSpend,
-            remaining: budget.total - newSpend,
-            usedPercent: Math.round((newSpend / budget.total) * 100),
-          };
-        }
-        return budget;
-      }),
-    );
-  };
-
-  const handleDeleteBudget = (id: string) => {
-    setBudgets(prev => prev.filter(b => b.id !== id));
-    setSelectedBudgetId(null);
-  };
-
+  // Find the budget object if one is selected
   const currentBudget = budgets.find(b => b.id === selectedBudgetId);
 
-  // Show a loader while reading from storage to prevent "flickering"
-  // between the empty state and your actual data.
+  // 1. Loading State (Prevents UI flicker while reading AsyncStorage)
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
@@ -145,24 +45,26 @@ const Expenses = () => {
     <>
       <AppContainer>
         <View style={styles.container1}>
+          {/* Only show the top ExpensesBar if we are NOT looking at a specific budget */}
           {!selectedBudgetId && (
             <View>
               <ExpensesBar />
             </View>
           )}
 
+          {/* ─── SCENARIO A: Viewing a specific Budget ─── */}
           {selectedBudgetId && currentBudget ? (
             <BudgetDetails
               budget={currentBudget}
               onBack={() => setSelectedBudgetId(null)}
-              onNewBudget={() => setModalVisible(true)}
-              onUpdateBudget={handleUpdateBudget}
-              onDelete={() => handleDeleteBudget(currentBudget.id)}
-              onAddExpense={(amount: number) =>
-                handleAddNewExpense(currentBudget.id, amount)
-              }
+              onUpdateBudget={updateBudget}
+              onDelete={() => {
+                deleteBudget(currentBudget.id);
+                setSelectedBudgetId(null);
+              }}
             />
-          ) : budgets.length === 0 ? (
+          ) : /* ─── SCENARIO B: No Budgets exist (Empty State) ─── */
+          budgets.length === 0 ? (
             <SafeAreaView style={styles.container2}>
               <View style={styles.centered}>
                 <ThemedText variant="title" style={styles.title}>
@@ -181,20 +83,20 @@ const Expenses = () => {
               </View>
             </SafeAreaView>
           ) : (
-            <BudgetDashboard
-              budgets={budgets}
-              onNewBudget={toggleModal}
-              onUpdateBudget={handleUpdateBudget}
-              onViewBudget={id => setSelectedBudgetId(id)}
-            />
+            /* ─── SCENARIO C: List of Budgets (Dashboard) ─── */
+            <BudgetDashboard onViewBudget={id => setSelectedBudgetId(id)} />
           )}
         </View>
       </AppContainer>
 
+      {/* Modal for adding a brand new budget */}
       <AddBudgetModal
         isVisible={isModalVisible}
         onClose={toggleModal}
-        onSave={handleSaveBudget}
+        onSave={(name, amount) => {
+          addBudget(name, amount);
+          setModalVisible(false);
+        }}
       />
     </>
   );
