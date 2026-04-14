@@ -13,6 +13,8 @@ import { ThemeProvider, ThemeContext } from './context/ThemeContext';
 import { EventsProvider } from './context/Eventscontext';
 import { MenuProvider } from './context/Menucontex';
 import { ChoreProvider } from './context/ChoreContext';
+import { MealProvider } from './context/MealContext';
+import { BudgetProvider } from './context/BudgetContext';
 
 const RootStack = createNativeStackNavigator();
 
@@ -64,11 +66,15 @@ const App: React.FC = () => {
   return (
     <ThemeProvider>
       <EventsProvider>
-        <MenuProvider>
-          <ChoreProvider>
-            <AppNavigator />
-          </ChoreProvider>
-        </MenuProvider>
+        <BudgetProvider>
+          <MenuProvider>
+            <MealProvider>
+              <ChoreProvider>
+                <AppNavigator />
+              </ChoreProvider>
+            </MealProvider>
+          </MenuProvider>
+        </BudgetProvider>
       </EventsProvider>
     </ThemeProvider>
   );

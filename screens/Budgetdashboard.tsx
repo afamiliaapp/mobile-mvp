@@ -12,6 +12,7 @@ import {
 import Svg, { Circle } from 'react-native-svg';
 import Icon from 'react-native-vector-icons/Feather';
 import AddBudgetModal from '../components/AddBudgetModal';
+import { useBudgets } from '../context/BudgetContext';
 
 const { width } = Dimensions.get('window');
 
@@ -141,13 +142,17 @@ const BudgetCard = ({ item, onView }: any) => (
 
 // ── Main Dashboard Component ──────────────────────────────────────────────────
 const BudgetDashboard = ({
-  budgets = [],
-  onNewBudget,
-  onUpdateBudget,
   onViewBudget,
-}: Props) => {
+}: {
+  onViewBudget: (id: string) => void;
+}) => {
+  // Pull from the global source
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingItem, setEditingItem] = useState<BudgetItem | null>(null);
+
+  const { budgets, addBudget, updateBudget } = useBudgets();
 
   const totalBudget = budgets.reduce((sum, item) => sum + item.total, 0);
   const sortedBudgets = [...budgets].sort((a, b) => b.total - a.total);
@@ -155,8 +160,8 @@ const BudgetDashboard = ({
   const secondBudget = sortedBudgets[1];
 
   const filteredBudgets = useMemo(() => {
-    return budgets.filter(budget =>
-      budget.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    return budgets.filter(b =>
+      b.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   }, [budgets, searchQuery]);
 
@@ -168,14 +173,14 @@ const BudgetDashboard = ({
   const getShare = (amount: number) =>
     totalBudget > 0 ? Math.round((amount / totalBudget) * 100) : 0;
 
-  const handleEditPress = (item: BudgetItem) => {
-    onUpdateBudget?.(item);
-  };
-
   const handleNewPress = () => {
-    onNewBudget?.();
+    setEditingItem(null);
+    setModalVisible(true);
   };
-
+  const handleEditPress = (item: BudgetItem) => {
+    setEditingItem(item);
+    setModalVisible(true);
+  };
   return (
     <View style={styles.container}>
       <ScrollView
@@ -252,6 +257,44 @@ const BudgetDashboard = ({
         <Icon name="plus" size={16} color="#000" style={{ marginRight: 6 }} />
         <Text style={styles.fabText}>New budget</Text>
       </TouchableOpacity>
+
+      <AddBudgetModal
+        isVisible={modalVisible}
+        initialData={
+          editingItem
+            ? { name: editingItem.name, total: editingItem.total }
+            : null
+        }
+        onClose={() => {
+          setModalVisible(false);
+          setEditingItem(null);
+        }}
+        onSave={(name, amount) => {
+          if (!name) return;
+          if (editingItem) {
+            const remaining = amount - editingItem.spend;
+            const usedPercent =
+              amount > 0 ? Math.round((editingItem.spend / amount) * 100) : 0;
+            updateBudget({
+              ...editingItem,
+              name,
+              total: amount,
+              remaining,
+              usedPercent,
+            });
+          } else {
+            addBudget({
+              name,
+              total: amount,
+              spend: 0,
+              remaining: amount,
+              usedPercent: 0,
+            });
+          }
+          setModalVisible(false);
+          setEditingItem(null);
+        }}
+      />
     </View>
   );
 };

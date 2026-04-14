@@ -10,49 +10,19 @@ import {
 import { useNavigation } from '@react-navigation/native'; // Add this
 import { Calendar } from 'react-native-calendars';
 import Icon from 'react-native-vector-icons/Feather';
-import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import AppContainer from '../components/AppContainer';
 import AddMealPlanModal from '../components/AddMealPlanModal';
 import MealPlannerBar from '../components/MealPlannerBar';
+import { useMeals } from '../context/MealContext';
 
 // 1. Updated Interface to include all details
-interface MealItemType {
-  id: string;
-  title: string;
-  category: string;
-  day: string;
-  selected: boolean;
-  member: string; // Added
-  notes: string; // Added
-}
 
 const Meal = () => {
   const navigation = useNavigation<any>(); // Hook for navigation
   const [selectedDate, setSelectedDate] = useState('2023-07-21');
   const [modalVisible, setModalVisible] = useState(false);
-  const [meals, setMeals] = useState<MealItemType[]>([]);
-
-  const deleteMeal = (id: string) => {
-    setMeals(prevMeals => prevMeals.filter(meal => meal.id !== id));
-  };
-
-  const updateMeal = (updatedData: any) => {
-    setMeals(prevMeals =>
-      prevMeals.map(m =>
-        m.id === updatedData.id
-          ? {
-              ...m,
-              // Map the modal's field names back to your MealItemType keys
-              title: updatedData.mealName,
-              day: updatedData.selectedDay,
-              category: updatedData.mealTime,
-              member: updatedData.member,
-              notes: updatedData.notes,
-            }
-          : m,
-      ),
-    );
-  };
+  const { meals, addMeal, deleteMeal, updateMeal, toggleMeal } = useMeals();
 
   const handleSave = (data: {
     mealName: string;
@@ -61,17 +31,13 @@ const Meal = () => {
     member: string;
     notes: string;
   }) => {
-    const newMeal: MealItemType = {
-      id: Math.random().toString(),
+    addMeal({
       title: data.mealName,
       category: data.mealTime,
       day: data.selectedDay,
-      selected: false,
       member: data.member,
       notes: data.notes,
-    };
-
-    setMeals(prevMeals => [...prevMeals, newMeal]);
+    });
     setModalVisible(false);
   };
 
@@ -119,11 +85,17 @@ const Meal = () => {
                   <View key={item.id} style={styles.mealCard}>
                     <View style={styles.cardHeader}>
                       <Text style={styles.mealTitleText}>{item.title}</Text>
-                      <View style={styles.checkbox}>
+                      <TouchableOpacity
+                        style={[
+                          styles.checkbox,
+                          item.selected && styles.checkboxDone,
+                        ]}
+                        onPress={() => toggleMeal(item.id)}
+                      >
                         {item.selected && (
-                          <MaterialIcon name="check" size={16} color="#FFF" />
+                          <Icon name="check" size={16} color="#FFF" />
                         )}
-                      </View>
+                      </TouchableOpacity>
                     </View>
                     <Text style={styles.mealCategoryText}>{item.category}</Text>
                     <View style={styles.cardFooter}>
@@ -229,6 +201,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
+  checkboxDone: {
+    backgroundColor: '#302B80',
+    borderColor: '#302B80',
+  },
   mealCategoryText: { fontSize: 12, color: '#A1A1A1', marginTop: 4 },
   cardFooter: {
     flexDirection: 'row',
@@ -282,7 +259,7 @@ const styles = StyleSheet.create({
   // FAB Styles
   fab: {
     position: 'absolute',
-    bottom: 50,
+    bottom: 30,
     right: 20,
     flexDirection: 'row',
     alignItems: 'center',
