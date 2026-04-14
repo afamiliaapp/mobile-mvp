@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -24,7 +24,7 @@ const DAYS = [
   'Sunday',
 ];
 const MEAL_TIMES = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
-const MEMBERS = ['Alice', 'Bob', 'Charlie', 'Diana', 'Everyone'];
+const MEMBERS = ['Dad', 'Mom', 'Brother', 'Sister', 'Others'];
 
 type DropdownField = 'day' | 'mealTime' | 'member' | null;
 
@@ -88,19 +88,15 @@ const Dropdown: React.FC<DropdownProps> = ({
 interface AddMealPlanModalProps {
   visible: boolean;
   onClose: () => void;
-  onSave?: (data: {
-    mealName: string;
-    selectedDay: string;
-    mealTime: string;
-    member: string;
-    notes: string;
-  }) => void;
+  initialData?: any; // 2. Added initialData prop
+  onSave?: (data: any) => void;
 }
 
 const AddMealPlanModal: React.FC<AddMealPlanModalProps> = ({
   visible,
   onClose,
   onSave,
+  initialData,
 }) => {
   const [mealName, setMealName] = useState('');
   const [selectedDay, setSelectedDay] = useState('');
@@ -109,13 +105,38 @@ const AddMealPlanModal: React.FC<AddMealPlanModalProps> = ({
   const [notes, setNotes] = useState('');
   const [openDropdown, setOpenDropdown] = useState<DropdownField>(null);
 
+  useEffect(() => {
+    if (visible && initialData) {
+      setMealName(initialData.title || '');
+      setSelectedDay(initialData.day || '');
+      setMealTime(initialData.category || 'Breakfast');
+      setMember(initialData.member || '');
+      setNotes(initialData.notes || '');
+    } else if (visible && !initialData) {
+      // Reset if adding new
+      setMealName('');
+      setSelectedDay('');
+      setMealTime('Breakfast');
+      setMember('');
+      setNotes('');
+    }
+  }, [visible, initialData]);
+
   const toggleDropdown = (field: DropdownField) => {
     setOpenDropdown(prev => (prev === field ? null : field));
   };
 
   const handleSave = () => {
-    onSave?.({ mealName, selectedDay, mealTime, member, notes });
-    handleClose();
+    // Pass the ID back if we are editing so we know which one to update
+    onSave?.({
+      id: initialData?.id,
+      mealName,
+      selectedDay,
+      mealTime,
+      member,
+      notes,
+    });
+    onClose();
   };
 
   const handleClose = () => {
@@ -152,7 +173,9 @@ const AddMealPlanModal: React.FC<AddMealPlanModalProps> = ({
 
           {/* Header */}
           <View style={styles.modalHeader}>
-            <Text style={styles.heading}>Add meal plan</Text>
+            <Text style={styles.heading}>
+              {initialData ? 'Edit meal plan' : 'Add meal plan'}
+            </Text>
             <TouchableOpacity
               onPress={handleClose}
               style={styles.closeBtn}
@@ -258,7 +281,7 @@ export default AddMealPlanModal;
 const styles = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    backgroundColor: 'rgba(27, 26, 26, 0.45)',
   },
   sheetWrapper: {
     flex: 1,

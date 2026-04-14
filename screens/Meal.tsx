@@ -36,6 +36,24 @@ const Meal = () => {
     setMeals(prevMeals => prevMeals.filter(meal => meal.id !== id));
   };
 
+  const updateMeal = (updatedData: any) => {
+    setMeals(prevMeals =>
+      prevMeals.map(m =>
+        m.id === updatedData.id
+          ? {
+              ...m,
+              // Map the modal's field names back to your MealItemType keys
+              title: updatedData.mealName,
+              day: updatedData.selectedDay,
+              category: updatedData.mealTime,
+              member: updatedData.member,
+              notes: updatedData.notes,
+            }
+          : m,
+      ),
+    );
+  };
+
   const handleSave = (data: {
     mealName: string;
     selectedDay: string;
@@ -118,6 +136,7 @@ const Meal = () => {
                           navigation.navigate('MealDetails', {
                             meal: item,
                             onDelete: (id: string) => deleteMeal(id),
+                            onUpdate: (data: any) => updateMeal(data),
                           })
                         }
                       >
