@@ -7,23 +7,28 @@ const BackButton = () => {
   const navigation = useNavigation();
 
   return (
-    <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
-      <Ionicons name="chevron-back" size={18} color="#000" />
+    <TouchableOpacity
+      onPress={() => navigation.goBack()}
+      style={styles.backArrow}
+    >
+      <Ionicons name="arrow-back" size={18} color="#2C247A" />
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  button: {
-    padding: 6,
-    borderRadius: 50,
+  backArrow: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#E2E8F9',
     justifyContent: 'center',
     alignItems: 'center',
-    width: 32,
-    height: 32,
-    borderWidth: 0.5,
-    marginTop: '15%',
+    marginTop: 12,
+    elevation: 2,
+    marginVertical: 5, // subtle shadow on Android
   },
 });
 

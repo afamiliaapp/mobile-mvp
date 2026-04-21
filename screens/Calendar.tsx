@@ -19,6 +19,7 @@ import ThemedText from '../components/ThemedText';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import BackButtonModal from '../components/BackButtonModal';
 import { useEvents } from '../context/Eventscontext';
+import BackButton from '../components/BackButton';
 
 // ─── Swipeable event row ───────────────────────────────────────────────────────
 const SWIPE_OPEN = -80; // px revealed when fully open
@@ -293,6 +294,7 @@ export default function Calendar() {
       <AppContainer>
         <View style={styles.container}>
           <CalendarBar />
+          <BackButton />
 
           <ScrollView
             style={styles.container2}
@@ -864,7 +866,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '25%',
   },
-  monthChangertext: { fontSize: 16, color: '#1B1C1E' },
+  monthChangertext: { fontSize: 16 },
   monthNavBox: {
     flexDirection: 'row',
     justifyContent: 'space-between',

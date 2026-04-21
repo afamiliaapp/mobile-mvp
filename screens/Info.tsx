@@ -10,6 +10,7 @@ export default function Info() {
     <AppContainer>
       <View style={styles.container}>
         <AboutinfoBar />
+        <BackButton />
 
         <ScrollView
           showsVerticalScrollIndicator={false}

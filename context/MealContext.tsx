@@ -72,9 +72,3 @@ export const useMeals = () => {
   if (!ctx) throw new Error('useMeals must be used within MealProvider');
   return ctx;
 };
-
-const toggleMeal = (id: string) => {
-  setMeals(prev =>
-    prev.map(m => (m.id === id ? { ...m, selected: !m.selected } : m)),
-  );
-};

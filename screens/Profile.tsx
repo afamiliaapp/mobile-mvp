@@ -6,12 +6,16 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+
 import ProfileBar from '../components/ProfileBar';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AppContainer from '../components/AppContainer';
 import { Dimensions } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import React, { useContext } from 'react'; // 👈 add useContext
+import { AuthContext } from '../App'; //
 
 const { width } = Dimensions.get('window');
 
@@ -20,6 +24,13 @@ const scale = size => (width / 375) * size;
 export default function Profile() {
   const navigation = useNavigation();
 
+  const { logout, profile } = useContext(AuthContext);
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('userToken');
+    logout();
+  };
+
   return (
     <AppContainer>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -27,13 +38,19 @@ export default function Profile() {
           <ProfileBar />
           <View style={styles.profilebox}>
             <View style={styles.profilebox2}>
-              <Image
-                source={require('../assets/notifyImage.png')}
-                style={styles.profileimage}
-              />
+              {profile.image ? (
+                <Image
+                  source={{ uri: profile.image }}
+                  style={styles.profileimage}
+                />
+              ) : (
+                <View
+                  style={[styles.profileimage, { backgroundColor: '#FFE7CC' }]}
+                />
+              )}
 
               <View>
-                <Text style={styles.nametitle}>Sandra Johnson</Text>
+                <Text style={styles.nametitle}>{profile.name}</Text>
                 <Text style={styles.progresstitle}>Progress Indicator</Text>
                 <View style={styles.progressbar} />
               </View>
@@ -136,7 +153,7 @@ export default function Profile() {
                   <Text style={styles.profilelistIcontext}>Rewards</Text>
                 </View>
                 <View style={styles.profileListbox5}>
-                  <Ionicons name="chevron-forward" size={18} color="#000" />{' '}
+                  <Ionicons name="chevron-forward" size={18} color="#000" />
                 </View>
               </View>
             </TouchableOpacity>
@@ -208,14 +225,13 @@ export default function Profile() {
 
             <View style={styles.profileListbox2a}>
               <TouchableOpacity
-                onPress={() => navigation.navigate('Logout')}
+                onPress={handleLogout}
                 style={styles.profileListbox3}
               >
                 <Image
                   source={require('../assets/logout-square-01.png')}
                   style={styles.profilelistIcon}
                 />
-
                 <Text style={styles.profilelistIcontext2}>Logout</Text>
               </TouchableOpacity>
             </View>
@@ -262,11 +278,11 @@ const styles = StyleSheet.create({
   nametitle: {
     color: '#FFFFFF',
     fontSize: 12,
-    fontWeight: 600,
+    fontWeight: '600',
   },
   progresstitle: {
     fontSize: 10,
-    fontWeight: 400,
+    fontWeight: '400',
     color: '#FFFFFF',
     marginVertical: 5,
   },
@@ -350,7 +366,7 @@ const styles = StyleSheet.create({
   profilelistIcontext: {
     color: '#999999',
     fontSize: 15,
-    fontWeight: 500,
+    fontWeight: '500',
   },
 
   profileListbox2a: {
@@ -364,7 +380,7 @@ const styles = StyleSheet.create({
   profilelistIcontext2: {
     color: '#FF1744',
     fontSize: 15,
-    fontWeight: 500,
+    fontWeight: '500',
   },
 
   profilelistIconbox: {

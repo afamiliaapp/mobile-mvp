@@ -10,26 +10,24 @@ export default function CalendarBar() {
   const { theme } = useContext(ThemeContext); // access current theme
 
   return (
-    <AppContainer>
-      <View style={styles.container}>
-        {/* Title */}
-        <ThemedText variant="title" style={styles.title}>
-          Calendar
-        </ThemedText>
+    <View style={styles.container}>
+      {/* Title */}
+      <ThemedText variant="title" style={styles.title}>
+        Calendar
+      </ThemedText>
 
-        {/* Bell Icon */}
-        <View style={[styles.belliconbox, { borderColor: theme.border }]}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Notificationpage')}
-          >
-            <Image
-              source={require('../assets/notificationbell.png')}
-              style={[styles.bellicon, { tintColor: theme.icon }]} // dynamic icon color
-            />
-          </TouchableOpacity>
-        </View>
+      {/* Bell Icon */}
+      <View style={[styles.belliconbox, { borderColor: theme.border }]}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Notificationpage')}
+        >
+          <Image
+            source={require('../assets/notificationbell.png')}
+            style={[styles.bellicon, { tintColor: theme.icon }]} // dynamic icon color
+          />
+        </TouchableOpacity>
       </View>
-    </AppContainer>
+    </View>
   );
 }
 

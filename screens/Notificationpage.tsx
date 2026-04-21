@@ -70,7 +70,10 @@ export default function Notificationpage() {
         <ThemedText variant="title" style={styles.notifytxt}>
           Notification
         </ThemedText>
-        <BackButton />
+
+        <View>
+          <BackButton />
+        </View>
 
         <ScrollView
           showsVerticalScrollIndicator={false}

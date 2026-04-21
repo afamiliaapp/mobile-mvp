@@ -3,23 +3,34 @@ import React, { useContext } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { ThemeContext } from '../context/ThemeContext';
 import ThemedText from './ThemedText';
+import { AuthContext } from '../App';
 
 export default function NotificationBar() {
   const navigation = useNavigation();
-  const { theme } = useContext(ThemeContext); // ac
+  const { theme } = useContext(ThemeContext);
+  const { profile } = useContext(AuthContext);
+
+  const getFormattedDate = () => {
+    const now = new Date();
+    const days = ['Sun', 'Mon', 'Tues', 'Wed', 'Thurs', 'Fri', 'Sat'];
+    const day = days[now.getDay()];
+    const date = now.getDate();
+    return `${day} ${date}`;
+  };
   return (
     <View style={styles.continer}>
       <View style={styles.notimagebox}>
-        <Image
-          source={require('../assets/notifyImage.png')}
-          style={styles.notimage}
-        />
+        {profile.image ? (
+          <Image source={{ uri: profile.image }} style={styles.notimage} />
+        ) : (
+          <View style={[styles.notimage, { backgroundColor: '#FFE7CC' }]} />
+        )}
       </View>
       <View style={styles.namebox}>
         <ThemedText variant="title" style={styles.name}>
-          Hello Sandra
+          Hello {profile.name}
         </ThemedText>
-        <ThemedText style={styles.date}>Tues 29</ThemedText>
+        <ThemedText style={styles.date}>{getFormattedDate()}</ThemedText>
       </View>
 
       <View style={[styles.belliconbox, { borderColor: theme.border }]}>
