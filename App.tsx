@@ -25,7 +25,7 @@ export const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [profile, setProfile] = useState({
-    name: 'Add Name',
+    name: '...',
     image: null,
   });
 
