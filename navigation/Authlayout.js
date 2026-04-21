@@ -12,12 +12,14 @@ import SuccessScreen2 from '../screens/SuccessScreen2';
 
 const Stack = createNativeStackNavigator();
 
-export default function Authlayout() {
+export default function Authlayout({ onSignIn }) {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Onboarding" component={Onboarding} />
       <Stack.Screen name="OtpVerification" component={OtpVerification} />
-      <Stack.Screen name="Signin" component={Signin} />
+      <Stack.Screen name="Signin">
+        {props => <Signin {...props} onSignIn={onSignIn} />}
+      </Stack.Screen>
       <Stack.Screen name="Signup" component={Signup} />
       <Stack.Screen name="SignupTwo" component={SignupTwo} />
       <Stack.Screen name="SuccessScreen" component={SuccessScreen} />

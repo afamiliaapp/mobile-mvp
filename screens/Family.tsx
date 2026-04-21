@@ -1,17 +1,20 @@
 import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import React from 'react';
 import FamilyManagementBar from '../components/FamilyManagementBar';
-import BackButton from '../components/BackButton';
+
 import MemberList from '../components/MemberList';
 import AppContainer from '../components/AppContainer';
 import ThemedText from '../components/ThemedText';
 import ThemedTextInput from '../components/ThemedTextInput';
+import BackButton from '../components/BackButton';
 
 export default function Family() {
   return (
     <AppContainer>
       <View style={styles.container}>
         <FamilyManagementBar />
+
+        <BackButton />
 
         <ScrollView
           showsVerticalScrollIndicator={false}

@@ -18,6 +18,9 @@ import BackButton from '../components/BackButton';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import PasswordInput from '../components/PasswordInput';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useNavigation } from '@react-navigation/native';
+import { useContext } from 'react';
+import { AuthContext } from '../App';
 
 // Example country list (expand as needed)
 const countries = [
@@ -84,6 +87,19 @@ export default function ProfileEdithPage() {
   const [showPicker, setShowPicker] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const navigation = useNavigation();
+  const { profile, updateProfile } = useContext(AuthContext);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  // 3. Initialize name from existing profile
+  const [name, setName] = useState(profile.name);
+
+  // 4. Add the handleSave function inside the component
+  const handleSave = () => {
+    updateProfile({ name, image: selectedImage });
+    navigation.goBack();
+  };
+
   const onChange = (event, selectedDate) => {
     setShowPicker(false);
 
@@ -101,8 +117,6 @@ export default function ProfileEdithPage() {
       setDate(formatted);
     }
   };
-
-  const [selectedImage, setSelectedImage] = useState(null);
 
   const openPickerOptions = () => {
     Alert.alert(
@@ -161,22 +175,20 @@ export default function ProfileEdithPage() {
               onPress={openPickerOptions}
               activeOpacity={0.8}
             >
-              {' '}
-              {/* Background Image */}{' '}
+              {/* Background Image */}
               {selectedImage && (
                 <Image
                   source={{ uri: selectedImage }}
                   style={styles.backgroundImage}
                 />
-              )}{' '}
-              {/* Camera Icon Overlay */}{' '}
+              )}
+              {/* Camera Icon Overlay */}
               <View style={styles.cameraOverlay}>
-                {' '}
                 <Image
                   source={require('../assets/camera-add-03.png')}
                   style={styles.cameraIcon}
-                />{' '}
-              </View>{' '}
+                />
+              </View>
             </TouchableOpacity>
           </View>
           <View style={styles.profileverify}>
@@ -193,6 +205,8 @@ export default function ProfileEdithPage() {
 
             <TextInput
               placeholder="Enter full name"
+              value={name}
+              onChangeText={setName} // 👈 add this
               style={{
                 height: 46,
                 borderWidth: 1,
@@ -284,7 +298,6 @@ export default function ProfileEdithPage() {
 
           <View style={styles.inputbox1}>
             <Text style={styles.inputtext1}>Language preference</Text>
-
             {/* INPUT BOX */}
             <TouchableOpacity
               style={styles.inputWrapper}
@@ -404,10 +417,9 @@ export default function ProfileEdithPage() {
           </View>
         </View>
 
-        <View style={styles.savebox}>
-          {' '}
-          <Text style={styles.savetext}>Save</Text>{' '}
-        </View>
+        <TouchableOpacity style={styles.savebox} onPress={handleSave}>
+          <Text style={styles.savetext}>Save</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -498,7 +510,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontSize: 12,
     color: '#6C7278',
-    fontWeight: 500,
+    fontWeight: '500',
   },
 
   inputbox2: {
@@ -666,5 +678,5 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginVertical: 35,
   },
-  savetext: { fontSize: 16, color: '#fff', fontWeight: 600 },
+  savetext: { fontSize: 16, color: '#fff', fontWeight: '600' },
 });

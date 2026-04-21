@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState, createContext } from 'react';
 import {
   NavigationContainer,
   DefaultTheme,
@@ -7,8 +7,11 @@ import {
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SplashScreen from 'react-native-splash-screen';
 
-import Authlayout from '../mobile-mvp/navigation/Authlayout';
-import MainLayout from '../mobile-mvp/navigation/Mainlayout';
+// Layouts
+import Authlayout from './navigation/Authlayout';
+import MainLayout from './navigation/Mainlayout';
+
+// Contexts
 import { ThemeProvider, ThemeContext } from './context/ThemeContext';
 import { EventsProvider } from './context/Eventscontext';
 import { MenuProvider } from './context/Menucontex';
@@ -16,8 +19,32 @@ import { ChoreProvider } from './context/ChoreContext';
 import { MealProvider } from './context/MealContext';
 import { BudgetProvider } from './context/BudgetContext';
 
+// 1. Simple Auth Context Setup
+export const AuthContext = createContext();
+
+const AuthProvider = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [profile, setProfile] = useState({
+    name: 'Add Name',
+    image: null,
+  });
+
+  const login = () => setIsAuthenticated(true);
+  const logout = () => setIsAuthenticated(false);
+  const updateProfile = data => setProfile(prev => ({ ...prev, ...data }));
+
+  return (
+    <AuthContext.Provider
+      value={{ isAuthenticated, login, logout, profile, updateProfile }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
 const RootStack = createNativeStackNavigator();
 
+// Themes
 const LightNavTheme = {
   ...DefaultTheme,
   colors: {
@@ -42,6 +69,8 @@ const DarkNavTheme = {
 
 const AppNavigator = () => {
   const { theme, isDark } = useContext(ThemeContext);
+  const { isAuthenticated, login } = useContext(AuthContext);
+
   return (
     <NavigationContainer theme={isDark ? DarkNavTheme : LightNavTheme}>
       <RootStack.Navigator
@@ -49,10 +78,16 @@ const AppNavigator = () => {
           headerShown: false,
           contentStyle: { backgroundColor: theme.background },
         }}
-        initialRouteName="Main"
       >
-        <RootStack.Screen name="Auth" component={Authlayout} />
-        <RootStack.Screen name="Main" component={MainLayout} />
+        {isAuthenticated ? (
+          // If logged in, only MainLayout is accessible
+          <RootStack.Screen name="Main" component={MainLayout} />
+        ) : (
+          // If not logged in, only Authlayout is accessible
+          <RootStack.Screen name="Auth">
+            {props => <Authlayout {...props} onSignIn={login} />}
+          </RootStack.Screen>
+        )}
       </RootStack.Navigator>
     </NavigationContainer>
   );
@@ -60,23 +95,26 @@ const AppNavigator = () => {
 
 const App: React.FC = () => {
   useEffect(() => {
+    // Hide splash screen on mount
     SplashScreen.hide();
   }, []);
 
   return (
-    <ThemeProvider>
-      <EventsProvider>
-        <BudgetProvider>
-          <MenuProvider>
-            <MealProvider>
-              <ChoreProvider>
-                <AppNavigator />
-              </ChoreProvider>
-            </MealProvider>
-          </MenuProvider>
-        </BudgetProvider>
-      </EventsProvider>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <EventsProvider>
+          <BudgetProvider>
+            <MenuProvider>
+              <MealProvider>
+                <ChoreProvider>
+                  <AppNavigator />
+                </ChoreProvider>
+              </MealProvider>
+            </MenuProvider>
+          </BudgetProvider>
+        </EventsProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 };
 

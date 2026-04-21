@@ -96,9 +96,12 @@ const Onboarding: React.FC = () => {
           <View style={styles.container1}>
             <View style={styles.skipbox}>
               <View style={styles.scrollenght} />
-              <View style={styles.skipbutton}>
+              <TouchableOpacity
+                style={styles.skipbutton}
+                onPress={() => navigation.navigate('Signin')}
+              >
                 <Text style={styles.skiptext}>Skip</Text>
-              </View>
+              </TouchableOpacity>
             </View>
             <View style={styles.Imagabox}>
               <Image
@@ -110,7 +113,7 @@ const Onboarding: React.FC = () => {
                 source={item.logo}
                 style={styles.logoType1}
                 resizeMode="contain"
-              />{' '}
+              />
             </View>
             <View style={styles.textbox}>
               <View style={styles.textbox2}>
@@ -125,9 +128,12 @@ const Onboarding: React.FC = () => {
           <View style={styles.container2}>
             <View style={styles.skipbox}>
               <View style={styles.scrollenght} />
-              <View style={styles.skipbutton}>
+              <TouchableOpacity
+                style={styles.skipbutton}
+                onPress={() => navigation.navigate('Signin')}
+              >
                 <Text style={styles.skiptext}>Skip</Text>
-              </View>
+              </TouchableOpacity>
             </View>
             <View style={styles.Imagabox2}>
               <Image
@@ -181,9 +187,12 @@ const Onboarding: React.FC = () => {
           <View style={styles.container2}>
             <View style={styles.skipbox}>
               <View style={styles.scrollenght} />
-              <View style={styles.skipbutton}>
+              <TouchableOpacity
+                style={styles.skipbutton}
+                onPress={() => navigation.navigate('Signin')}
+              >
                 <Text style={styles.skiptext}>Skip</Text>
-              </View>
+              </TouchableOpacity>
             </View>
 
             {/**IMAGE BOX */}
@@ -279,9 +288,7 @@ const Onboarding: React.FC = () => {
               { backgroundColor: '#2C247A' }, // keep purple background
             ]}
           >
-            <Text style={{ color: '#fff', fontWeight: 'bold' }}>
-              <Ionicons name="chevron-forward" size={18} color="#fff" />
-            </Text>
+            <Ionicons name="chevron-forward" size={18} color="#fff" />
           </TouchableOpacity>
         ) : (
           <TouchableOpacity

@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 
-export default function Signin() {
+export default function Signin({ onSignIn }) {
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
   return (
@@ -75,9 +75,9 @@ export default function Signin() {
             </View>
 
             <View style={styles.SignInButtonbox}>
-              <View style={styles.SignInButton}>
+              <TouchableOpacity style={styles.SignInButton} onPress={onSignIn}>
                 <Text style={styles.SignInButtonText}>Sign In</Text>
-              </View>
+              </TouchableOpacity>
 
               <View style={styles.border}>
                 <View style={styles.borderline}></View>

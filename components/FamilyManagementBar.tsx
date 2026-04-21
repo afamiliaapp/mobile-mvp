@@ -10,7 +10,7 @@ export default function FamilyManagementBar() {
   const { theme } = useContext(ThemeContext); // access current theme
 
   return (
-    <AppContainer>
+    <>
       <View style={styles.container}>
         {/* Title */}
         <ThemedText variant="title" style={styles.title}>
@@ -29,7 +29,7 @@ export default function FamilyManagementBar() {
           </TouchableOpacity>
         </View>
       </View>
-    </AppContainer>
+    </>
   );
 }
 

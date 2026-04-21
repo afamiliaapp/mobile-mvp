@@ -9,6 +9,7 @@ import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BackButton from '../components/BackButton';
 import { useNavigation } from '@react-navigation/native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function ForgotPassword() {
   const navigation = useNavigation();
@@ -18,11 +19,17 @@ export default function ForgotPassword() {
         <View style={styles.titlebox}>
           <Text style={styles.title}>Forgot password</Text>
           <Text style={styles.subtitle}>Forgot your password</Text>
-          <BackButton />
+
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backArrow}
+          >
+            <Ionicons name="arrow-back" size={18} color="#2C247A" />
+          </TouchableOpacity>
+
           <View style={styles.slideline}></View>
         </View>
         <View style={styles.inputbox1}>
-          {' '}
           <Text style={styles.inputtext1}>Email</Text>{' '}
           <TextInput
             placeholder="Enter email"
@@ -33,7 +40,7 @@ export default function ForgotPassword() {
               borderRadius: 10,
               paddingHorizontal: 14,
             }}
-          />{' '}
+          />
         </View>
 
         <View style={styles.backbtn}>
@@ -57,6 +64,19 @@ export default function ForgotPassword() {
 }
 
 const styles = StyleSheet.create({
+  backArrow: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#E2E8F9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 12,
+    elevation: 2,
+    marginVertical: 5, // subtle shadow on Android
+  },
   container: {
     height: '100%',
     paddingHorizontal: 24,
@@ -71,7 +91,7 @@ const styles = StyleSheet.create({
   title: {
     color: '#1B1C1E',
     fontSize: 32,
-    fontWeight: 700,
+    fontWeight: '700',
   },
   subtitle: {
     color: '#999999',
@@ -104,7 +124,7 @@ const styles = StyleSheet.create({
   backbtntext: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: 600,
+    fontWeight: '600',
   },
   backbtnTouchable: {
     paddingVertical: 12,
@@ -131,6 +151,6 @@ const styles = StyleSheet.create({
   signintxt2: {
     fontSize: 12,
     color: '#2C247A',
-    fontWeight: 600,
+    fontWeight: '600',
   },
 });
