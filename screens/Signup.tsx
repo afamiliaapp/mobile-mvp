@@ -15,6 +15,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import PasswordInput from '../components/PasswordInput';
 import { useNavigation } from '@react-navigation/native';
+import BackButton from '../components/BackButton';
 
 // Example country list (expand as needed)
 const countries = [
@@ -108,6 +109,7 @@ const Signup = () => {
           <View style={styles.titlebox}>
             <Text style={styles.title}>Create an account</Text>
             <Text style={styles.subtitle}>Create your family space</Text>
+            <BackButton />
             <View style={styles.slideline}></View>
           </View>
 
@@ -373,7 +375,7 @@ export default Signup;
 const styles = StyleSheet.create({
   container: {
     height: 1056,
-    paddingTop: 30,
+    paddingTop: 20,
     paddingHorizontal: 24,
     width: '100%',
     backgroundColor: '#fff',
@@ -381,6 +383,7 @@ const styles = StyleSheet.create({
 
   titlebox: {
     height: 90,
+    marginBottom: 30,
   },
 
   title: {
