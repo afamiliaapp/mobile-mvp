@@ -1,0 +1,337 @@
+import {
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  View,
+  TouchableOpacity,
+} from 'react-native';
+import React, { useState, useContext } from 'react';
+import SettingsBar from '../components/SettingsBar';
+import BackButton from '../components/BackButton';
+import EnableQuietHours from '../components/EnableQuietHours';
+import Themesettings from '../components/Themesettings';
+import AppContainer from '../components/AppContainer';
+import { ThemeContext } from '../context/ThemeContext';
+import ThemedText from '../components/ThemedText';
+import DeleteAccount from '../components/DeleteAccount';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+export default function Settings() {
+  const [switches, setSwitches] = useState({
+    financeAccess: false,
+    guestPhotos: false,
+    guestMemories: false,
+    childrenChores: false,
+    parentApproval: false,
+    showBirthdays: false,
+    showRelationships: false,
+    pushNotification: false,
+    emailNotification: false,
+  });
+  const { theme } = useContext(ThemeContext);
+
+  return (
+    <AppContainer>
+      <View style={styles.container}>
+        <SettingsBar />
+        <BackButton />
+
+        <ScrollView
+          style={styles.settingsbox}
+          showsVerticalScrollIndicator={false}
+        >
+          <ThemedText variant="title" style={styles.titletxt}>
+            Privacy & Permissions
+          </ThemedText>
+
+          {/**Finance Access */}
+
+          <View style={styles.settingsbox2}>
+            <ThemedText variant="title" style={styles.titletxt2}>
+              Finance Access
+            </ThemedText>
+            <View style={styles.settingsbox3}>
+              <ThemedText style={styles.subtitletxt}>
+                Allow children to view family expenses & budgets
+              </ThemedText>
+
+              <Switch
+                value={switches.financeAccess}
+                onValueChange={value =>
+                  setSwitches(prev => ({ ...prev, financeAccess: value }))
+                }
+              />
+            </View>
+          </View>
+
+          {/**Photos & Memories Access */}
+
+          <View style={styles.settingsbox2}>
+            <ThemedText variant="title" style={styles.titletxt2}>
+              Photos & Memories Access
+            </ThemedText>
+            <View style={styles.settingsbox3}>
+              <ThemedText style={styles.subtitletxt}>
+                Allow guests to view photos
+              </ThemedText>
+
+              <Switch
+                value={switches.guestPhotos}
+                onValueChange={value =>
+                  setSwitches(prev => ({ ...prev, guestPhotos: value }))
+                }
+              />
+            </View>
+
+            <View style={styles.settingsbox3}>
+              <ThemedText style={styles.subtitletxt}>
+                Allow relatives to upload photos
+              </ThemedText>
+
+              <Switch
+                value={switches.guestMemories}
+                onValueChange={value =>
+                  setSwitches(prev => ({ ...prev, guestMemories: value }))
+                }
+              />
+            </View>
+          </View>
+
+          {/**Chores Access */}
+
+          <View style={styles.settingsbox2}>
+            <ThemedText variant="title" style={styles.titletxt2}>
+              Chores Access
+            </ThemedText>
+            <View style={styles.settingsbox3}>
+              <ThemedText style={styles.subtitletxt}>
+                Children can mark chores as completed
+              </ThemedText>
+
+              <Switch
+                value={switches.childrenChores}
+                onValueChange={value =>
+                  setSwitches(prev => ({ ...prev, childrenChores: value }))
+                }
+              />
+            </View>
+
+            <View style={styles.settingsbox3}>
+              <ThemedText style={styles.subtitletxt}>
+                Parents must approve before awarding points
+              </ThemedText>
+
+              <Switch
+                value={switches.parentApproval}
+                onValueChange={value =>
+                  setSwitches(prev => ({ ...prev, parentApproval: value }))
+                }
+              />
+            </View>
+          </View>
+
+          {/**Data Visibility */}
+
+          <View style={styles.settingsbox2}>
+            <ThemedText variant="title" style={styles.titletxt2}>
+              Data Visibility
+            </ThemedText>
+            <View style={styles.settingsbox3}>
+              <ThemedText style={styles.subtitletxt}>
+                Show birthdays to all members
+              </ThemedText>
+
+              <Switch
+                value={switches.showBirthdays}
+                onValueChange={value =>
+                  setSwitches(prev => ({ ...prev, showBirthdays: value }))
+                }
+              />
+            </View>
+
+            <View style={styles.settingsbox3}>
+              <ThemedText style={styles.subtitletxt}>
+                Show relationships in Family Tree
+              </ThemedText>
+
+              <Switch
+                value={switches.showRelationships}
+                onValueChange={value =>
+                  setSwitches(prev => ({ ...prev, showRelationships: value }))
+                }
+              />
+            </View>
+          </View>
+
+          {/**Notifications */}
+
+          <View style={styles.settingsbox2}>
+            <ThemedText variant="title" style={styles.titletxt2}>
+              Notifications
+            </ThemedText>
+            <View style={styles.settingsbox3}>
+              <ThemedText style={styles.subtitletxt}>
+                Push notifications
+              </ThemedText>
+
+              <Switch
+                value={switches.pushNotification}
+                onValueChange={value =>
+                  setSwitches(prev => ({ ...prev, pushNotification: value }))
+                }
+              />
+            </View>
+
+            <View style={styles.settingsbox3}>
+              <ThemedText style={styles.subtitletxt}>Email</ThemedText>
+
+              <Switch
+                value={switches.emailNotification}
+                onValueChange={value =>
+                  setSwitches(prev => ({ ...prev, emailNotification: value }))
+                }
+              />
+            </View>
+
+            <EnableQuietHours />
+          </View>
+
+          {/**Security */}
+
+          <View style={styles.settingsbox2}>
+            <ThemedText variant="title" style={styles.titletxt2}>
+              Security
+            </ThemedText>
+            <View style={styles.settingsbox3}>
+              <ThemedText style={styles.subtitletxt}>
+                Biometric Login
+              </ThemedText>
+
+              <Switch
+                value={switches.pushNotification}
+                onValueChange={value =>
+                  setSwitches(prev => ({ ...prev, pushNotification: value }))
+                }
+              />
+            </View>
+          </View>
+
+          {/**Data Visibility */}
+
+          <Themesettings />
+
+          <DeleteAccount />
+
+          <View style={styles.savebox}>
+            <ThemedText style={styles.savetext}>Save</ThemedText>
+          </View>
+        </ScrollView>
+      </View>
+    </AppContainer>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+
+    height: '100%',
+  },
+
+  settingsbox: {
+    paddingTop: 20,
+    paddingBottom: 40,
+  },
+  titletxt: {
+    fontSize: 16,
+    fontWeight: 500,
+  },
+
+  settingsbox2: {
+    borderBottomWidth: 1,
+    paddingVertical: 10,
+    borderColor: '#E2E8F9',
+  },
+
+  titletxt2: {
+    fontSize: 14,
+    fontWeight: 500,
+    marginVertical: 10,
+  },
+
+  settingsbox3: {
+    flex: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  subtitletxt: {
+    fontSize: 12,
+    fontWeight: 500,
+
+    marginVertical: 15,
+  },
+
+  themetxt: {
+    color: '#6C7278',
+    fontSize: 12,
+    marginTop: 20,
+  },
+
+  themebox: {
+    flex: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    height: 50,
+
+    marginTop: 5,
+  },
+
+  themeitem: {
+    flex: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 8,
+    width: 80,
+    alignItems: 'center',
+    borderColor: '#E2E8F9',
+  },
+
+  themeimg: {
+    height: 18,
+    width: 18,
+  },
+
+  themeitem2: {
+    flex: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 8,
+    width: 150,
+    alignItems: 'center',
+    borderColor: '#E2E8F9',
+  },
+
+  savebox: {
+    backgroundColor: '#2C247A',
+    flex: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    paddingVertical: 20,
+    marginBottom: 40,
+  },
+
+  savetext: {
+    fontSize: 16,
+    fontWeight: 600,
+    color: '#ffffff',
+  },
+});

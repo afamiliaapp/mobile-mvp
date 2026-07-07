@@ -1,0 +1,120 @@
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import NotificationBar from '../components/NotificationBar';
+import TodaysSchedule from '../components/TodaysSchedule';
+import AppContainer from '../components/AppContainer';
+import ThemedText from '../components/ThemedText';
+import { useMeals } from '../context/MealContext';
+import { useChores } from '../context/ChoreContext';
+import { useBudgets } from '../context/BudgetContext';
+
+export default function Dashboard() {
+  const { meals } = useMeals();
+  const doneMeals = meals.filter(m => m.selected).length;
+  const totalMeals = meals.length;
+  const { chores } = useChores();
+  const doneChores = chores.filter(c => c.status === 'closed').length;
+  const totalChores = chores.length;
+  const { budgets } = useBudgets();
+  const totalBudgets = budgets.length;
+
+  return (
+    <AppContainer>
+      <View style={styles.container}>
+        <NotificationBar />
+
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles.statbox}>
+            <Text variant="title" style={styles.statlabel}>
+              Statistics
+            </Text>
+            {/**FIRST ROW */}
+            <View style={styles.activitybox}>
+              <View style={styles.activitybox2}>
+                <Text style={styles.activitytext1}>Members</Text>
+                <Text style={styles.activitytext2}>4</Text>
+                <ThemedText style={styles.activitytext3}>View</ThemedText>
+              </View>
+              <View style={styles.activitybox2}>
+                <Text style={styles.activitytext1}>Today’s chores</Text>
+                <Text style={styles.activitytext2}>
+                  {doneChores}/{totalChores}
+                </Text>
+                <Text style={styles.activitytext3}>View</Text>
+              </View>
+            </View>
+
+            {/**SECOND ROW */}
+            <View style={styles.activitybox}>
+              <View style={styles.activitybox2}>
+                <Text style={styles.activitytext1}>Budget</Text>
+                <Text style={styles.activitytext2}>{totalBudgets}</Text>
+                <Text style={styles.activitytext3}>View</Text>
+              </View>
+              <View style={styles.activitybox2}>
+                <Text style={styles.activitytext1}>Today’s meals</Text>
+                <Text style={styles.activitytext2}>
+                  {doneMeals}/{totalMeals}
+                </Text>
+                <Text style={styles.activitytext3}>View</Text>
+              </View>
+            </View>
+          </View>
+
+          <TodaysSchedule />
+        </ScrollView>
+      </View>
+    </AppContainer>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 0,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
+    height: '100%',
+  },
+  statbox: {
+    marginTop: 30,
+    backgroundColor: '#EAE9F2',
+    height: 254,
+    borderRadius: 15,
+    paddingVertical: 14,
+    paddingHorizontal: 10,
+  },
+  statlabel: {
+    fontSize: 18,
+    fontWeight: 600,
+  },
+
+  activitybox: {
+    flex: 0,
+    flexDirection: 'row',
+    marginTop: 6,
+    justifyContent: 'space-between',
+  },
+
+  activitybox2: {
+    width: '45%',
+
+    backgroundColor: '#fff',
+    borderRadius: 7,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  activitytext1: {
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  activitytext2: {
+    fontSize: 20,
+    marginBottom: 4,
+    fontWeight: 600,
+  },
+  activitytext3: {
+    fontSize: 10,
+    marginBottom: 4,
+  },
+});

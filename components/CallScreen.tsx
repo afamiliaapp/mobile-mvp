@@ -1,0 +1,190 @@
+'use client';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Modal,
+} from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Sound from 'react-native-sound';
+
+Sound.setCategory('Playback');
+
+const CallScreen = ({ visible, member, onEndCall }) => {
+  const [callStatus, setCallStatus] = useState('Calling..');
+  const [seconds, setSeconds] = useState(0);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isVideoOff, setIsVideoOff] = useState(false);
+
+  const ringtone = useRef(null);
+
+  useEffect(() => {
+    let timer;
+    let connectionTimeout;
+
+    if (visible) {
+      ringtone.current = new Sound('ringing.mp3', Sound.MAIN_BUNDLE, error => {
+        if (error) return;
+        ringtone.current.setNumberOfLoops(-1);
+        ringtone.current.play();
+      });
+
+      connectionTimeout = setTimeout(() => {
+        stopRinging();
+        setCallStatus('Connected');
+        setIsConnected(true);
+      }, 4000);
+
+      if (isConnected) {
+        timer = setInterval(() => {
+          setSeconds(prev => prev + 1);
+        }, 1000);
+      }
+
+      return () => {
+        stopRinging();
+        clearTimeout(connectionTimeout);
+        clearInterval(timer);
+      };
+    } else {
+      stopRinging();
+      setSeconds(0);
+      setCallStatus('Calling..');
+      setIsConnected(false);
+    }
+  }, [visible, isConnected]);
+
+  const stopRinging = () => {
+    if (ringtone.current) {
+      ringtone.current.stop(() => {
+        ringtone.current.release();
+        ringtone.current = null;
+      });
+    }
+  };
+
+  const formatTimer = totalSeconds => {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${mins < 10 ? '0' + mins : mins}:${secs < 10 ? '0' + secs : secs}`;
+  };
+
+  return (
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="fullScreen"
+    >
+      <View style={styles.container}>
+        <View style={styles.topBar}>
+          <TouchableOpacity style={styles.backBtn} onPress={onEndCall}>
+            <Ionicons name="chevron-back" size={20} color="#000" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.profileContainer}>
+          <Image
+            source={require('../assets/avata.png')}
+            style={styles.avatar}
+          />
+          <Text style={styles.name}>{member?.name || 'Member'}</Text>
+          <Text style={[styles.status, isConnected && { color: '#4CAF50' }]}>
+            {callStatus}
+          </Text>
+          {isConnected && (
+            <Text style={styles.timer}>{formatTimer(seconds)}</Text>
+          )}
+        </View>
+
+        <View style={styles.actions}>
+          {/* 1. END CALL (LEFT) */}
+          <TouchableOpacity
+            style={[styles.actionBtn, styles.endCall]}
+            onPress={onEndCall}
+          >
+            <Ionicons
+              name="call"
+              size={22}
+              color="#fff"
+              style={{ transform: [{ rotate: '135deg' }] }}
+            />
+          </TouchableOpacity>
+
+          {/* 2. VIDEO & 3. MUTE (Beside it) */}
+          {isConnected && (
+            <>
+              <TouchableOpacity
+                style={styles.actionBtn}
+                onPress={() => setIsVideoOff(!isVideoOff)}
+              >
+                <Ionicons
+                  name={isVideoOff ? 'videocam-off' : 'videocam'}
+                  size={24}
+                  color={isVideoOff ? '#E53935' : '#2C247A'}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.actionBtn}
+                onPress={() => setIsMuted(!isMuted)}
+              >
+                <Ionicons
+                  name={isMuted ? 'mic-off' : 'mic'}
+                  size={24}
+                  color={isMuted ? '#E53935' : '#2C247A'}
+                />
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+export default CallScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    justifyContent: 'space-between',
+    paddingVertical: 60,
+  },
+  topBar: { paddingHorizontal: 20 },
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileContainer: { alignItems: 'center' },
+  avatar: { width: 160, height: 160, borderRadius: 80 },
+  name: { fontSize: 24, fontWeight: '700', marginTop: 20, color: '#2C247A' },
+  status: { color: '#999', marginTop: 8, fontSize: 18 },
+  timer: { color: '#666', marginTop: 4, fontSize: 16, fontWeight: '500' },
+  actions: {
+    flexDirection: 'row', // Ensures left-to-right order
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 30,
+  },
+  actionBtn: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 10, // Spacing between buttons
+  },
+  endCall: {
+    backgroundColor: '#E53935',
+  },
+});
